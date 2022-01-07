@@ -1,0 +1,202 @@
+
+                                 Apache-Lizenz
+                           Version 2.0, Januar 2004
+                        http://www.apache.org/licenses/
+
+   ALLGEMEINE GESCHÄFTSBEDINGUNGEN FÜR NUTZUNG, REPRODUKTION UND VERTRIEB
+
+   1. Definitionen.
+
+      "Lizenz" bezeichnet die Bedingungen für die Nutzung, Vervielfältigung,
+      und Verbreitung gemäß den Abschnitten 1 bis 9 dieses Dokuments.
+
+      "Lizenzgeber" bezeichnet den Urheberrechtsinhaber oder die von . autorisierte Einrichtung
+      der Urheberrechtsinhaber, der die Lizenz gewährt.
+
+      „Rechtsträger“ bezeichnet die Vereinigung des handelnden Rechtsträgers und aller
+      andere Unternehmen, die die Kontrolle haben, von denen kontrolliert werden oder unter gemeinsamen
+      Kontrolle mit dieser Instanz. Für die Zwecke dieser Definition gilt:
+      "Kontrolle" bedeutet (i) die direkte oder indirekte Macht, die
+      Leitung oder Leitung eines solchen Unternehmens, sei es durch Vertrag oder
+      anderweitig oder (ii) Eigentum von fünfzig Prozent (50 %) oder mehr der
+      ausstehenden Aktien oder (iii) wirtschaftliches Eigentum an einem solchen Unternehmen.
+
+      „Sie“ (oder „Ihr“) bezeichnet eine natürliche oder juristische Person
+      Ausübung der durch diese Lizenz gewährten Berechtigungen.
+
+      "Quelle"-Formular ist das bevorzugte Formular für die Vornahme von Änderungen,
+      einschließlich, aber nicht beschränkt auf Softwarequellcode, Dokumentation
+      Quell- und Konfigurationsdateien.
+
+      "Objekt"-Form bezeichnet jede Form, die sich aus mechanischen
+      Transformation oder Übersetzung eines Quellformulars, einschließlich aber
+      nicht beschränkt auf kompilierten Objektcode, generierte Dokumentation,
+      und Konvertierungen in andere Medientypen.
+
+      "Werk" bezeichnet das Werk der Urheberschaft, sei es in Source oder
+      Objektform, zur Verfügung gestellt unter der Lizenz, wie durch a . angegeben
+      Urheberrechtshinweis, der in das Werk aufgenommen oder diesem beigefügt ist
+      (ein Beispiel finden Sie im Anhang unten).
+
+      "Abgeleitete Werke" bezeichnet jedes Werk, sei es in Quelle oder Objekt
+      Form, die auf dem Werk basiert (oder davon abgeleitet ist) und für das die
+      redaktionelle Überarbeitungen, Anmerkungen, Ausarbeitungen oder andere Modifikationen
+      stellen in ihrer Gesamtheit ein Originalwerk der Urheberschaft dar. Für diese Zwecke
+      dieser Lizenz enthalten abgeleitete Werke keine Werke, die verbleiben
+      trennbar oder lediglich mit den Schnittstellen von,
+      das Werk und davon abgeleitete Werke.
+
+      "Beitrag" bezeichnet jedes Werk der Urheberschaft, einschließlich
+      die Originalversion des Werks und alle Änderungen oder Ergänzungen
+      zu diesem Werk oder davon abgeleiteten Werken, d. h. absichtlich
+      dem Lizenzgeber zur Aufnahme in das Werk vom Urheberrechtsinhaber vorgelegt
+      oder von einer natürlichen oder juristischen Person, die befugt ist, im Namen von
+      der Urheberrechtsinhaber. Im Sinne dieser Definition bedeutet "eingereicht"
+      bezeichnet jede Form der gesendeten elektronischen, mündlichen oder schriftlichen Kommunikation
+      an den Lizenzgeber oder seine Vertreter, einschließlich, aber nicht beschränkt auf
+      Kommunikation über elektronische Mailinglisten, Quellcodekontrollsysteme,
+      und Issue-Tracking-Systeme, die von oder im Auftrag der . verwaltet werden
+      Lizenzgeber zum Zweck der Diskussion und Verbesserung der Arbeit, aber
+      ausgenommen Kommunikation, die auffällig oder anderweitig gekennzeichnet ist
+      vom Urheberrechtsinhaber schriftlich als "Kein Beitrag" bezeichnet.
+
+      „Beitragender“ bezeichnet den Lizenzgeber und jede natürliche oder juristische Person
+      in deren Namen der Lizenzgeber einen Beitrag erhalten hat und
+      nachträglich in das Werk eingearbeitet.
+
+   2. Gewährung einer Urheberrechtslizenz. Es gelten die Allgemeinen Geschäftsbedingungen von
+      dieser Lizenz gewährt Ihnen jeder Mitwirkende hiermit eine unbefristete,
+      weltweit, nicht exklusiv, kostenlos, gebührenfrei, unwiderruflich
+      Urheberrechtslizenz zur Vervielfältigung, Vorbereitung abgeleiteter Werke von,
+      öffentlich anzeigen, öffentlich aufführen, unterlizenzieren und verteilen
+      Werke und solche abgeleiteten Werke in Quell- oder Objektform.
+
+   3. Erteilung einer Patentlizenz. Es gelten die Allgemeinen Geschäftsbedingungen von
+      dieser Lizenz gewährt Ihnen jeder Mitwirkende hiermit eine unbefristete,
+      weltweit, nicht exklusiv, kostenlos, gebührenfrei, unwiderruflich
+      (außer wie in diesem Abschnitt angegeben) Patentlizenz zum Herstellen, Anfertigen,
+      das Werk zu verwenden, zum Verkauf anzubieten, zu verkaufen, zu importieren und anderweitig zu übertragen,
+      wenn diese Lizenz nur für die lizenzierbaren Patentansprüche gilt
+      von einem solchen Mitwirkenden, die notwendigerweise durch ihre
+      Beitrag(en) allein oder in Kombination von Beitrag(en)
+      mit dem Werk, zu dem diese Beiträge eingereicht wurden. Wenn du
+      Einleiten eines Patentstreits gegen jede juristische Person (einschließlich a
+      Gegenklage oder Widerklage in einem Gerichtsverfahren), mit der behauptet wird, dass das Werk
+      oder ein in das Werk integrierter Beitrag stellt eine direkte
+      oder mittelbare Patentverletzung, dann etwaige Patentlizenzen
+      die Ihnen im Rahmen dieser Lizenz für dieses Werk gewährt wurde, endet
+      ab dem Tag, an dem ein solcher Rechtsstreit eingereicht wird.
+
+   4. Umverteilung. Sie dürfen Kopien der
+      Werke oder abgeleitete Werke davon in jedem Medium, mit oder ohne
+      Änderungen und in Quell- oder Objektform, vorausgesetzt, Sie
+      folgende Bedingungen erfüllen:
+
+      (a) Sie müssen allen anderen Empfängern des Werks oder
+          Abgeleitete Werke eine Kopie dieser Lizenz; und
+
+      (b) Sie müssen dafür sorgen, dass alle geänderten Dateien auffällige Hinweise tragen
+          mit der Angabe, dass Sie die Dateien geändert haben; und
+
+      (c) Sie müssen alle abgeleiteten Werke in der Quellform aufbewahren
+          die Sie verteilen, alle Urheberrechte, Patente, Marken und
+          Namensnennung aus der Quellform des Werkes,
+          mit Ausnahme der Mitteilungen, die sich nicht auf einen Teil von . beziehen
+          die abgeleiteten Werke; und
+
+      (d) Wenn das Werk eine "HINWEIS"-Textdatei als Teil seiner
+          Vertrieb, dann müssen alle abgeleiteten Werke, die Sie verteilen,
+          eine lesbare Kopie der enthaltenen Namensnennungshinweise beifügen
+          innerhalb einer solchen NOTICE-Datei, mit Ausnahme der Mitteilungen, die dies nicht tun
+          sich auf einen Teil der abgeleiteten Werke beziehen, in mindestens einem
+          an folgenden Orten: innerhalb einer NOTICE-Textdatei verteilt
+          als Teil der abgeleiteten Werke; im Quellformular oder
+          Dokumentation, wenn sie zusammen mit den abgeleiteten Werken bereitgestellt wird; oder,
+          innerhalb einer von den abgeleiteten Werken erzeugten Anzeige, wenn und
+          überall dort, wo solche Hinweise Dritter normalerweise erscheinen. Die Inhalte
+          der NOTICE-Datei dienen nur zu Informationszwecken und
+          Ändern Sie die Lizenz nicht. Sie können Ihre eigene Namensnennung hinzufügen
+          Hinweise in abgeleiteten Werken, die Sie zusammen mit
+          oder als Ergänzung zum HINWEIS-Text aus dem Werk, vorausgesetzt
+          dass solche zusätzlichen Zuweisungsvermerke nicht ausgelegt werden können
+          als Änderung der Lizenz.
+
+      Sie können Ihren Modifikationen Ihre eigene Copyright-Erklärung hinzufügen und
+      kann zusätzliche oder abweichende Lizenzbedingungen vorsehen
+      zur Verwendung, Reproduktion oder Verbreitung Ihrer Modifikationen, oder
+      für solche abgeleiteten Werke als Ganzes, sofern Ihre Nutzung,
+      Vervielfältigung und Verbreitung des Werkes entspricht ansonsten
+      die in dieser Lizenz genannten Bedingungen.
+
+   5. Einreichung von Beiträgen. Sofern Sie nicht ausdrücklich etwas anderes angeben,
+      jeder Beitrag, der absichtlich zur Aufnahme in das Werk eingereicht wurde
+      von Ihnen an den Lizenzgeber erfolgen unter den Bedingungen von
+      dieser Lizenz, ohne zusätzliche Bedingungen.
+      Ungeachtet des Vorstehenden ersetzt oder ändert nichts hierin
+      die Bedingungen einer separaten Lizenzvereinbarung, die Sie möglicherweise unterzeichnet haben
+      mit dem Lizenzgeber bezüglich solcher Beiträge.
+
+   6. Marken. Diese Lizenz gewährt keine Erlaubnis zur Nutzung des Handels
+      Namen, Marken, Dienstleistungsmarken oder Produktnamen des Lizenzgebers,
+      es sei denn, dies ist für den angemessenen und üblichen Gebrauch bei der Beschreibung der
+      Ursprung des Werkes und Reproduktion des Inhalts der NOTICE-Datei.
+
+   7. Gewährleistungsausschluss. Sofern nicht gesetzlich vorgeschrieben oder
+      schriftlich vereinbart, stellt der Lizenzgeber das Werk (und jede
+      Mitwirkender stellt seine Beiträge) "WIE BESEHEN" bereit,
+      OHNE GEWÄHRLEISTUNGEN ODER BEDINGUNGEN JEGLICHER ART, weder ausdrücklich noch
+      stillschweigend, einschließlich, aber nicht beschränkt auf alle Garantien oder Bedingungen
+      von TITEL, NICHTVERLETZUNG, MARKTGÄNGIGKEIT oder EIGNUNG FÜR A
+      BESONDERER ZWECK. Sie sind allein verantwortlich für die Bestimmung der
+      Angemessenheit der Nutzung oder Weiterverteilung des Werks und gehen von jeglichen
+      Risiken, die mit Ihrer Ausübung von Berechtigungen im Rahmen dieser Lizenz verbunden sind.
+
+   8. Haftungsbeschränkung. In keinem Fall und ohne Rechtstheorie
+      ob aus unerlaubter Handlung (einschließlich Fahrlässigkeit), Vertrag oder auf andere Weise,
+      es sei denn, dies ist nach geltendem Recht erforderlich (z. B. vorsätzlich und grob)
+      fahrlässiges Handeln) oder schriftlich vereinbart wurde, ist jeder Mitwirkende
+      Ihnen gegenüber für Schäden haftbar gemacht werden, einschließlich aller direkten, indirekten, besonderen,
+      zufällige oder Folgeschäden jeglicher Art, die als
+      Ergebnis dieser Lizenz oder aus der Nutzung oder Unmöglichkeit der Nutzung der
+      Arbeit (einschließlich, aber nicht beschränkt auf Schadensersatz wegen Verlust des Firmenwerts,
+      Arbeitsunterbrechung, Computerausfall oder -fehlfunktion oder alles andere
+      andere kommerzielle Schäden oder Verluste), selbst wenn ein solcher Mitwirkender
+      auf die Möglichkeit solcher Schäden hingewiesen wurde.
+
+   9. Übernahme von Gewährleistung oder zusätzlicher Haftung. Beim Umverteilen
+      das Werk oder davon abgeleitete Werke, können Sie anbieten,
+      und eine Gebühr erheben für die Annahme von Support, Gewährleistung, Schadenersatz,
+      oder andere damit zusammenhängende Haftungspflichten und/oder -rechte
+      Lizenz. Bei der Annahme solcher Verpflichtungen dürfen Sie jedoch nur handeln
+      in Ihrem eigenen Namen und in Ihrer alleinigen Verantwortung, nicht in Ihrem Namen
+      eines anderen Mitwirkenden, und nur wenn Sie zustimmen, schadlos zu halten,
+      verteidigen und schadlos halten jeden Mitwirkenden für jegliche Haftung
+      die einem solchen Mitwirkenden aus Gründen entstanden sind oder Ansprüche gegen ihn geltend gemacht werden
+      dass Sie eine solche Garantie oder zusätzliche Haftung akzeptieren.
+
+   ENDE DER GESCHÄFTSBEDINGUNGEN
+
+   ANHANG: So wenden Sie die Apache-Lizenz auf Ihre Arbeit an.
+
+      Um die Apache-Lizenz auf Ihre Arbeit anzuwenden, fügen Sie Folgendes bei:
+      Boilerplate-Hinweis, mit den in Klammern eingeschlossenen Feldern "[]"
+      durch Ihre eigenen Identifikationsdaten ersetzt. (Nicht enthalten
+      die Klammern!) Der Text sollte in den entsprechenden
+      Kommentarsyntax für das Dateiformat. Wir empfehlen auch, dass a
+      Datei- oder Klassenname und eine Beschreibung des Verwendungszwecks auf der
+      gleiche "gedruckte Seite" wie der Copyright-Vermerk zur einfacheren
+      Identifizierung in Drittarchiven.
+
+   Urheberrecht [yyyy] [Name des Urheberrechtsinhabers]
+
+   Lizenziert unter der Apache-Lizenz, Version 2.0 (die „Lizenz“);
+   Sie dürfen diese Datei nur in Übereinstimmung mit der Lizenz verwenden.
+   Eine Kopie der Lizenz erhalten Sie unter
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Sofern nicht gesetzlich vorgeschrieben oder schriftlich vereinbart, ist Software
+   unter der Lizenz vertrieben wird "AS IS" BASIS,
+   OHNE GEWÄHRLEISTUNGEN ODER BEDINGUNGEN JEGLICHER ART, weder ausdrücklich noch stillschweigend.
+   Siehe die Lizenz für die spezifische Sprache, die Berechtigungen regelt und
+   Einschränkungen unter der Lizenz.

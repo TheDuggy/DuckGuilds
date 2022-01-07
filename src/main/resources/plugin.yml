@@ -1,0 +1,9 @@
+name: DuckGuilds
+version: 1.0
+main: at.theduggy.duckguilds.Main
+
+commands:
+  guild:
+    description: The base guild-command
+  temp:
+    description: wad!

@@ -1,0 +1,71 @@
+DuckGuilds
+Copyright 2021 Georg Kollegger(TheDuggy/CoderTheDuggy)
+
+In this file are listed a few informations about the libraries that are used in this plugin.
+It contains if possible a link to the homepage of the library or the github of the library.
+If not, I wasn't be abel to find one. If the library is licensed under Apache License v2 and
+contains a NOTICE.txt file, the NOTICE.txt file can be found in licenses/notice_files.
+
+This plugin contains the spigot-api version 1.18.1-R0.1-20211223.003801-13. 
+More details can be found on https://www.spigotmc.org/. It is licensed under the 
+GNU gpl v3. See licenses/spigot_api_license.txt for more details about the license.
+
+This plugin contains the library hamcrest-library library version 1.3. More details 
+can be found on http://hamcrest.org. It is licensed under the BSD license. 
+See licenses/hamecrast_library_license.txt for more details about the license.
+Copyright (c) 2000-2006, www.hamcrest.org
+All rights reserved.
+
+This plugin contains the snakeyaml library version 1.30 library. More details 
+can be found on https://bitbucket.org/snakeyaml/snakeyaml/src/master/. It is 
+licensed under the Apache License v2. See licenses/snakeyaml_license.txt 
+for more details about the license.
+
+This plugin contains the checker-qual library version 3.12.0. More details can be found on https://checkerframework.org/.
+It is licensed under the MIT license. See licenses/checker_qual_license.txt for more details about 
+the license.
+
+This plugin contains the junit library version 4.10. More details can be found under on https://junit.org/junit5/.
+It is licensed under the BSD license. See licenses/junit_license.txt for more details about the license.
+Copyright (c) 2000-2006, www.hamcrest.org
+All rights reserved.
+
+This plugin contains the commons-lang library version 2.6 library. More details can be found on
+https://commons.apache.org/proper/commons-lang/. It is licensed under 
+the Apache License v2. See licenses/commons-lang_license.txt for more details about
+the license. It also contains a NOTICE.txt file which you can find 
+in licenses/notice_files/commons-lang_notice-file.txt.
+
+This plugin contains the json-simple library version 1.1.1 . More details can 
+be found on https://code.google.com/archive/p/json-simple/. It is licensed 
+under the Apache License v2. See licenses/json_simple_license.txt for more 
+details about the license.
+
+This plugin contains the j2obj-annotations library version 1.3. More details can be found 
+on https://github.com/google/j2objc/. It is licensed under the Apache License v2.
+See licenses/j2obj_annotations_license.txt for more details about the license.
+
+This plugin contains the listenablefuture-9999.0-empty-to-avoid-conflict-with-guava library.
+It is licensed under the Apache License v2. See 
+licenses/listenablefuture_9999.0_empty_to_avoid_conflict_with_guava_license.txt for 
+more details about the license.
+
+This plugin contains the guava library version 31.0.1-jre. More details can be found on
+https://github.com/google/guava. It is licensed under the Apache License v2. See
+licenses/guava_license.txt for more details about the license.
+
+This plugin contains the failureacces library version 1.0.1. More details can be found on
+https://github.com/google/guava. It is licensed under the Apache License v2. See 
+licenses/failureacces_license.txt for more details about the license.
+
+This plugin contains the error_prone_annotions library version 2.7.1. It is licensed
+under the Apache License v2. See licenses/error_prone_annotions_license.txt for more details
+about the license.
+
+This library contains the gson library version 2.8.8. More details can be found on
+https://github.com/google/gson. It is licensed under the Apache License v2. See
+licenses/gson_license.txt for more details about the license.
+
+This plugin contains the jsr305 library version 3.0.2. More details can be failureacces on
+http://findbugs.sourceforge.net/. It is licensed under the Apache License v2. See 
+licenses/jsr305_license.txt for more details about the license.
