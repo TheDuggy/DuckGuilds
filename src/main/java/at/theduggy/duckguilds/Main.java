@@ -22,6 +22,7 @@ import at.theduggy.duckguilds.startUp.IndexGuilds;
 import at.theduggy.duckguilds.startUp.StartGuildSystemOnReload;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -37,6 +38,7 @@ import java.util.UUID;
 public final class Main extends JavaPlugin {
 
 public static HashMap<UUID,HashMap<String,Object>> cachedPlayers = new HashMap<>();
+public static FileConfiguration mainFileConfiguration;
 public static Scoreboard scoreboard;
 public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
 public static HashMap<String,HashMap<String,Object>> cachedGuilds = new HashMap<>();
@@ -58,6 +60,7 @@ public static Path guildRootFolder;
     public void onEnable(){
         this.saveDefaultConfig();
         this.addColorsTolIst();
+        mainFileConfiguration = this.getConfig();
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         try {
             guildRootFolder = GuildsConfig.getGuildRootFolder(this.getConfig());

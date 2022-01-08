@@ -42,7 +42,7 @@ public class IndexGuilds {
         ArrayList<String> allGuildsByIndex = (ArrayList<String>) allGuilds.get("guilds"); //Get all indexed guilds
         for (String s:allGuildsByIndex){
             JSONParser jsonParser1 = new JSONParser();
-            FileReader fileReader = new FileReader(guildGuildsFolder + "/" + s+ ".json",StandardCharsets.UTF_8);
+            FileReader fileReader = new FileReader(guildGuildsFolder + "/" + s + ".json",StandardCharsets.UTF_8);
             JSONObject jsonStringComponents = (JSONObject) jsonParser1.parse(fileReader);
             fileReader.close();
             HashMap<String,Object> guildDetails = new HashMap<>();
@@ -57,7 +57,7 @@ public class IndexGuilds {
             guildDetails.put("name", jsonStringComponents.get("name"));
             guildDetails.put("tag", jsonStringComponents.get("tag"));
             Main.cachedGuilds.put(s, guildDetails); // guild indexed to HasMap
-
+            //TODO Set all file-writers to utf-8!
         }
 
     }

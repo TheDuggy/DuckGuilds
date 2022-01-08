@@ -16,16 +16,35 @@
 package at.theduggy.duckguilds.config;
 
 import at.theduggy.duckguilds.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class GuildsConfig{
 
-
+    public static int getMaxGuildSize(FileConfiguration f){
+        if (f.get("maxGuilds")instanceof Boolean){
+            return 0;
+        }else if (f.get("maxGuilds") instanceof Integer){
+            if (f.getInt("maxGuilds")>0){
+                Bukkit.getLogger().warning(String.valueOf(Main.cachedGuilds.size()));
+                if (f.getInt("maxGuilds")<=Main.cachedGuilds.size()){
+                    return f.getInt("maxGuilds");
+                }else {
+                    return 0;
+                }
+            }else {
+                return 0;
+            }
+        }else {
+            return 0;
+        }
+    }
 
     public static long getTimeTillInviteIsDeleted(FileConfiguration f){
         if (f.getLong("inviteDeleteTime")>108000){

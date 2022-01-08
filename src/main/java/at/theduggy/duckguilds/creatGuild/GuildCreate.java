@@ -45,72 +45,17 @@ import java.util.UUID;
                         if (Utils.isStringReadyToUse(name)) {
                             if (Utils.isReadyForCreate(tag)) {
                                 if (tag.length() <= 4) {
-                                    Team guild = Main.scoreboard.registerNewTeam(name);
-                                    ArrayList<UUID> players = new ArrayList<>();
-                                    players.add(p.getUniqueId());
-                                    ArrayList<String> playersForFile = new ArrayList<>();
-                                    playersForFile.add(p.getUniqueId().toString());
-                                    JSONObject components = new JSONObject();
-                                    guild.setSuffix(ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]");
-                                    guild.setColor(color);
-                                    guild.setDisplayName(name);
-
-                                    components.put("name", name);
-                                    components.put("color", Utils.getChatColorCode(color));
-                                    components.put("tag", tag);
-                                    components.put("tagColor", Utils.getChatColorCode(tagColor));
-                                    components.put("players", playersForFile);
-                                    components.put("head", p.getUniqueId().toString());
-                                    HashMap<String, Object> guildData = new HashMap<>();
-                                    guildData.put("name", name);
-                                    guildData.put("color", Utils.getChatColorCode(color));
-                                    guildData.put("tag", tag);
-                                    guildData.put("tagColor", Utils.getChatColorCode(tagColor));
-                                    guildData.put("players", players);
-                                    guildData.put("head", p.getUniqueId());
-                                    createGuildAndSafeFile(p, name, components, guildData);
-                                    addGuildToPlayerGuildFile(name, p);
-                                    guild.addEntry(p.getName());
-                                    p.setDisplayName(color + p.getName() + ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]" + ChatColor.WHITE);
-                                    for (Player player : Bukkit.getOnlinePlayers()) {
-                                        player.setScoreboard(Main.scoreboard);
-                                    }
-                                    p.sendMessage(Main.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.UNDERLINE + "" + ChatColor.GOLD + name + ChatColor.GREEN + " has been created!");
-                             /*       } catch (IllegalArgumentException e) {
-                                        Team guild = Main.scoreboard.getTeam(name);
-                                        ArrayList<UUID> players = new ArrayList<>();
-                                        players.add(p.getUniqueId());
-                                        ArrayList<String> playersForFile = new ArrayList<>();
-                                        playersForFile.add(p.getUniqueId().toString());
-                                        JSONObject components = new JSONObject();
-                                        guild.setSuffix(ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]");
-                                        guild.setColor(color);
-                                        guild.setDisplayName(name);
-
-                                        components.put("name", name);
-                                        components.put("color", Utils.getChatColorCode(color));
-                                        components.put("tag", tag);
-                                        components.put("tagColor", Utils.getChatColorCode(tagColor));
-                                        components.put("players", playersForFile);
-                                        components.put("head", p.getUniqueId().toString());
-                                        HashMap<String, Object> guildData = new HashMap<>();
-                                        guildData.put("name", name);
-                                        guildData.put("color", Utils.getChatColorCode(color));
-                                        guildData.put("tag", tag);
-                                        guildData.put("tagColor", Utils.getChatColorCode(tagColor));
-                                        guildData.put("players", players);
-                                        guildData.put("head", p.getUniqueId());
-                                        createGuildAndSafeFile(p, name, components, guildData);
-                                        addGuildToPlayerGuildFile(name, p);
-                                        guild.addEntry(p.getName());
-                                        p.setDisplayName(color + p.getName() + ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]" + ChatColor.WHITE);
-                                        for (Player player : Bukkit.getOnlinePlayers()) {
-                                            player.setScoreboard(Main.scoreboard);
+                                    if (GuildsConfig.getMaxGuildSize(Main.mainFileConfiguration)>0){
+                                        Bukkit.getLogger().warning(String.valueOf(GuildsConfig.getMaxGuildSize(Main.mainFileConfiguration)));
+                                        if (Main.cachedGuilds.size()>GuildsConfig.getMaxGuildSize(Main.mainFileConfiguration)){//TODO make max-guild working!
+                                            Bukkit.getLogger().warning("Break-point passed!");
+                                            addPlayerToTeamAndCreateFiles(p,color,name,tag,tagColor);
+                                        }else {
+                                            p.sendMessage(Main.prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildsConfig.getMaxGuildSize(Main.mainFileConfiguration) + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.cachedGuilds.size() + ChatColor.RED + " !" + " You can't create guilds till a minimum of 1 is deleted!");
                                         }
-                                        p.sendMessage(Main.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.UNDERLINE + "" + ChatColor.GOLD + name + ChatColor.GREEN + " has been created!");
-
-
-                                }*/
+                                    }else {
+                                        addPlayerToTeamAndCreateFiles(p,color,name,tag,tagColor);
+                                    }
                                 } else {
                                     p.sendMessage(Main.prefix + ChatColor.RED + "The tag is " + ChatColor.YELLOW + tag.length() + ChatColor.RED + " characters long, but can only be 4 characters long!");
                                 }
@@ -129,9 +74,49 @@ import java.util.UUID;
         }else {
                 p.sendMessage(Main.prefix + ChatColor.RED + "The name of a guild can't be longer that 50 characters!");
             }
+    }
+
+    public static void addPlayerToTeamAndCreateFiles(Player p, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException {
+        Team guild;
+        try {
+             guild = Main.scoreboard.registerNewTeam(name);
+        }catch (IllegalArgumentException e){
+            guild = Main.scoreboard.getTeam(name);
+        }
+        ArrayList<UUID> players = new ArrayList<>();
+        players.add(p.getUniqueId());
+        ArrayList<String> playersForFile = new ArrayList<>();
+        playersForFile.add(p.getUniqueId().toString());
+        JSONObject components = new JSONObject();
+        guild.setSuffix(ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]");
+        guild.setColor(color);
+        guild.setDisplayName(name);
+
+        components.put("name", name);
+        components.put("color", Utils.getChatColorCode(color));
+        components.put("tag", tag);
+        components.put("tagColor", Utils.getChatColorCode(tagColor));
+        components.put("players", playersForFile);
+        components.put("head", p.getUniqueId().toString());
+        HashMap<String, Object> guildData = new HashMap<>();
+        guildData.put("name", name);
+        guildData.put("color", Utils.getChatColorCode(color));
+        guildData.put("tag", tag);
+        guildData.put("tagColor", Utils.getChatColorCode(tagColor));
+        guildData.put("players", players);
+        guildData.put("head", p.getUniqueId());
+        createGuildAndSafeFile(p, name, components, guildData);
+        addGuildToPlayerGuildFile(name, p);
+        guild.addEntry(p.getName());
+        p.setDisplayName(color + p.getName() + ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]" + ChatColor.WHITE);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.setScoreboard(Main.scoreboard);
+        }
+        p.sendMessage(Main.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.UNDERLINE + "" + ChatColor.GOLD + name + ChatColor.GREEN + " has been created!");
+    }
 
 
-
+    public static void addPlayerToTeamAndCreateFilesWhenTeamAlreadyInUse(Player p, ChatColor color, String name, String tag, ChatColor tagColor){
 
     }
 

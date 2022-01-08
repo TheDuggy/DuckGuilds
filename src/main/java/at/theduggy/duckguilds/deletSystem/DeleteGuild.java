@@ -78,7 +78,7 @@ public class DeleteGuild {
         guilds.remove(name);
         guildsByIndexFile.remove("guilds");
         guildsByIndexFile.put("guilds",guilds);
-        FileWriter fileWriter = new FileWriter(guildIndexFile.toFile());
+        FileWriter fileWriter = new FileWriter(guildIndexFile.toFile(), StandardCharsets.UTF_8);
         fileWriter.write(guildsByIndexFile.toJSONString());
         fileWriter.close();
         Files.deleteIfExists(guildFile);
