@@ -96,6 +96,6 @@ public class GuildInviteCommand {
 
                 }
             }
-        }.runTaskLater(Main.getPlugin(Main.class), GuildsConfig.getTimeTillInviteIsDeleted(Main.mainFileConfiguration));
+        }.runTaskLater(Main.getPlugin(Main.class), GuildsConfig.getTimeTillInviteIsDeleted());
     }
 }

@@ -27,12 +27,12 @@ import java.util.HashMap;
 
 public class GuildsConfig{
 
-    public static int getMaxGuildSize(FileConfiguration f){
+    public static int getMaxGuildSize(){
+        FileConfiguration f = Main.mainFileConfiguration;
         if (f.get("maxGuilds")instanceof Boolean){
             return 0;
         }else if (f.get("maxGuilds") instanceof Integer){
             if (f.getInt("maxGuilds")>0){
-                Bukkit.getLogger().warning(String.valueOf(Main.cachedGuilds.size()));
                 if (f.getInt("maxGuilds")<=Main.cachedGuilds.size()){
                     return f.getInt("maxGuilds");
                 }else {
@@ -46,7 +46,8 @@ public class GuildsConfig{
         }
     }
 
-    public static long getTimeTillInviteIsDeleted(FileConfiguration f){
+    public static long getTimeTillInviteIsDeleted(){
+        FileConfiguration f = Main.mainFileConfiguration;
         if (f.getLong("inviteDeleteTime")>108000){
             return 18000;
         }else if (f.getLong("inviteDeleteTime")<6000){
@@ -56,7 +57,8 @@ public class GuildsConfig{
         }
     }
 
-    public static Path getGuildRootFolder(FileConfiguration f) throws FileNotFoundException {
+    public static Path getGuildRootFolder() throws FileNotFoundException {
+        FileConfiguration f = Main.mainFileConfiguration;
         if (f.getString("guildDirRootPath").equals("default")){
             return Paths.get(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
         }else if (!f.getString("guildDirRootPath").equals("default")){
@@ -68,5 +70,33 @@ public class GuildsConfig{
             }
         }
         return null;
+    }
+
+    public static boolean getLogging(){
+        FileConfiguration f = Main.mainFileConfiguration;
+        return f.getBoolean("log");
+    }
+
+    public static Object getCustomLogging() {
+        FileConfiguration f = Main.mainFileConfiguration;
+        if (getLogging()) {
+            if (f.get("customLogging") instanceof Boolean) {
+                return false;
+            } else if (f.get("customLogging") instanceof String) {
+                if (Files.exists(Path.of(f.getString("customLogging")))) {
+                    if (Files.isDirectory(Path.of(f.getString("customLogging")))) {
+                        return Path.of(f.getString("customLogging"));
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }else {
+            return false;
+        }
     }
 }

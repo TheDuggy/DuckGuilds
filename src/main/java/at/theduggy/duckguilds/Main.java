@@ -17,15 +17,16 @@ package at.theduggy.duckguilds;
 
 import at.theduggy.duckguilds.config.GuildsConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
-import at.theduggy.duckguilds.startUp.CachePlayers;
+import at.theduggy.duckguilds.logging.AutoLogger;
 import at.theduggy.duckguilds.startUp.IndexGuilds;
-import at.theduggy.duckguilds.startUp.StartGuildSystemOnReload;
+import at.theduggy.duckguilds.startUp.Players;
+import org.apache.log4j.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.json.simple.parser.ParseException;
 
 import java.io.FileNotFoundException;
@@ -40,9 +41,10 @@ public final class Main extends JavaPlugin {
 public static HashMap<UUID,HashMap<String,Object>> cachedPlayers = new HashMap<>();
 public static FileConfiguration mainFileConfiguration;
 public static Scoreboard scoreboard;
+public static Plugin plugin;
 public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
 public static HashMap<String,HashMap<String,Object>> cachedGuilds = new HashMap<>();
-public static String prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "Guild-System" + ChatColor.GRAY + "] ";
+public static String prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "DuckGuilds" + ChatColor.GRAY + "] ";
 public static String wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!";
 public static String playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!";
 public static String guildDoesntExists = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list to see all guilds!";
@@ -55,18 +57,30 @@ public static String forbiddenArgument = prefix + ChatColor.RED + "This command 
 public static String playerDoesntExists = prefix + ChatColor.RED + "That player doesn't exist!";
 public static String playerInstOnline = prefix + ChatColor.RED + "This player isn't online!";
 public static Path guildRootFolder;
+public static Path loggingFolder;
 
     @Override
     public void onEnable(){
         this.saveDefaultConfig();
         this.addColorsTolIst();
+        plugin = this;
         mainFileConfiguration = this.getConfig();
-        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         try {
-            guildRootFolder = GuildsConfig.getGuildRootFolder(this.getConfig());
+            guildRootFolder = GuildsConfig.getGuildRootFolder();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        if (!GuildFiles.logFolderExists()&&GuildsConfig.getLogging()&&GuildsConfig.getCustomLogging() instanceof Boolean){
+            try {
+                GuildFiles.createLogFolder();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        addLogFolderPath();
+        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        AutoLogger.logMessage("Guild-System started successfully!", Level.INFO);
+
         try {
             commandRegistration();
             listenerRegistration();
@@ -77,8 +91,8 @@ public static Path guildRootFolder;
                 }
             }
             IndexGuilds.indexGuilds();
-            CachePlayers.cachePlayers();
-            StartGuildSystemOnReload.startOnReload();
+            Players.cachePlayers();
+            Players.addPlayersOnReload();
         }catch (IOException|ParseException e){
                 e.printStackTrace();
         }
@@ -96,8 +110,7 @@ public static Path guildRootFolder;
     }
 
     public void listenerRegistration(){
-        Bukkit.getPluginManager().registerEvents(new CachePlayers(),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinEventGuild(),this);
+        Bukkit.getPluginManager().registerEvents(new Players(), this);
     }
 
     public void addColorsTolIst(){
@@ -121,5 +134,13 @@ public static Path guildRootFolder;
         GuildCommand.allColorsForColorAndDark.add("Dark_Aqua");
         GuildCommand.allColorsForColorAndDark.add("Dark_Green");
         GuildCommand.allColorsForColorAndDark.add("Dark_Red");
+    }
+
+    public static void addLogFolderPath(){
+        if (GuildsConfig.getCustomLogging() instanceof Path){
+            loggingFolder = (Path) GuildsConfig.getCustomLogging();
+        }else {
+            loggingFolder = Path.of(plugin.getDataFolder().toPath() + "/logs/");
+        }
     }
 }

@@ -36,7 +36,7 @@ public class KickPlayerFromGuild {
                 if (sender.getName().equals(p.getName())) {
                     if (guildName.equals(guildNameOfPlayerToKick)) {
                         PlayerLeaveGuild.leaveGuild(p, guildName);
-                        p.sendMessage(Main.prefix + ChatColor.RED + ChatColor.BOLD + " IMPORTANT! " + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
+                        p.sendMessage(Main.prefix  + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             if (Utils.getPlayerGuild(player).equals(guildNameOfPlayerToKick)) {
                                 if (Utils.getIfPlayerIsHeadOfGuild(guildNameOfPlayerToKick, sender)) {

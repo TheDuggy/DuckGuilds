@@ -310,21 +310,18 @@ public class Utils {
     }
 
     public static boolean containsPlayerDataFolderNeededFiles(File f){
-        boolean containsPlayerDataFolderNeededFiles = true;
         if (f.listFiles().length==2){
             for (File playerFile:f.listFiles()){
-                if (playerFile.getName().equals("name.json")) {
-
-                }else if (playerFile.getName().equals("guild.json")){
-
+                if (playerFile.getName().equals("data.json")) {
+                    return true;
                 }else{
-                    containsPlayerDataFolderNeededFiles = false;
+                    return false;
                 }
             }
         }else {
-            containsPlayerDataFolderNeededFiles = false;
+            return false;
         }
-        return  containsPlayerDataFolderNeededFiles;
+        return  false;
     }
 
     public static boolean isPlayerOnline(UUID uuid){

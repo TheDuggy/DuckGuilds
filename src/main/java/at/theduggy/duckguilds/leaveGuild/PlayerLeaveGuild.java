@@ -61,7 +61,7 @@ public class PlayerLeaveGuild {
     public static void removeGuildFromPlayerFile(Player p) throws IOException, ParseException {
         Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
         Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path personalPlayerGuildTeamsFile = Paths.get(personalPlayerGuildFolder + "/guild.json");
+        Path personalPlayerGuildTeamsFile = Paths.get(personalPlayerGuildFolder + "/data.json");
         JSONParser jsonParser = new JSONParser();
         FileReader fileReader = new FileReader(personalPlayerGuildTeamsFile.toFile(),StandardCharsets.UTF_8);
         JSONObject oldGuild = (JSONObject) jsonParser.parse(fileReader);

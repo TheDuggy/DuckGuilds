@@ -89,7 +89,7 @@ public class GuildJoinCommand {
         allPlayersOfThatGuild.add(p.getUniqueId().toString());
         oldGuildFile.remove("players");
         oldGuildFile.put("players",allPlayersOfThatGuild);
-        FileWriter fileWriter = new FileWriter(guildFile.toFile());
+        FileWriter fileWriter = new FileWriter(guildFile.toFile(), StandardCharsets.UTF_8);
         fileWriter.write(oldGuildFile.toJSONString());
         fileWriter.close();
     }
@@ -103,7 +103,7 @@ public class GuildJoinCommand {
         fileReader.close();
         addGuildToPlayerGuildFile.remove("guild");
         addGuildToPlayerGuildFile.put("guild",name);
-        FileWriter fileWriter = new FileWriter(String.valueOf(personalPlayerGuildTeamsFile));
+        FileWriter fileWriter = new FileWriter(String.valueOf(personalPlayerGuildTeamsFile),StandardCharsets.UTF_8);
         fileWriter.write(addGuildToPlayerGuildFile.toJSONString());
         fileWriter.close();
     }

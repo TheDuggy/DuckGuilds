@@ -60,9 +60,9 @@ public class ListGuilds {
                 String tag = Utils.centerText(ChatColor.GREEN + "Tag: " + tagColor + guildInfos.get("tag"));
                 Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
                 Path headPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + guildInfos.get("head"));
-                Path playerNameFile = Paths.get(headPlayerGuildFolder + "/name.json");
+                Path playerNameData = Paths.get(headPlayerGuildFolder + "/data.json");
                 String name;
-                if (Files.exists(playerNameFile)){
+                if (Files.exists(playerNameData)){
                     name = (String) Main.cachedPlayers.get(guildInfos.get("head")).get("name");//TODO Change all UUID-objects to strings
                 }else{
                     name = ChatColor.RED + "NOT FOUND";

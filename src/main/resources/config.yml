@@ -2,12 +2,24 @@
 #IMPORTANT! This is in ticks(1 sec = 20 ticks)
 #By default it is set to 15 min(18000 ticks)
 inviteDeleteTime: 18000
+
 #This is the folder where all guild-data is stored! By default, it's the root-folder of the server.
 #If the path doesn't exist than it automatically uses the root-folder of the server.
 #If you change this and you already created a few guilds, they would be lost!
 #The old guild-folder isn't deleted automatically, so you can copy all guild-files to the new folder!
 guildDirRootPath: default
-#This option sets hoe many guilds can be created!
-#By default it is set to false. It must between 1 and 9223372036854775807. If it is 0 or bigger than 9223372036854775807,
-#it will take the default value (false), which is endless!
+
+#This option sets hoe many guilds can be created! By default it is set to false. It must between 1 and
+#9223372036854775807. If it is 0 or bigger than 9223372036854775807,it will take the default value
+#(false), which is endless! If you enter something that isn't a false or not a valid number, the plugin
+#would ignore it!
 maxGuilds: false
+
+#This option sets if the plugin should log in a login-fil! By default, the location of that file pluginDataFolder/logs/
+#It generates a new log-file daily!
+#If you want to set a custom-path for the log file, see customLogging.
+log: true
+
+#You can use this option to generate logging-files in a custom log-folder! That folder must
+#already exist! If not, the plugin would use the default log-location(pluginDataFolder/logs/);
+customLogging: false

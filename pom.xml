@@ -26,7 +26,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>D:\jaspace\Plugins\Server\1_18_1_Paper\plugins</outputDirectory>
+                            <outputFile>D:\jaspace\Plugins\Server\1_18_1_Paper\plugins\${project.artifactId}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -53,6 +53,11 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
     </dependencies>
 </project>

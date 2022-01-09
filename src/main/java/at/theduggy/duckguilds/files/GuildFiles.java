@@ -42,63 +42,47 @@ public class GuildFiles {
         return exists;
     }
 
+    public static boolean logFolderExists(){
+        if (Files.exists(Path.of(Main.plugin.getDataFolder() + "/logs"))){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public static void createLogFolder() throws IOException {
+        Files.createDirectory(Path.of(Main.plugin.getDataFolder() + "/logs"));
+    }
+
     public static void createGuildFiles() throws IOException {
         Files.createDirectories(guildPlayerFolder);
         Files.createDirectory(guildGuildsFolder);
     }
     public static boolean checkForPersonalPlayerGuildFolder(Player p){
-        boolean exists = false;
         Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
         if (Files.exists(personalPlayerGuildFolder)){
-            exists = true;
+            return true;
+        }else {
+            return false;
         }
-        return exists;
     }
 
-    public static boolean checkForPersonalPlayerGuildTeamsFile(Player p){
-        boolean exists = false;
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path personalPlayerGuildTeamsFile = Paths.get(personalPlayerGuildFolder + "/guild.json");
-        if (Files.exists(personalPlayerGuildTeamsFile)){
-            exists = true;
-        }
-        return exists;
+    public static boolean checkForPlayerDataFile(Player p){
+        return Files.exists(Path.of(guildPlayerFolder + "/" + p.getUniqueId() + "/data.json"));
     }
 
-    public static boolean checkForPlayerNameFile(Player p){
-        boolean exists = false;
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path playerNameFile = Paths.get(personalPlayerGuildFolder + "/name.json");
-        if (Files.exists(playerNameFile)){
-         exists = true;
-        }
-        return exists;
+    public static void createPlayerDataFile(Player p) throws IOException {
+        JSONObject playerBlankData = new JSONObject();
+        playerBlankData.put("guild","");
+        playerBlankData.put("name", p.getName());
+        Files.createFile(Path.of(guildPlayerFolder + "/" + p.getUniqueId() + "/data.json"));
+        FileWriter blankDataWriter = new FileWriter(guildPlayerFolder + "/" + p.getUniqueId() + "/data.json", StandardCharsets.UTF_8);
+        blankDataWriter.write(playerBlankData.toJSONString());
+        blankDataWriter.close();
     }
     public static void createPersonalPlayerGuildFolder(Player p) throws IOException {
         Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
         Files.createDirectory(personalPlayerGuildFolder);
-    }
-
-    public static void createPersonalPlayerGuildTeamsFile(Player p) throws IOException {
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path personalPlayerGuildTeamsFile = Paths.get(personalPlayerGuildFolder + "/guild.json");
-        Files.createFile(personalPlayerGuildTeamsFile);
-        JSONObject guildForGuildFile = new JSONObject();
-        guildForGuildFile.put("guild","");
-        FileWriter guildFileWriter = new FileWriter(String.valueOf(personalPlayerGuildTeamsFile),StandardCharsets.UTF_8);
-        guildFileWriter.write(guildForGuildFile.toJSONString());
-        guildFileWriter.close();
-    }
-
-    public static void createPlayerNameFile(Player p) throws IOException {
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path playerNameFile = Paths.get(personalPlayerGuildFolder + "/name.json");
-        Files.createFile(playerNameFile);
-        FileWriter nameFileWriter = new FileWriter(String.valueOf(playerNameFile), StandardCharsets.UTF_8);
-        JSONObject name = new JSONObject();
-        name.put("name",p.getName());
-        nameFileWriter.write(name.toJSONString());
-        nameFileWriter.close();
     }
 
     public static boolean checkForIndex(){
@@ -116,7 +100,7 @@ public class GuildFiles {
         Files.createFile(guildIndexFile);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("guilds",dummyList);
-        FileWriter fileWriter = new FileWriter(String.valueOf(guildIndexFile));
+        FileWriter fileWriter = new FileWriter(String.valueOf(guildIndexFile), StandardCharsets.UTF_8);
         fileWriter.write(jsonObject.toJSONString());
         fileWriter.close();
     }
