@@ -16,23 +16,15 @@
 package at.theduggy.duckguilds.other;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildsConfig;
-import at.theduggy.duckguilds.files.GuildFiles;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -310,7 +302,7 @@ public class Utils {
     }
 
     public static boolean containsPlayerDataFolderNeededFiles(File f){
-        if (f.listFiles().length==2){
+        if (f.listFiles().length==1){
             for (File playerFile:f.listFiles()){
                 if (playerFile.getName().equals("data.json")) {
                     return true;
@@ -339,5 +331,25 @@ public class Utils {
     public static String convertStringToUTF8(String toConvert){
         byte[] bytes = toConvert.getBytes(StandardCharsets.UTF_8);
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    public static String getKeyFromValueGuilds(HashMap<String,HashMap<String ,Object>> hashmap, UUID playerUUID){
+        for (String s: hashmap.keySet()){
+            ArrayList<UUID> players = (ArrayList<UUID>) hashmap.get(s).get("players");
+            if (players.contains(playerUUID)){
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public static boolean isPlayerInGuildPlayerList(HashMap<String,HashMap<String,Object>> hashMap, UUID playerUUID){
+        for (String s: hashMap.keySet()){
+            ArrayList<UUID> players = (ArrayList<UUID>) hashMap.get(s).get("players");
+            if (players.contains(playerUUID)){
+                return true;
+            }
+        }
+        return false;
     }
 }

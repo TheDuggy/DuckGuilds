@@ -20,6 +20,13 @@ maxGuilds: false
 #If you want to set a custom-path for the log file, see customLogging.
 log: true
 
-#You can use this option to generate logging-files in a custom log-folder! That folder must
-#already exist! If not, the plugin would use the default log-location(pluginDataFolder/logs/);
+#You can use this option to generate logging-files in a custom log-folder! This option can only
+#take the boolean-value false or a path to a folder! That folder must already exist! If not, the
+#plugin would use the default log-location(pluginDataFolder/logs/). If log is set to false, nothing
+#would be logged!
 customLogging: false
+
+#This option is a high-security-option! If a player folder is deleted, the player normally wouldn't
+#be added to a guild! But if this is activated, the plugin would check first if the player is in a guild-file!
+#This isn't needed and may cause some performance-issues, if you have a lot of guilds!
+checkForPlayerInAllGuilds: false

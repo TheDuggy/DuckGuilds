@@ -15,11 +15,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds;
 
-import at.theduggy.duckguilds.config.GuildsConfig;
+import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
 import at.theduggy.duckguilds.logging.AutoLogger;
 import at.theduggy.duckguilds.startUp.IndexGuilds;
-import at.theduggy.duckguilds.startUp.Players;
+import at.theduggy.duckguilds.startUp.GuildPlayers;
 import org.apache.log4j.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,6 +44,7 @@ public static Scoreboard scoreboard;
 public static Plugin plugin;
 public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
 public static HashMap<String,HashMap<String,Object>> cachedGuilds = new HashMap<>();
+public static HashMap<String, ArrayList<UUID>> playersInAllGuilds = new HashMap<>();
 public static String prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "DuckGuilds" + ChatColor.GRAY + "] ";
 public static String wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!";
 public static String playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!";
@@ -66,11 +67,11 @@ public static Path loggingFolder;
         plugin = this;
         mainFileConfiguration = this.getConfig();
         try {
-            guildRootFolder = GuildsConfig.getGuildRootFolder();
+            guildRootFolder = GuildConfig.getGuildRootFolder();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if (!GuildFiles.logFolderExists()&&GuildsConfig.getLogging()&&GuildsConfig.getCustomLogging() instanceof Boolean){
+        if (!GuildFiles.logFolderExists()&& GuildConfig.getLogging()&& GuildConfig.getCustomLogging() instanceof Boolean){
             try {
                 GuildFiles.createLogFolder();
             } catch (IOException e) {
@@ -79,8 +80,6 @@ public static Path loggingFolder;
         }
         addLogFolderPath();
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        AutoLogger.logMessage("Guild-System started successfully!", Level.INFO);
-
         try {
             commandRegistration();
             listenerRegistration();
@@ -91,10 +90,16 @@ public static Path loggingFolder;
                 }
             }
             IndexGuilds.indexGuilds();
-            Players.cachePlayers();
-            Players.addPlayersOnReload();
+            GuildPlayers.cachePlayers();
+            GuildPlayers.addPlayersOnReload();
         }catch (IOException|ParseException e){
                 e.printStackTrace();
+        }
+        AutoLogger.logMessage("Guild-System started successfully! There are " + cachedGuilds.size() + "guilds on this server!", Level.INFO);
+        try {
+            AutoLogger.logMessage("Following parameters were set in the config.yml: inviteDeleteTime=" + GuildConfig.getTimeTillInviteIsDeleted() + ", guildDirRootPath=" + GuildConfig.getGuildRootFolder(), Level.INFO);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
     
@@ -110,7 +115,7 @@ public static Path loggingFolder;
     }
 
     public void listenerRegistration(){
-        Bukkit.getPluginManager().registerEvents(new Players(), this);
+        Bukkit.getPluginManager().registerEvents(new GuildPlayers(), this);
     }
 
     public void addColorsTolIst(){
@@ -137,8 +142,8 @@ public static Path loggingFolder;
     }
 
     public static void addLogFolderPath(){
-        if (GuildsConfig.getCustomLogging() instanceof Path){
-            loggingFolder = (Path) GuildsConfig.getCustomLogging();
+        if (GuildConfig.getCustomLogging() instanceof Path){
+            loggingFolder = (Path) GuildConfig.getCustomLogging();
         }else {
             loggingFolder = Path.of(plugin.getDataFolder().toPath() + "/logs/");
         }

@@ -1,8 +1,6 @@
 package at.theduggy.duckguilds.logging;
 
-import at.theduggy.duckguilds.config.GuildsConfig;
 import org.apache.log4j.Level;
-import org.bukkit.Bukkit;
 
 public class AutoLogger {
 

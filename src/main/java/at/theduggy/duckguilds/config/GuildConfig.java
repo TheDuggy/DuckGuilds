@@ -25,7 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-public class GuildsConfig{
+public class GuildConfig {
 
     public static int getMaxGuildSize(){
         FileConfiguration f = Main.mainFileConfiguration;
@@ -95,6 +95,15 @@ public class GuildsConfig{
             } else {
                 return false;
             }
+        }else {
+            return false;
+        }
+    }
+
+    public static boolean getIfCheckForPlayerInAllGuilds(){
+        if (Main.mainFileConfiguration.getBoolean("checkForPlayerInAllGuilds")){
+
+            return true;
         }else {
             return false;
         }

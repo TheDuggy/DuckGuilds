@@ -16,9 +16,6 @@
 package at.theduggy.duckguilds.leaveGuild;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildsConfig;
-import at.theduggy.duckguilds.files.GuildFiles;
-import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

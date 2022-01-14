@@ -17,8 +17,6 @@ package at.theduggy.duckguilds.guild_invite;
 
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildsConfig;
-import at.theduggy.duckguilds.files.GuildFiles;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

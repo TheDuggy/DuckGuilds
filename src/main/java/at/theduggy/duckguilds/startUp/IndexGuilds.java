@@ -16,7 +16,7 @@
 package at.theduggy.duckguilds.startUp;
 
 import at.theduggy.duckguilds.Main;
-import org.bukkit.Bukkit;
+import at.theduggy.duckguilds.config.GuildConfig;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -54,8 +54,11 @@ public class IndexGuilds {
             guildDetails.put("color", jsonStringComponents.get("color"));
             guildDetails.put("tagColor", jsonStringComponents.get("tagColor"));
             guildDetails.put("players", players);
-            guildDetails.put("name", jsonStringComponents.get("name"));
+            guildDetails.put("name", s);//TODO remove name-option from json-object
             guildDetails.put("tag", jsonStringComponents.get("tag"));
+            if (GuildConfig.getIfCheckForPlayerInAllGuilds()){
+                Main.playersInAllGuilds.put(s,players);
+            }
             Main.cachedGuilds.put(s, guildDetails); // guild indexed to HasMap
             //TODO Set all file-writers to utf-8!
         }

@@ -17,7 +17,7 @@
 package at.theduggy.duckguilds.creatGuild;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildsConfig;
+import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,13 +45,12 @@ import java.util.UUID;
                         if (Utils.isStringReadyToUse(name)) {
                             if (Utils.isReadyForCreate(tag)) {
                                 if (tag.length() <= 4) {
-                                    if (GuildsConfig.getMaxGuildSize()>0){
-                                        Bukkit.getLogger().warning(String.valueOf(GuildsConfig.getMaxGuildSize()));
-                                        if (Main.cachedGuilds.size()>GuildsConfig.getMaxGuildSize()){//TODO make max-guild working!
-                                            Bukkit.getLogger().warning("Break-point passed!");
+                                    if (GuildConfig.getMaxGuildSize()>0){
+                                        Bukkit.getLogger().warning(String.valueOf(GuildConfig.getMaxGuildSize()));
+                                        if (Main.cachedGuilds.size()> GuildConfig.getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(p,color,name,tag,tagColor);
                                         }else {
-                                            p.sendMessage(Main.prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildsConfig.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.cachedGuilds.size() + ChatColor.RED + " !" + " You can't create guilds till a minimum of 1 is deleted!");
+                                            p.sendMessage(Main.prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfig.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.cachedGuilds.size() + ChatColor.RED + " !" + " You can't create guilds till a minimum of 1 is deleted!");
                                         }
                                     }else {
                                         addPlayerToTeamAndCreateFiles(p,color,name,tag,tagColor);

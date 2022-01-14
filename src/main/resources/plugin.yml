@@ -1,5 +1,5 @@
 name: DuckGuilds
-version: 1.0
+version: '${project.version}'
 main: at.theduggy.duckguilds.Main
 
 commands:
