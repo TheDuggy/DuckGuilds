@@ -18,7 +18,9 @@ package at.theduggy.duckguilds.creatGuild;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
+import at.theduggy.duckguilds.logging.AutoLogger;
 import at.theduggy.duckguilds.other.Utils;
+import org.apache.log4j.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -49,6 +51,7 @@ import java.util.UUID;
                                         Bukkit.getLogger().warning(String.valueOf(GuildConfig.getMaxGuildSize()));
                                         if (Main.cachedGuilds.size()> GuildConfig.getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(p,color,name,tag,tagColor);
+                                            AutoLogger.logMessage( p.getUniqueId() + "(" + p.getName() + ") created the guild " + name + "!%n Tag: " + tag + "%n Color: " + color + "%n tagColor: " + tag, Level.INFO);
                                         }else {
                                             p.sendMessage(Main.prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfig.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.cachedGuilds.size() + ChatColor.RED + " !" + " You can't create guilds till a minimum of 1 is deleted!");
                                         }
@@ -65,6 +68,7 @@ import java.util.UUID;
                             p.sendMessage(Main.prefix + ChatColor.RED + "Tha guild-name " + ChatColor.YELLOW + name + ChatColor.RED + " is invalid, because it contains other symbols than alphabetic characters or digits!");
                         }
                     } else {
+                        Bukkit.getLogger().info(Main.cachedGuilds.toString());
                         p.sendMessage(Main.prefix + ChatColor.RED + "Guild already exists!");
                     }
                 }else {
