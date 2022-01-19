@@ -109,13 +109,13 @@ public class Utils {
         }
         return isTrue;
     }
-
+//TODO Check for each guild-file!
     public static boolean guildExists(String name) throws IOException, ParseException {
-        boolean exists = false;
         if (Main.cachedGuilds.containsKey(name)){
-            exists = true;
+            return true;
+        }else {
+            return false;
         }
-        return exists;
     }
 
     public static UUID getHeadOfGuild(String guildName){

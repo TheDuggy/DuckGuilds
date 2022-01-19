@@ -38,6 +38,12 @@ public class GuildPlayers implements Listener {
     }
 
     public static void startBasicsForGuildAdding(Player p) throws IOException, ParseException {
+        if (!GuildFiles.checkForPersonalPlayerGuildFolder(p)){
+            GuildFiles.createPersonalPlayerGuildFolder(p);
+        }
+        if (!GuildFiles.checkForPlayerDataFile(p)){
+            GuildFiles.checkForPlayerDataFile(p);
+        }
         Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
         Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
         Path playerNameData = Paths.get(personalPlayerGuildFolder + "/data.json");
