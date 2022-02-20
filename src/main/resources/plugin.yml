@@ -7,3 +7,5 @@ commands:
     description: The base guild-command
   temp:
     description: wad!
+  guildFakePlayer:
+    description: Guild-Fake-Player!

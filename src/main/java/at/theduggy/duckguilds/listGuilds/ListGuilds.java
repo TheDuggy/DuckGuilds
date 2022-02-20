@@ -29,8 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class ListGuilds {
 
@@ -42,24 +41,43 @@ public class ListGuilds {
                 int pageCount = (int) Math.ceil((double) Main.getGuildCache().size() / 8.0);
                 if (page<=pageCount) {
                     HashMap<Integer,ArrayList<String>> guildPages = new HashMap<>();
-                    ArrayList<String> guildNames = new ArrayList<>(Main.getGuildCache().keySet());
+                    ArrayList<String> keys = new ArrayList<>(Main.getGuildCache().keySet());
+                    ArrayList<Integer> values = new ArrayList<>();
+                    for (String key : keys) {
+                        ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(key).get("players");
+                        values.add(players.size());
+                    }
+                    for (int i =0;i<values.size();i++){
+                        for (int j = values.size()-1;j>=i;j--){
+                            if (values.get(i)<values.get(j)){
+                                int temp = values.get(j);
+                                values.set(j,values.get(i));
+                                values.set(i,temp);
+                                String tempString = keys.get(j);
+                                keys.set(j,keys.get(i));
+                                keys.set(i,tempString);
+                            }
+                        }
+                    }
                     int pages = (int) Math.ceil((double) Main.getGuildCache().keySet().size()/8.0);
                     int lastCheckPoint = 0;
                     for (int i = 1; i<=pages; i++,lastCheckPoint+=8){
                         guildPages.put(i,new ArrayList<>());
-                        for (int i2 = lastCheckPoint; i2 !=lastCheckPoint+8&&i2!=guildNames.size(); i2++){
-                            guildPages.get(i).add(guildNames.get(i2));
+                        for (int i2 = lastCheckPoint; i2 !=lastCheckPoint+8&&i2!=keys.size(); i2++){
+                            guildPages.get(i).add(keys.get(i2));
                         }
                     }
+                    //TODO Sort guilds after size!
                     StringBuilder msg = new StringBuilder();
-                    msg.append(Main.prefix  + ChatColor.GREEN + "List of all guilds from page " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
-                    msg.append(ChatColor.WHITE + "-".repeat(37) + "\n");//60
+                    msg.append(Main.prefix  + ChatColor.GREEN + "List of all guilds from server " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
+                    msg.append(ChatColor.WHITE + "-".repeat(39) + "\n");//60
                     for (String guildName:guildPages.get(page)){
                         ChatColor color = (ChatColor) Main.getGuildCache().get(guildName).get("color");
                         ChatColor tagColor = (ChatColor) Main.getGuildCache().get(guildName).get("tagColor");
                         String tag = (String) Main.getGuildCache().get(guildName).get("tag");
                         Bukkit.getLogger().warning(tag);
-                        msg.append("   - " + color + guildName + ChatColor.GRAY + " [" + tagColor + tag + ChatColor.GRAY + "]" + "\n");
+                        ArrayList<UUID> guildPlayers = (ArrayList<UUID>) Main.getGuildCache().get(guildName).get("players");
+                        msg.append(ChatColor.GRAY + "   - " + color + guildName + ChatColor.GRAY + " [" + tagColor + tag + ChatColor.GRAY + "] " +  guildPlayers.size() + "\n");//TODO Test sorting after guild-size!
                     }
                     player.sendMessage(msg.toString());
                 }else {

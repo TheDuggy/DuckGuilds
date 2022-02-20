@@ -70,6 +70,11 @@ public static Path loggingFolder;
         plugin = this;
         mainFileConfiguration = this.getConfig();
         try {
+            FakePlayerData.initFakePlayer();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
             guildRootFolder = GuildConfig.getGuildRootFolder();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -111,7 +116,8 @@ public static Path loggingFolder;
     public void commandRegistration(){
         getCommand("guild").setExecutor(new GuildCommand());
         getCommand("guild").setTabCompleter(new GuildCommand());
-        getCommand("temp").setExecutor(new TempExecutor());
+        getCommand("guildFakePlayer").setExecutor(new FakeGuildPlayer());
+        getCommand("guildFakePlayer").setTabCompleter(new FakeGuildPlayer());
     }
 
     public void listenerRegistration(){

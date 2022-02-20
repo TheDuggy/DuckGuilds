@@ -132,15 +132,10 @@ public class GuildCommand implements TabExecutor {
                         } catch (IOException | ParseException e) {
                             e.printStackTrace();
                         }
-
-
                         break;
                     case "delete":
                         try {
-
                             if (args.length == 3) {
-
-
                                 if (args[2].equals("-y")) {
                                     GuildDelete.removeGuild(args[1], player);
                                 } else if (args[2].equals("-n")) {

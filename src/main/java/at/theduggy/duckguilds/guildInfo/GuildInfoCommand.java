@@ -41,8 +41,6 @@ creationDate,
             ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(guildName).get("players");
             int pageCount = (int) Math.ceil((double) players.size() / 8.0);
             if (page<=pageCount) {
-                ArrayList<String> names = new ArrayList<>();
-                names.add((String) Main.getPlayerCache().get(Main.getGuildCache().get(guildName).get("head")).get("name"));
                 HashMap<Integer,ArrayList<String>> playerPages = new HashMap<>();
                 int pages = (int) Math.ceil((double) players.size()/8.0);
                 int lastCheckPoint = 0;
@@ -52,17 +50,17 @@ creationDate,
                         playerPages.get(i).add((String) Main.getPlayerCache().get(players.get(i2)).get("name"));
                     }
                 }
-                //TODO put head on first place!
                 System.out.println(playerPages);
                 String headName = (String) Main.getPlayerCache().get(Main.getGuildCache().get(guildName).get("head")).get("name");
                 StringBuilder msg = new StringBuilder();
                 msg.append(Main.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                 msg.append(ChatColor.WHITE + "-".repeat(40) + "\n");//60
-                Bukkit.broadcastMessage(String.valueOf(names.size()));
-                msg.append(ChatColor.GRAY + "   - " + ChatColor.YELLOW + headName + ChatColor.GRAY +" [" + ChatColor.AQUA + "HEAD" + ChatColor.GRAY + "]\n");
+                putHeadToFirstPosition(playerPages,headName);
                 for (String name:playerPages.get(page)){
-                    if (!name.equals(headName)) {
-                        msg.append(ChatColor.GRAY + "   - " + ChatColor.YELLOW + name + "\n");
+                    if (name.equals(headName)) {
+                        msg.append(ChatColor.GRAY + "   - " + ChatColor.YELLOW + name +  ChatColor.GRAY + " [" + ChatColor.AQUA+ "HEAD" + ChatColor.GRAY + "]\n");
+                    }else {
+                        msg.append(ChatColor.GRAY + "   - " + ChatColor.YELLOW + name +"\n");
                     }
                 }
                 player.sendMessage(msg.toString());
@@ -72,5 +70,21 @@ creationDate,
         }else {
             player.sendMessage(Main.pageIndexOutOfBounds);
         }
+    }
+
+    public static HashMap<Integer,ArrayList<String>> putHeadToFirstPosition(HashMap<Integer,ArrayList<String>> listToWork,String headName){
+        int headPage= 0;
+        for (Integer key:listToWork.keySet()){
+            for (String name:listToWork.get(key)){
+                if (name.equals(headName)) {
+                    headPage = key;
+                    break;
+                }
+            }
+        }
+        String nameOfPlayerOnFirstPlace = listToWork.get(1).get(0);
+        listToWork.get(1).set(0,headName);
+        listToWork.get(headPage).set(listToWork.get(headPage).indexOf(headName),nameOfPlayerOnFirstPlace);
+        return listToWork;
     }
 }

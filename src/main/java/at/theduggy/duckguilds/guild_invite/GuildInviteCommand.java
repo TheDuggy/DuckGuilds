@@ -23,6 +23,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.parser.ParseException;
@@ -46,7 +47,7 @@ public class GuildInviteCommand {
                             }
                             if (!Main.guildInvites.get(guildName).contains(playerNameToInvite)) {
                                 Main.guildInvites.get(guildName).add(playerNameToInvite);
-                                invitedPlayer.spigot().sendMessage(new TextComponent(Main.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.YELLOW + guildName + ChatColor.RED + "!"), clickableMsgJoin( invitedPlayer.getName()), new TextComponent(" "), clickableMsgDiscard(sender, guildName));
+                                invitedPlayer.spigot().sendMessage(new TextComponent(Main.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.YELLOW + guildName + ChatColor.RED + "!"), clickableMsgJoin(guildName), new TextComponent(" "), clickableMsgDiscard(sender, guildName));
                                 sender.sendMessage(Main.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
                                 autoDeleteGuildInvite(Bukkit.getPlayerExact(playerNameToInvite), guildName);
 
