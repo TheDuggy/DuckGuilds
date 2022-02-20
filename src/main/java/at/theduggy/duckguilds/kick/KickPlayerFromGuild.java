@@ -28,21 +28,21 @@ import java.io.IOException;
 
 public class KickPlayerFromGuild {
 
-    public static void kickPlayerFromGuild( Player sender, Player p) throws IOException, ParseException {
+    public static void kickPlayerFromGuild( Player sender, Player player) throws IOException, ParseException {
         if (Utils.isPlayerInGuild(sender)) {
             String guildName = Utils.getPlayerGuild(sender);
-            String guildNameOfPlayerToKick = Utils.getPlayerGuild(p);
+            String guildNameOfPlayerToKick = Utils.getPlayerGuild(player);
             if (Utils.getIfPlayerIsHeadOfGuild(guildName, sender)) {
-                if (sender.getName().equals(p.getName())) {
+                if (sender.getName().equals(player.getName())) {
                     if (guildName.equals(guildNameOfPlayerToKick)) {
-                        PlayerLeaveGuild.leaveGuild(p, guildName);
-                        p.sendMessage(Main.prefix  + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (Utils.getPlayerGuild(player).equals(guildNameOfPlayerToKick)) {
+                        PlayerLeaveGuild.leaveGuild(player, guildName);
+                        player.sendMessage(Main.prefix  + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
+                        for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
+                            if (Utils.getPlayerGuild(playerFromServer).equals(guildNameOfPlayerToKick)) {
                                 if (Utils.getIfPlayerIsHeadOfGuild(guildNameOfPlayerToKick, sender)) {
-                                    player.sendMessage(Main.prefix + ChatColor.RED + "The player " + ChatColor.YELLOW + p.getName() + ChatColor.RED + " has been kicked from your guild!");
+                                    playerFromServer.sendMessage(Main.prefix + ChatColor.RED + "The player " + ChatColor.YELLOW + playerFromServer.getName() + ChatColor.RED + " has been kicked from your guild!");
                                 } else {
-                                    player.sendMessage(Main.prefix + ChatColor.RED + "The head of your guild, " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has kicked " + ChatColor.YELLOW + p.getName() + ChatColor.RED + " from your guild!");
+                                    playerFromServer.sendMessage(Main.prefix + ChatColor.RED + "The head of your guild, " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has kicked " + ChatColor.YELLOW + player.getName() + ChatColor.RED + " from your guild!");
                                 }
                             }
                         }

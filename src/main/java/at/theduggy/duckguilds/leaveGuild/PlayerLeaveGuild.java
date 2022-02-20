@@ -16,6 +16,8 @@
 package at.theduggy.duckguilds.leaveGuild;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.storage.Storage;
+import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -36,96 +38,50 @@ import java.util.UUID;
 
 public class PlayerLeaveGuild {
 
-    public static void leaveGuild(Player p, String name) throws IOException, ParseException {
-        if (Main.cachedGuilds.containsKey(name)) {
-            HashMap<String, Object> playersList = Main.cachedGuilds.get(name);
+    public static void leaveGuild(Player player, String name) throws IOException, ParseException {
+        if (Main.getGuildCache().containsKey(name)) {
+            HashMap<String, Object> playersList = Main.getGuildCache().get(name);
             ArrayList<UUID> players = (ArrayList<UUID>) playersList.get("players");
-            if (players.contains(p.getUniqueId())) {
-                    removePlayerFromScoreboard(p, name);
-                    removeGuildFromPlayerFile(p);
-                    changeGuildFile(p, name);
-                    reindexAndChangeFile(name);
-                    p.sendMessage(Main.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
+            if (players.contains(player.getUniqueId())) {
+                    removePlayerFromScoreboard(player, name);
+                    updatePlayerCache(player);
+                    Storage.removePlayerFromGuildField(player.getUniqueId(),name);
+                    player.setDisplayName(ChatColor.WHITE + "<" + player.getName() + ">");
+                    reindexAndChangeFile(name,player.getUniqueId());
+                    player.sendMessage(Main.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
             } else {
-                p.sendMessage(Main.youArentInThatGuild);
+                player.sendMessage(Main.youArentInThatGuild);
 
             }
         }else {
-            p.sendMessage(Main.guildDoesntExists);
+            player.sendMessage(Main.guildDoesntExists);
         }
     }
 
-    public static void removeGuildFromPlayerFile(Player p) throws IOException, ParseException {
-        Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path personalPlayerGuildTeamsFile = Paths.get(personalPlayerGuildFolder + "/data.json");
-        JSONParser jsonParser = new JSONParser();
-        FileReader fileReader = new FileReader(personalPlayerGuildTeamsFile.toFile(),StandardCharsets.UTF_8);
-        JSONObject oldGuild = (JSONObject) jsonParser.parse(fileReader);
-        fileReader.close();
-        oldGuild.remove("guild");
-        oldGuild.put("guild","");
-        FileWriter fileWriter = new FileWriter(personalPlayerGuildTeamsFile.toFile(),StandardCharsets.UTF_8);
-        fileWriter.write(oldGuild.toJSONString());
-        fileWriter.close();
-        UUID uuidFromPlayer = p.getUniqueId();
+    public static void updatePlayerCache(Player player) throws IOException, ParseException {
+        UUID uuidFromPlayer = player.getUniqueId();
         HashMap<String,Object> tempCachedPlayerData = new HashMap<>();
-        tempCachedPlayerData.put("name", Main.cachedPlayers.get(uuidFromPlayer).get("name"));
+        tempCachedPlayerData.put("name", Main.getPlayerCache().get(uuidFromPlayer).get("name"));
         tempCachedPlayerData.put("guild","");
-        tempCachedPlayerData.put("online", Main.cachedPlayers.get(uuidFromPlayer).get("online"));
-        Main.cachedPlayers.remove(uuidFromPlayer);
-        Main.cachedPlayers.put(uuidFromPlayer, tempCachedPlayerData);
+        tempCachedPlayerData.put("online", Main.getPlayerCache().get(uuidFromPlayer).get("online"));
+        Main.getPlayerCache().remove(uuidFromPlayer);
+        Main.getPlayerCache().put(uuidFromPlayer, tempCachedPlayerData);
     }
 
-    public static void changeGuildFile(Player p, String name) throws IOException, ParseException {
-        Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
-        Path guildFile = Paths.get(guildGuildsFolder + "/" + name + ".json");
-        JSONParser jsonParser = new JSONParser();
-        FileReader fileReader = new FileReader(guildFile.toFile(),StandardCharsets.UTF_8);
-        JSONObject guildFileJsonString = (JSONObject) jsonParser.parse(fileReader);
-        fileReader.close();
-        ArrayList<String> members = (ArrayList<String>) guildFileJsonString.get("players");
-        for (int i = 0;i<=members.size();i++){
-            if (members.get(i).equals(p.getUniqueId().toString())){
-                members.remove(i);
+    public static void reindexAndChangeFile(String name,UUID player) throws IOException, ParseException {
+        ArrayList<UUID> oldPlayers = (ArrayList<UUID>) Main.getGuildCache().get(name).get("players");
+        for (int i=0; i!=oldPlayers.size();i++){
+            if (oldPlayers.get(i).equals(player)){
+                ((ArrayList<?>) Main.getGuildCache().get(name).get("players")).remove(i);
                 break;
             }
         }
-        guildFileJsonString.remove("players");
-        guildFileJsonString.put("players",members);
-        FileWriter fileWriter = new FileWriter(guildFile.toFile(),StandardCharsets.UTF_8);
-        fileWriter.write(guildFileJsonString.toJSONString());
-        fileWriter.close();
-        p.setDisplayName(ChatColor.WHITE + "<" + p.getName() + ">");
     }
-
-    public static void reindexAndChangeFile(String name) throws IOException, ParseException {
-        Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
-        Path guildFile = Paths.get(guildGuildsFolder + "/" + name + ".json");
-        JSONParser jsonParser = new JSONParser();
-        FileReader fileReader = new FileReader(guildFile.toFile(),StandardCharsets.UTF_8);
-        JSONObject guildFileJsonString = (JSONObject) jsonParser.parse(fileReader);
-        fileReader.close();
-        HashMap<String,Object> guildDataFromFile = new HashMap<>();
-        ArrayList<UUID> players = new ArrayList<>();
-        for (String s: (ArrayList<String>)guildFileJsonString.get("players")){
-            players.add(UUID.fromString(s));
-        }
-        guildDataFromFile.put("players",players);
-        guildDataFromFile.put("head", UUID.fromString((String) guildFileJsonString.get("head")));
-        guildDataFromFile.put("color",  guildFileJsonString.get("color"));
-        guildDataFromFile.put("tagColor",  guildFileJsonString.get("tagColor"));
-        guildDataFromFile.put("name", guildFileJsonString.get("name"));
-        guildDataFromFile.put("tag", guildFileJsonString.get("tag"));
-        Main.cachedGuilds.remove(name);
-        Main.cachedGuilds.put(name, guildFileJsonString);
-
-    }
-    public static void removePlayerFromScoreboard(Player p, String name){
-        Team team = Main.scoreboard.getTeam(name);
-        team.removeEntry(p.getName());
-        for (Player player:Bukkit.getOnlinePlayers()){
-            player.setScoreboard(Main.scoreboard);
+    public static void removePlayerFromScoreboard(Player player, String name){
+        Team team = Main.getScoreboard().getTeam(name);
+        team.removeEntry(player.getName());
+        for (Player playerFromServer:Bukkit.getOnlinePlayers()){
+            playerFromServer.setScoreboard(Main.getScoreboard());
         }
     }
 }

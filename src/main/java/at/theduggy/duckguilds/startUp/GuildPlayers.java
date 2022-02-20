@@ -1,9 +1,8 @@
 package at.theduggy.duckguilds.startUp;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -12,204 +11,83 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Team;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class GuildPlayers implements Listener {
 
-
-    public static void addPlayersOnReload() throws IOException, ParseException {
-        if (Bukkit.getOnlinePlayers().size()!=0){
-            for (Player p:Bukkit.getOnlinePlayers()){
-                startBasicsForGuildAdding(p);
+    public static void handlePlayersOnReload() throws IOException, ParseException {
+        for (Player player:Bukkit.getServer().getOnlinePlayers()){
+            if (!GuildFiles.checkForPersonalPlayerFile(player.getUniqueId())){
+                GuildFiles.createPersonalPlayerFile(player);
+                HashMap<String,Object> playerData = new HashMap<>();
+                playerData.put("name",player.getName());
+                playerData.put("guild","");
+                playerData.put("online",true);
+                Main.getPlayerCache().put(player.getUniqueId(),playerData);
+                Bukkit.getLogger().warning(Main.getPlayerCache().toString());
+            }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
+                Main.getPlayerCache().get(player.getUniqueId()).replace("online",true);
+            }else {
+                Storage.cachePlayer(player.getUniqueId(),"");
             }
         }
     }
 
-    public static void startBasicsForGuildAdding(Player p) throws IOException, ParseException {
-        if (!GuildFiles.checkForPersonalPlayerGuildFolder(p)){
-            GuildFiles.createPersonalPlayerGuildFolder(p);
-        }
-        if (!GuildFiles.checkForPlayerDataFile(p)){
-            GuildFiles.checkForPlayerDataFile(p);
-        }
-        Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path playerNameData = Paths.get(personalPlayerGuildFolder + "/data.json");
-        JSONParser getPlayerDataParser = new JSONParser();
-        FileReader fileReader = new FileReader(playerNameData.toFile());
-        JSONObject getPlayerData= (JSONObject) getPlayerDataParser.parse(fileReader);
-        fileReader.close();
-        String oldName = (String) getPlayerData.get("name");
-        if (!oldName.equals(p.getName())){
-            JSONObject newPlayerName= new JSONObject();
-            getPlayerData.remove("name");
-            getPlayerData.put("name", p.getName());
-            FileWriter changePlayerNameInFile = new FileWriter(String.valueOf(playerNameData), StandardCharsets.UTF_8);
-            changePlayerNameInFile.write(newPlayerName.toJSONString());
-            changePlayerNameInFile.close();
-        }
-        addToOldGuild(p);
-    }
-
     @EventHandler
-    public void cachePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException {
-        Player p = e.getPlayer();
-        if (!GuildFiles.checkForPersonalPlayerGuildFolder(p)){
-            GuildFiles.createPersonalPlayerGuildFolder(p);
-        }
-        if (!GuildFiles.checkForPlayerDataFile(p)){
-            GuildFiles.createPlayerDataFile(p);
-        }
-        HashMap<String,Object> tempPlayerData = new HashMap<>();
-        FileReader getPlayerName = new FileReader(GuildFiles.guildPlayerFolder + "/" + p.getUniqueId() + "/data.json",StandardCharsets.UTF_8);
-        JSONObject getPlayerDataToJsonObject = (JSONObject) new JSONParser().parse(getPlayerName);
-        getPlayerName.close();
-        String playerName = (String) getPlayerDataToJsonObject.get("name");
-        String playerGuild = (String) getPlayerDataToJsonObject.get("guild");
-        tempPlayerData.put("name",  playerName);
-        tempPlayerData.put("guild", playerGuild);
-        if (Utils.isPlayerOnline(p.getUniqueId())){
-            tempPlayerData.put("online",true);
-        }else {
-            tempPlayerData.put("online",false);
-        }
-        Main.cachedPlayers.put(p.getUniqueId(), tempPlayerData);
-        Bukkit.getLogger().warning(Main.cachedPlayers.toString());
-    }
-
-    @EventHandler
-    public void managePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException {
-        Player p = e.getPlayer();
-        Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path playerNameFile = Paths.get(personalPlayerGuildFolder + "/data.json");
-
-        JSONParser getPlayerNameParser = new JSONParser();
-        FileReader fileReader = new FileReader(playerNameFile.toFile());
-        JSONObject getPlayerName= (JSONObject) getPlayerNameParser.parse(fileReader);
-        fileReader.close();
-        String oldName = (String) getPlayerName.get("name");
-        if (!oldName.equals(p.getName())){
-            JSONObject newPlayerName= new JSONObject();
-            newPlayerName.put("name", p.getName());
-            FileWriter changePlayerNameInFile = new FileWriter(String.valueOf(playerNameFile), StandardCharsets.UTF_8);
-            changePlayerNameInFile.write(newPlayerName.toJSONString());
-            changePlayerNameInFile.close();
-        }
-        addToOldGuild(p);
-
-    }
-
-    public static void addToOldGuild(Player p) throws IOException, ParseException {
-        Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
-        Path personalPlayerData = Paths.get(personalPlayerGuildFolder + "/data.json");
-        JSONParser jsonParser = new JSONParser();
-        FileReader fileReader = new FileReader(personalPlayerData.toFile(),StandardCharsets.UTF_8);
-        JSONObject getPlayerGuild = (JSONObject) jsonParser.parse(fileReader);
-        fileReader.close();
-        String guild = (String) getPlayerGuild.get("guild");
-        if (GuildConfig.getIfCheckForPlayerInAllGuilds()){
-            if (Utils.isPlayerInGuildPlayerList(Main.cachedGuilds, p.getUniqueId())){
-                Bukkit.getLogger().warning("Breakpoint reached!");
-                Bukkit.getLogger().warning(guild);
-                HashMap<String,Object> indexedGuild = Main.cachedGuilds.get(Utils.getKeyFromValueGuilds(Main.cachedGuilds, p.getUniqueId()));
-                Team guildTeam;
-                try {
-                    guildTeam = Main.scoreboard.registerNewTeam(guild);
-                }catch (IllegalArgumentException e){
-                    guildTeam = Main.scoreboard.getTeam(guild);
-                }
-                ChatColor tagColor =  Utils.translateFromStringToChatColor((String) indexedGuild.get("tagColor"));
-                String tag = (String) indexedGuild.get("tag");
-                ChatColor color = Utils.translateFromStringToChatColor((String) indexedGuild.get("color"));
-                guildTeam.setSuffix(ChatColor.GRAY + "[" + tagColor+ tag + ChatColor.GRAY + "]");
-                guildTeam.setDisplayName(guild);
-                guildTeam.setColor(color);
-                guildTeam.addEntry(p.getName());
-                p.setDisplayName(color + p.getName() + ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]" + ChatColor.WHITE);
-                for (Player player:Bukkit.getOnlinePlayers()){
-                    player.setScoreboard(Main.scoreboard);
-                }
+    public void handlePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException {
+        Player player = e.getPlayer();
+        if (!GuildFiles.checkForPersonalPlayerFile(player.getUniqueId())){
+            GuildFiles.createPersonalPlayerFile(player);
+            HashMap<String,Object> playerData = new HashMap<>();
+            playerData.put("name",player.getName());
+            playerData.put("guild","");
+            playerData.put("online",true);
+            Main.getPlayerCache().put(player.getUniqueId(),playerData);
+            Bukkit.getLogger().warning("Breakpoint 1: " +  Main.getPlayerCache().toString());
+        }else if (!Main.getPlayerCache().get(player.getUniqueId()).get("guild").equals("")){
+            String oldName = Storage.getPlayerDataFromStorage(player.getUniqueId());
+            if (!oldName.equals(player.getName())) {
+                HashMap<String, String> newPlayerData = new HashMap<>();
+                newPlayerData.put("name", player.getName());
+                Storage.updatePlayerData(player.getUniqueId(), newPlayerData);
+                Main.getPlayerCache().get(player.getUniqueId()).replace("name","TestName");
+                Main.getPlayerCache().get(player.getUniqueId()).replace("online",true);
             }
-        }else if(!guild.equals("")){
-            Bukkit.getLogger().warning(guild);
-            HashMap<String,Object> indexedGuild = Main.cachedGuilds.get(guild);
-            Team guildTeam;
+            Team team;
+            String guildName = (String) Main.getPlayerCache().get(player.getUniqueId()).get("guild");
             try {
-                guildTeam = Main.scoreboard.registerNewTeam(guild);
-            }catch (IllegalArgumentException e){
-                guildTeam = Main.scoreboard.getTeam(guild);
+                team = Main.getScoreboard().registerNewTeam(guildName);
+            }catch (IllegalArgumentException exception){
+                team = Main.getScoreboard().getTeam(guildName);
             }
-            ChatColor tagColor =  Utils.translateFromStringToChatColor((String) indexedGuild.get("tagColor"));
-            String tag = (String) indexedGuild.get("tag");
-            ChatColor color = Utils.translateFromStringToChatColor((String) indexedGuild.get("color"));
-            guildTeam.setSuffix(ChatColor.GRAY + "[" + tagColor+ tag + ChatColor.GRAY + "]");
-            guildTeam.setDisplayName(guild);
-            guildTeam.setColor(color);
-            guildTeam.addEntry(p.getName());
-            p.setDisplayName(color + p.getName() + ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]" + ChatColor.WHITE);
-            for (Player player:Bukkit.getOnlinePlayers()){
-                player.setScoreboard(Main.scoreboard);
+            String newPlayerName = Main.getGuildCache().get(guildName).get("color") + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).get("tagColor") + Main.getGuildCache().get(guildName).get("tag") + ChatColor.GRAY + "]" + ChatColor.WHITE;
+            team.setColor((ChatColor) Main.getGuildCache().get(guildName).get("color"));
+            team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).get("tagColor") + Main.getGuildCache().get(guildName).get("tag") + ChatColor.GRAY + "]" + ChatColor.WHITE);
+            team.setDisplayName(guildName);
+            team.addEntry(player.getName());
+            player.setDisplayName(newPlayerName);
+            player.setCustomName(newPlayerName);
+            for (Player playerFromServer:Bukkit.getServer().getOnlinePlayers()){
+                playerFromServer.setScoreboard(Main.getScoreboard());
             }
+
+
         }else {
-            p.setScoreboard(Main.scoreboard);
-        }
-
-    }
-
-    public static void cachePlayers() throws IOException, ParseException {
-        if (GuildFiles.guildPlayerFolder.toFile().listFiles().length>0) {
-            for (File f : GuildFiles.guildPlayerFolder.toFile().listFiles()) {
-                if (f.isDirectory()){
-                    if (Utils.isStringUUID(f.getName())){
-                        if (Utils.containsPlayerDataFolderNeededFiles(f)){
-                            HashMap<String,Object> tempPalyerData = new HashMap<>();
-                            FileReader getPlayerName = new FileReader(GuildFiles.guildPlayerFolder + "/" + f.getName() + "/data.json",StandardCharsets.UTF_8);
-                            JSONObject getPlayerDataJson = (JSONObject) new JSONParser().parse(getPlayerName);
-                            getPlayerName.close();
-                            String playerName = (String) getPlayerDataJson.get("name");
-                            String playerGuild = (String) getPlayerDataJson.get("guild");
-                            tempPalyerData.put("name",  playerName);
-                            tempPalyerData.put("guild", playerGuild);
-                            if (Utils.isPlayerOnline(UUID.fromString(f.getName()))){
-                                tempPalyerData.put("online",true);
-                            }else {
-                                tempPalyerData.put("online",false);
-                            }
-                            Main.cachedPlayers.put(UUID.fromString(f.getName()), tempPalyerData);
-                            Bukkit.getLogger().warning(Main.cachedPlayers.toString());
-
-                        }
-                    }
-                }
-            }
+            HashMap<String,Object> playerData = new HashMap<>();
+            playerData.put("name",player.getName());
+            playerData.put("online",true);
+            playerData.put("guild","");
+            Bukkit.getLogger().warning("Breakpoint 3: " + Main.getPlayerCache().toString());
         }
     }
-
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e){
-        Player p = e.getPlayer();
-        UUID uuidFromPlayer = p.getUniqueId();
-        HashMap<String,Object> tempCachedPlayerData = new HashMap<>();
-        tempCachedPlayerData.put("name", Main.cachedPlayers.get(uuidFromPlayer).get("name"));
-        tempCachedPlayerData.put("guild",Main.cachedPlayers.get(uuidFromPlayer).get("guild"));
-        tempCachedPlayerData.put("online", false);
-        Main.cachedPlayers.remove(uuidFromPlayer);
-        Main.cachedPlayers.put(uuidFromPlayer, tempCachedPlayerData);
-        Bukkit.getLogger().warning(Main.cachedPlayers.toString());
+        Player player = e.getPlayer();
+        Main.getPlayerCache().get(player.getUniqueId()).replace("online",false);
+        Bukkit.getLogger().warning(Main.getPlayerCache().toString());
     }
 }

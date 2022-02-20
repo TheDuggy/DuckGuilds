@@ -18,8 +18,8 @@ package at.theduggy.duckguilds;
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
 import at.theduggy.duckguilds.logging.AutoLogger;
-import at.theduggy.duckguilds.startUp.IndexGuilds;
 import at.theduggy.duckguilds.startUp.GuildPlayers;
+import at.theduggy.duckguilds.storage.Storage;
 import org.apache.log4j.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,19 +32,20 @@ import org.json.simple.parser.ParseException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 public final class Main extends JavaPlugin {
 
-public static HashMap<UUID,HashMap<String,Object>> cachedPlayers = new HashMap<>();
+private static HashMap<UUID,HashMap<String,Object>> cachedPlayers = new HashMap<>();
+public static ArrayList<String> guildInfo = new ArrayList<>();
 public static FileConfiguration mainFileConfiguration;
-public static Scoreboard scoreboard;
+private static Scoreboard scoreboard;
 public static Plugin plugin;
 public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
-public static HashMap<String,HashMap<String,Object>> cachedGuilds = new HashMap<>();
-public static HashMap<String, ArrayList<UUID>> playersInAllGuilds = new HashMap<>();
+private static HashMap<String,HashMap<String,Object>> cachedGuilds = new HashMap<>();
 public static String prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "DuckGuilds" + ChatColor.GRAY + "] ";
 public static String wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!";
 public static String playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!";
@@ -57,6 +58,8 @@ public static String youAreNotTheHeadOfThatGuild = prefix + ChatColor.RED + "You
 public static String forbiddenArgument = prefix + ChatColor.RED + "This command do not take this argument!";
 public static String playerDoesntExists = prefix + ChatColor.RED + "That player doesn't exist!";
 public static String playerInstOnline = prefix + ChatColor.RED + "This player isn't online!";
+public static String pageIndexMustBeNumeric = prefix + ChatColor.RED + "The page-index must be numeric!";
+public static String pageIndexOutOfBounds = prefix + ChatColor.RED + "The page-index must be valid!";
 public static Path guildRootFolder;
 public static Path loggingFolder;
 
@@ -85,13 +88,10 @@ public static Path loggingFolder;
             listenerRegistration();
             if (!GuildFiles.guildFolderStructureExists()) {
                 GuildFiles.createGuildFiles();
-                if (!GuildFiles.checkForIndex()) {
-                    GuildFiles.createIndexFile();
-                }
             }
-            IndexGuilds.indexGuilds();
-            GuildPlayers.cachePlayers();
-            GuildPlayers.addPlayersOnReload();
+            Storage.cacheGuilds();
+            GuildPlayers.handlePlayersOnReload();
+            Storage.cachePlayers();
         }catch (IOException|ParseException e){
                 e.printStackTrace();
         }
@@ -145,7 +145,23 @@ public static Path loggingFolder;
         if (GuildConfig.getCustomLogging() instanceof Path){
             loggingFolder = (Path) GuildConfig.getCustomLogging();
         }else {
-            loggingFolder = Path.of(plugin.getDataFolder().toPath() + "/logs/");
+            loggingFolder = Paths.get(plugin.getDataFolder().toPath() + "/logs/");
         }
+    }
+
+    public static HashMap<String,HashMap<String,Object>> getGuildCache(){
+        return cachedGuilds;
+    }
+
+    public static HashMap<UUID,HashMap<String,Object>> getPlayerCache(){
+        return cachedPlayers;
+    }
+
+    public static Scoreboard getScoreboard(){
+        return scoreboard;
+    }
+
+    public static ArrayList<String> getGuildInfo() {
+        return guildInfo;
     }
 }

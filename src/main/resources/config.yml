@@ -1,3 +1,8 @@
+#This option sets which type of storage should be used! On small server, FILE (which is the default)
+#is strong enough, but if you've got a server with >100 players it's highly recommended using a
+#database (DATABASE)!
+storageType: FILE
+
 #The inviteDeleteTime is the length of time since a guild-invite was created until it is deleted.
 #IMPORTANT! This is in ticks(1 sec = 20 ticks)
 #By default it is set to 15 min(18000 ticks)

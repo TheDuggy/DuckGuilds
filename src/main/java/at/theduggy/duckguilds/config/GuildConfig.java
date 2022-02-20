@@ -16,6 +16,7 @@
 package at.theduggy.duckguilds.config;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.storage.StorageType;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -27,13 +28,15 @@ import java.util.HashMap;
 
 public class GuildConfig {
 
+    public static StorageType storageType;
+
     public static int getMaxGuildSize(){
         FileConfiguration f = Main.mainFileConfiguration;
         if (f.get("maxGuilds")instanceof Boolean){
             return 0;
         }else if (f.get("maxGuilds") instanceof Integer){
             if (f.getInt("maxGuilds")>0){
-                if (f.getInt("maxGuilds")<=Main.cachedGuilds.size()){
+                if (f.getInt("maxGuilds")<=Main.getGuildCache().size()){
                     return f.getInt("maxGuilds");
                 }else {
                     return 0;
@@ -62,8 +65,8 @@ public class GuildConfig {
         if (f.getString("guildDirRootPath").equals("default")){
             return Paths.get(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
         }else if (!f.getString("guildDirRootPath").equals("default")){
-            if (Files.exists(Path.of(f.getString("guildDirRootPath")))){
-                return Path.of(f.getString("guildDirRootPath")+ "/guilds");
+            if (Files.exists(Paths.get(f.getString("guildDirRootPath")))){
+                return Paths.get(f.getString("guildDirRootPath")+ "/guilds");
             }else {
                 return Paths.get(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
 
@@ -83,9 +86,9 @@ public class GuildConfig {
             if (f.get("customLogging") instanceof Boolean) {
                 return false;
             } else if (f.get("customLogging") instanceof String) {
-                if (Files.exists(Path.of(f.getString("customLogging")))) {
-                    if (Files.isDirectory(Path.of(f.getString("customLogging")))) {
-                        return Path.of(f.getString("customLogging"));
+                if (Files.exists(Paths.get(f.getString("customLogging")))) {
+                    if (Files.isDirectory(Paths.get(f.getString("customLogging")))) {
+                        return Paths.get(f.getString("customLogging"));
                     } else {
                         return false;
                     }
@@ -100,12 +103,25 @@ public class GuildConfig {
         }
     }
 
-    public static boolean getIfCheckForPlayerInAllGuilds(){
-        if (Main.mainFileConfiguration.getBoolean("checkForPlayerInAllGuilds")){
-
-            return true;
+    public static Enum<StorageType> getStorageType(){
+        FileConfiguration fileConfiguration = Main.mainFileConfiguration;
+        if (storageType==null) {
+            switch (fileConfiguration.getString("storageType")) {
+                case "FILE":
+                    storageType=StorageType.FILE;
+                    return StorageType.FILE;
+                case "DATABASE":
+                    storageType=StorageType.DATABASE;
+                    return StorageType.DATABASE;
+                default:
+                    return StorageType.FILE;
+            }
         }else {
-            return false;
+            return storageType;
         }
+    }
+
+    public static boolean getIfCheckForPlayerInAllGuilds(){
+        return Main.mainFileConfiguration.getBoolean("checkForPlayerInAllGuilds");
     }
 }

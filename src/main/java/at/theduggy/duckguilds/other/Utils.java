@@ -20,13 +20,12 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class Utils {
@@ -52,99 +51,97 @@ public class Utils {
     public static ChatColor translateFromStringToChatColor(String toTranslate){
         ChatColor color;
 
-        if (toTranslate.equals("&9")){
-            color=ChatColor.BLUE;
-            return color;
-        }else if (toTranslate.equals("&1")){
-            color =ChatColor.DARK_BLUE;
-            return color;
-        }else if (toTranslate.equals("&5")){
-            color = ChatColor.DARK_PURPLE;
-            return color;
-        }else if (toTranslate.equals("&d")){
-            color=ChatColor.LIGHT_PURPLE;
-            return color;
-        }else if (toTranslate.equals("&b")){
-            color=ChatColor.AQUA;
-            return color;
-        }else if (toTranslate.equals("&3")){
-            color = ChatColor.DARK_AQUA;
-            return color;
-        }else if (toTranslate.equals("&2")){
-            color=ChatColor.DARK_GREEN;
-            return color;
-        }else if (toTranslate.equals("&4")){
-            color=ChatColor.DARK_RED;
-            return color;
-        }else if (toTranslate.equals("&6")){
-            color=ChatColor.GOLD;
-            return color;
-        }else if (toTranslate.equals("&a")){
-            color=ChatColor.GREEN;
-            return color;
-        }else if (toTranslate.equals("&c")){
-            color=ChatColor.RED;
-            return color;
-        }else if (toTranslate.equals("&e")){
-            color=ChatColor.YELLOW;
-            return color;
-        }else if (toTranslate.equals("&f")){
-            color=ChatColor.WHITE;
-            return color;
+        switch (toTranslate) {
+            case "&9":
+                color = ChatColor.BLUE;
+                return color;
+            case "&1":
+                color = ChatColor.DARK_BLUE;
+                return color;
+            case "&5":
+                color = ChatColor.DARK_PURPLE;
+                return color;
+            case "&d":
+                color = ChatColor.LIGHT_PURPLE;
+                return color;
+            case "&b":
+                color = ChatColor.AQUA;
+                return color;
+            case "&3":
+                color = ChatColor.DARK_AQUA;
+                return color;
+            case "&2":
+                color = ChatColor.DARK_GREEN;
+                return color;
+            case "&4":
+                color = ChatColor.DARK_RED;
+                return color;
+            case "&6":
+                color = ChatColor.GOLD;
+                return color;
+            case "&a":
+                color = ChatColor.GREEN;
+                return color;
+            case "&c":
+                color = ChatColor.RED;
+                return color;
+            case "&e":
+                color = ChatColor.YELLOW;
+                return color;
+            case "&f":
+                color = ChatColor.WHITE;
+                return color;
         }
         return null;
     }
 
-    public static String getPlayerGuild(Player p) throws IOException, ParseException {
-        return (String) Main.cachedPlayers.get(p.getUniqueId()).get("guild");
+    public static String getPlayerGuild(Player player){
+        return (String) Main.getPlayerCache().get(player.getUniqueId()).get("guild");
     }
 
-    public static boolean getIfPlayerIsHeadOfGuild(String name, Player p) throws IOException, ParseException {
+    public static boolean getIfPlayerIsHeadOfGuild(String name, Player player) {
         boolean isTrue = false;
-        if (Main.cachedGuilds.containsKey(name)){
-            if (Main.cachedGuilds.get(name).get("head").equals(p.getUniqueId())){
-
+        if (Main.getGuildCache().containsKey(name)){
+            if (Main.getGuildCache().get(name).get("head").equals(player.getUniqueId())){
                 isTrue = true;
             }
         }
         return isTrue;
     }
-//TODO Check for each guild-file!
+
     public static boolean guildExists(String name) throws IOException, ParseException {
-        if (Main.cachedGuilds.containsKey(name)){
-            return true;
-        }else {
-            return false;
-        }
+        return Main.getGuildCache().containsKey(name);
     }
 
     public static UUID getHeadOfGuild(String guildName){
-        return (UUID) Main.cachedGuilds.get(guildName).get("head");
+        return (UUID) Main.getGuildCache().get(guildName).get("head");
     }
 
-    public static ArrayList<String> getPlayerGuildInvites(Player p){
+    public static ArrayList<String> getPlayerGuildInvites(Player player){
         ArrayList<String> keys = new ArrayList<>(Main.guildInvites.keySet());
         ArrayList<String> guilds = new ArrayList<>();
         for (int i = 0;i!=keys.size();i++){
-            if (Main.guildInvites.get(keys.get(i)).contains(p.getName())){
+            if (Main.guildInvites.get(keys.get(i)).contains(player.getName())){
                 guilds.add(keys.get(i));
             }
         }
         return guilds;
     }
 
-    public static ArrayList<String> getPlayersThatArentInAGuild() throws IOException, ParseException {
+    public static ArrayList<String> getPlayersThatArentInAGuild(){
         ArrayList<String> players = new ArrayList<>();
-        for (Player p:Bukkit.getOnlinePlayers()){
-            if (!Utils.isPlayerInGuild(p)){
-                players.add(p.getName());
+        for (Player player:Bukkit.getOnlinePlayers()){
+            if (!Utils.isPlayerInGuild(player)){
+                players.add(player.getName());
             }
         }
         return players;
     }
 
+    //TODO Check if all for-loops use the correct player!!!
+
     public static int getGuildSize(String guild) {
-        ArrayList<UUID> players = new ArrayList<>((ArrayList<UUID>) Main.cachedGuilds.get(guild).get("players"));
+        ArrayList<UUID> players = new ArrayList<>((ArrayList<UUID>) Main.getGuildCache().get(guild).get("players"));
         return players.size();
     }
 
@@ -168,17 +165,6 @@ public class Utils {
         return isTrue;
     }
 
-    public static ArrayList<String> getAllPlayersOfAGuild(String guildName) throws ParseException {
-        HashMap<String, Object> guildInfo = Main.cachedGuilds.get(guildName);
-        ArrayList<UUID> playersFromUUID = (ArrayList<UUID>) guildInfo.get("players");
-        ArrayList<String> playersWithNames = new ArrayList<>();
-        for (int i =0;i!=playersFromUUID.size();i++){
-            playersWithNames.add(Bukkit.getPlayer(playersFromUUID.get(i)).getName());
-
-        }
-        return playersWithNames;
-    }
-
     public static ArrayList<String> getAllPlayerGuildInvitesForAGuild(String guildName){
         ArrayList<String> invites = new ArrayList<>();
         if  (Main.guildInvites.get(guildName)!=null) {
@@ -190,11 +176,11 @@ public class Utils {
     }
 
    public static ChatColor getGuildChatColor(String guildName) throws ParseException {
-       return Utils.translateFromStringToChatColor((String) Main.cachedGuilds.get(guildName).get("color"));
+       return Utils.translateFromStringToChatColor((String) Main.getGuildCache().get(guildName).get("color"));
     }
 
     public static ChatColor getTagColor(String guildName) throws ParseException {
-        return Utils.translateFromStringToChatColor((String) Main.cachedGuilds.get(guildName).get("color"));
+        return Utils.translateFromStringToChatColor((String) Main.getGuildCache().get(guildName).get("color"));
     }
 
     public static String getChatColorCode(ChatColor color){
@@ -231,64 +217,83 @@ public class Utils {
 
     public static ChatColor translateFromReadableStringToChatColorLightColors(String toTranslate){
         ChatColor color = null;
-        if (toTranslate.equals("Blue")){
-            color=ChatColor.BLUE;
-        }else if (toTranslate.equals("Light_Purple")){
-            color=ChatColor.LIGHT_PURPLE;
-        }else if (toTranslate.equals("Aqua")){
-            color=ChatColor.AQUA;
-        }else if (toTranslate.equals("Gold")){
-            color=ChatColor.GOLD;
-        }else if (toTranslate.equals("Green")){
-            color=ChatColor.GREEN;
-        }else if (toTranslate.equals("Red")){
-            color=ChatColor.RED;
-        }else if (toTranslate.equals("Yellow")){
-            color=ChatColor.YELLOW;
-        }else if (toTranslate.equals("White")){
-            color=ChatColor.WHITE;
+        switch (toTranslate) {
+            case "Blue":
+                color = ChatColor.BLUE;
+                break;
+            case "Light_Purple":
+                color = ChatColor.LIGHT_PURPLE;
+                break;
+            case "Aqua":
+                color = ChatColor.AQUA;
+                break;
+            case "Gold":
+                color = ChatColor.GOLD;
+                break;
+            case "Green":
+                color = ChatColor.GREEN;
+                break;
+            case "Red":
+                color = ChatColor.RED;
+                break;
+            case "Yellow":
+                color = ChatColor.YELLOW;
+                break;
+            case "White":
+                color = ChatColor.WHITE;
+                break;
         }
         return color;
     }
 
     public static ChatColor translateFromReadableStringToChatColorAllColors(String toTranslate){
         ChatColor color = null;
-        if (toTranslate.equals("Blue")){
-            color=ChatColor.BLUE;
-        }else if (toTranslate.equals("Dark_Blue")){
-            color =ChatColor.DARK_BLUE;
-        }else if (toTranslate.equals("Dark_Purple")){
-            color = ChatColor.DARK_PURPLE;
-        }else if (toTranslate.equals("Light_Purple")){
-            color=ChatColor.LIGHT_PURPLE;
-        }else if (toTranslate.equals("Aqua")){
-            color=ChatColor.AQUA;
-        }else if (toTranslate.equals("Dark_Aqua")) {
-            color = ChatColor.DARK_AQUA;
-        }else if (toTranslate.equals("Dark_Green")){
-            color=ChatColor.DARK_GREEN;
-        }else if (toTranslate.equals("Dark_Red")){
-            color=ChatColor.DARK_RED;
-        }else if (toTranslate.equals("Gold")){
-            color=ChatColor.GOLD;
-        }else if (toTranslate.equals("Green")){
-            color=ChatColor.GREEN;
-        }else if (toTranslate.equals("Red")){
-            color=ChatColor.RED;
-        }else if (toTranslate.equals("Yellow")){
-            color=ChatColor.YELLOW;
-        }else if (toTranslate.equals("White")){
-            color=ChatColor.WHITE;
+        switch (toTranslate) {
+            case "Blue":
+                color = ChatColor.BLUE;
+                break;
+            case "Dark_Blue":
+                color = ChatColor.DARK_BLUE;
+                break;
+            case "Dark_Purple":
+                color = ChatColor.DARK_PURPLE;
+                break;
+            case "Light_Purple":
+                color = ChatColor.LIGHT_PURPLE;
+                break;
+            case "Aqua":
+                color = ChatColor.AQUA;
+                break;
+            case "Dark_Aqua":
+                color = ChatColor.DARK_AQUA;
+                break;
+            case "Dark_Green":
+                color = ChatColor.DARK_GREEN;
+                break;
+            case "Dark_Red":
+                color = ChatColor.DARK_RED;
+                break;
+            case "Gold":
+                color = ChatColor.GOLD;
+                break;
+            case "Green":
+                color = ChatColor.GREEN;
+                break;
+            case "Red":
+                color = ChatColor.RED;
+                break;
+            case "Yellow":
+                color = ChatColor.YELLOW;
+                break;
+            case "White":
+                color = ChatColor.WHITE;
+                break;
         }
         return color;
     }
 
-    public static boolean isPlayerInGuild(Player p) throws IOException, ParseException {
-        boolean isTrue = false;
-        if (!Main.cachedPlayers.get(p.getUniqueId()).get("guild").equals("")){
-            isTrue = true;
-        }
-        return isTrue;
+    public static boolean isPlayerInGuild(Player player){
+        return !Main.getPlayerCache().get(player.getUniqueId()).get("guild").equals("");
     }
 
     public static boolean isStringUUID(String s){
@@ -301,55 +306,70 @@ public class Utils {
         return canBeParsed;
     }
 
-    public static boolean containsPlayerDataFolderNeededFiles(File f){
-        if (f.listFiles().length==1){
-            for (File playerFile:f.listFiles()){
-                if (playerFile.getName().equals("data.json")) {
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        }else {
+    public static boolean isPlayerOnline(UUID uuid){
+        ArrayList<UUID> onlineUUIDS = new ArrayList<>();
+        for (Player player: Bukkit.getOnlinePlayers()){
+            onlineUUIDS.add(player.getUniqueId());
+        }
+        return onlineUUIDS.contains(uuid);
+    }
+
+
+    public static String getFileBaseName(File file){
+        return file.getName().substring(0,file.getName().lastIndexOf('.'));
+    }
+
+    public static String getFileExtension(File file) {
+        return file.getName().substring(file.getName().lastIndexOf('.'));
+    }
+
+    public static boolean isStringInteger(String toCheck){
+        try {
+            int i = Integer.parseInt(toCheck);
+            return true;
+        }catch (NumberFormatException e){
             return false;
         }
-        return  false;
     }
 
-    public static boolean isPlayerOnline(UUID uuid){
-        boolean isOnline= false;
-        ArrayList<UUID> onlineUUIDS = new ArrayList<>();
-        for (Player p: Bukkit.getOnlinePlayers()){
-            onlineUUIDS.add(p.getUniqueId());
-        }
-        if (onlineUUIDS.contains(uuid)){
-            isOnline= true;
-        }
-        return isOnline;
-    }
-
-    public static String convertStringToUTF8(String toConvert){
-        byte[] bytes = toConvert.getBytes(StandardCharsets.UTF_8);
-        return new String(bytes, StandardCharsets.UTF_8);
-    }
-
-    public static String getKeyFromValueGuilds(HashMap<String,HashMap<String ,Object>> hashmap, UUID playerUUID){
-        for (String s: hashmap.keySet()){
-            ArrayList<UUID> players = (ArrayList<UUID>) hashmap.get(s).get("players");
-            if (players.contains(playerUUID)){
-                return s;
-            }
+    public static String chatColorToString(ChatColor color){
+        if (color.equals(ChatColor.BLUE)){
+            return "Blue";
+        }else if (color.equals(ChatColor.DARK_BLUE)){
+            return "Dark_Blue";
+        }else if (color.equals(ChatColor.DARK_PURPLE)){
+            return "Dark_Purple";
+        }else if (color.equals(ChatColor.LIGHT_PURPLE)){
+            return "Light_Purple";
+        }else if (color.equals(ChatColor.AQUA)){
+            return "Aqua";
+        }else if (color.equals(ChatColor.DARK_AQUA)) {
+            return "Dark_Aqua";
+        }else if (color.equals(ChatColor.DARK_GREEN)){
+            return "Dark_Green";
+        }else if (color.equals(ChatColor.DARK_RED)){
+            return "Dark_Red";
+        }else if (color.equals(ChatColor.GOLD)){
+            return "Gold";
+        }else if (color.equals(ChatColor.GREEN)){
+            return "Green";
+        }else if (color.equals(ChatColor.RED)){
+            return "Red";
+        }else if (color.equals(ChatColor.YELLOW)){
+            return "Yellow";
+        }else if (color.equals(ChatColor.WHITE)){
+            return "White";
         }
         return null;
     }
 
-    public static boolean isPlayerInGuildPlayerList(HashMap<String,HashMap<String,Object>> hashMap, UUID playerUUID){
-        for (String s: hashMap.keySet()){
-            ArrayList<UUID> players = (ArrayList<UUID>) hashMap.get(s).get("players");
-            if (players.contains(playerUUID)){
-                return true;
+    public static int getOnlinePlayersOfGuild(String guildName){
+        int onlinePlayers =0;
+        for (UUID player: (ArrayList<UUID>) Main.getGuildCache().get(guildName).get("players")){
+            if (Bukkit.getPlayer(player)!=null){
+                onlinePlayers+=1;
             }
         }
-        return false;
+        return onlinePlayers;
     }
 }

@@ -47,20 +47,20 @@ public class GuildJoinCommand {
 
                     addPlayerToGuildFile(player,guildName);
                     reindexGuild(player,guildName);
-                   Main.scoreboard.getTeam(guildName).addEntry(player.getName());
+                   Main.getScoreboard().getTeam(guildName).addEntry(player.getName());
                    FileReader fileReader = new FileReader(guildFile.toFile(), StandardCharsets.UTF_8);
                    JSONParser jsonParser = new JSONParser();
                    JSONObject guildInfo = (JSONObject) jsonParser.parse(fileReader);
                    fileReader.close();
                    player.setDisplayName(Utils.getGuildChatColor(guildName) + player.getName() + ChatColor.GRAY + Utils.getTagColor(guildName) + guildInfo.get("tag") + ChatColor.GRAY + "]" + ChatColor.WHITE);
-                    for (Player p: Bukkit.getOnlinePlayers()){
-                        p.setScoreboard(Main.scoreboard);
+                    for (Player playerFromServer: Bukkit.getOnlinePlayers()){
+                        playerFromServer.setScoreboard(Main.getScoreboard());
 
-                        if (Utils.getPlayerGuild(p).equals(guildName)){
-                            if (Utils.getIfPlayerIsHeadOfGuild(guildName, p)){
-                                p.sendMessage(Main.prefix + " " + ChatColor.YELLOW + player.getName() + ChatColor.RED + " has joined your guild!");
+                        if (Utils.getPlayerGuild(playerFromServer).equals(guildName)){
+                            if (Utils.getIfPlayerIsHeadOfGuild(guildName, playerFromServer)){
+                                playerFromServer.sendMessage(Main.prefix + " " + ChatColor.YELLOW + player.getName() + ChatColor.RED + " has joined your guild!");
                             }else {
-                                p.sendMessage(Main.prefix + ChatColor.GREEN + player.getName() + " joined your guild!");
+                                playerFromServer.sendMessage(Main.prefix + ChatColor.GREEN + player.getName() + " joined your guild!");
                             }
                         }
                     }
@@ -76,7 +76,7 @@ public class GuildJoinCommand {
         }
     }
 
-    public static void addPlayerToGuildFile(Player p, String guildName) throws IOException, ParseException {
+    public static void addPlayerToGuildFile(Player player, String guildName) throws IOException, ParseException {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         Path guildFile = Paths.get(guildGuildsFolder + "/" + guildName + ".json");
         FileReader fileReader = new FileReader(guildFile.toFile(),StandardCharsets.UTF_8);
@@ -84,16 +84,16 @@ public class GuildJoinCommand {
         JSONObject oldGuildFile = (JSONObject) jsonParser.parse(fileReader);
         fileReader.close();
         ArrayList<String> allPlayersOfThatGuild = (ArrayList<String>) oldGuildFile.get("players");
-        allPlayersOfThatGuild.add(p.getUniqueId().toString());
+        allPlayersOfThatGuild.add(player.getUniqueId().toString());
         oldGuildFile.remove("players");
         oldGuildFile.put("players",allPlayersOfThatGuild);
         FileWriter fileWriter = new FileWriter(guildFile.toFile(), StandardCharsets.UTF_8);
         fileWriter.write(oldGuildFile.toJSONString());
         fileWriter.close();
     }
-    public static void addGuildToPlayerGuildFile(String name, Player p) throws IOException, ParseException {
+    public static void addGuildToPlayerGuildFile(String name, Player player) throws IOException, ParseException {
         Path guildPlayerFolder = Paths.get(Main.guildRootFolder + "/playerData");
-        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + p.getUniqueId());
+        Path personalPlayerGuildFolder = Paths.get(guildPlayerFolder + "/" + player.getUniqueId());
         Path personalPlayerGuildTeamsFile = Paths.get(personalPlayerGuildFolder + "/guild.json");
         JSONParser jsonParser = new JSONParser();
         FileReader fileReader = new FileReader(personalPlayerGuildTeamsFile.toFile(),StandardCharsets.UTF_8);
@@ -106,13 +106,13 @@ public class GuildJoinCommand {
         fileWriter.close();
     }
 
-    public static void reindexGuild(Player p,String name) throws ParseException {
-        HashMap<String, Object> tempCachedData =Main.cachedGuilds.get(name);
+    public static void reindexGuild(Player player,String name) throws ParseException {
+        HashMap<String, Object> tempCachedData =Main.getGuildCache().get(name);
         ArrayList<UUID> players = new ArrayList<>();
-        players.add(p.getUniqueId());
+        players.add(player.getUniqueId());
         tempCachedData.remove("players");
         tempCachedData.put("players", players);
-        Main.cachedGuilds.remove(name);
-        Main.cachedGuilds.put(name,tempCachedData);
+        Main.getGuildCache().remove(name);
+        Main.getGuildCache().put(name,tempCachedData);
     }
 }
