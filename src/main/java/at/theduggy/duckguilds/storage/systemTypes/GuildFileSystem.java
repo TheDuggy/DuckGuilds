@@ -3,11 +3,15 @@ package at.theduggy.duckguilds.storage.systemTypes;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
+import at.theduggy.duckguilds.metadata.GuildMetadata;
+import at.theduggy.duckguilds.metadata.GuildPlayerMetadata;
 import at.theduggy.duckguilds.other.JsonUtils;
 import at.theduggy.duckguilds.other.Utils;
+import jdk.jshell.execution.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,25 +32,14 @@ public class GuildFileSystem {
     //TODO Use only uuid named player file, instead of dir with data.json
     public static File PLAYER_DATA_FOLDER = new File(Main.guildRootFolder.toAbsolutePath() + "/playerData");
 
-    public static void createGuildFile(HashMap<String,Object> guildData,String name) throws IOException {
-        JSONObject jsonData = new JSONObject();
-        ArrayList<String> players = new ArrayList<>();
-        for (UUID uuid:(ArrayList<UUID>)guildData.get("players")){
-            players.add(uuid.toString());
-        }
-        System.out.println(guildData.get("name"));
-        jsonData.put("name", guildData.get("name"));
-        jsonData.put("color", guildData.get("color"));
-        jsonData.put("tag", guildData.get("tag"));
-        jsonData.put("tagColor", guildData.get("tagColor"));
-        jsonData.put("players", players);
-        jsonData.put("head", guildData.get("head").toString());
+    public static void createGuildFile(GuildMetadata guildMetadata, String name) throws IOException {
         try {
             Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
             Path guildFile = Paths.get(guildGuildsFolder + "/" + name + ".json");
             Files.createFile(guildFile);
             BufferedWriter fileWriter = new BufferedWriter(new FileWriter(String.valueOf(guildFile), StandardCharsets.UTF_8));
-            fileWriter.write(JsonUtils.toPrettyJsonString(jsonData.toJSONString()));
+            System.out.println(guildMetadata.toString());
+            fileWriter.write(JsonUtils.toPrettyJsonString(guildMetadata.toString()));
             fileWriter.close();
         }catch (IOException e){
             e.printStackTrace();
@@ -61,18 +54,28 @@ public class GuildFileSystem {
             for (File file : guildGuildsFolder.toFile().listFiles()) {
                 if (Utils.getFileExtension(file).equals(".json")) {
                     JSONObject jsonStringComponents = (JSONObject) new JSONParser().parse(readPrettyJsonFile(file));
-                    HashMap<String, Object> guildDetails = new HashMap<>();
                     ArrayList<UUID> players = new ArrayList<>();
                     for (String playerUUID : (ArrayList<String>) jsonStringComponents.get("players")) {
                         players.add(UUID.fromString(playerUUID));
                         cachePlayer(UUID.fromString(playerUUID), Utils.getFileBaseName(file));
                     }
-                    guildDetails.put("head", UUID.fromString((String) jsonStringComponents.get("head")));
-                    guildDetails.put("color", Utils.translateFromStringToChatColor((String) jsonStringComponents.get("color")));//TODO Redesign everything to use uuid.json instant!
-                    guildDetails.put("tagColor",  Utils.translateFromStringToChatColor((String) jsonStringComponents.get("tagColor")));
-                    guildDetails.put("players", players);
-                    guildDetails.put("tag", jsonStringComponents.get("tag"));
-                    Main.getGuildCache().put(Utils.getFileBaseName(file), guildDetails); // guild indexed to HasMap
+                    GuildMetadata guildMetadata = new GuildMetadata();
+                    guildMetadata.setHead(UUID.fromString((String) jsonStringComponents.get("head")));
+                    guildMetadata.setColor(Utils.translateFromStringToChatColor((String) jsonStringComponents.get("color")));
+                    guildMetadata.setTagColor(Utils.translateFromStringToChatColor((String) jsonStringComponents.get("tagColor")));
+                    guildMetadata.setPlayers(players);
+                    guildMetadata.setTag((String) jsonStringComponents.get("tag"));
+                    guildMetadata.setName(Utils.getFileBaseName(file));
+                    Team team;
+                    try {
+                        team = Main.getScoreboard().registerNewTeam(Utils.getFileBaseName(file));
+                    }catch (IllegalArgumentException e){
+                        team = Main.getScoreboard().getTeam(Utils.getFileBaseName(file));
+                    }
+                    team.setColor(guildMetadata.getColor());
+                    team.setSuffix(ChatColor.GRAY + "[" + guildMetadata.getTagColor() + guildMetadata.getTag() + ChatColor.GRAY + "]");
+                    team.setDisplayName(Utils.getFileBaseName(file));
+                    Main.getGuildCache().put(Utils.getFileBaseName(file), guildMetadata); // guild indexed to HasMap
                 }
             }
         }catch (IOException|ParseException e){
@@ -136,16 +139,9 @@ public class GuildFileSystem {
     public static void cachePlayer(UUID player,String guild) throws IOException, ParseException {
         Path playerFile = Path.of(GuildFiles.guildPlayerFolder + "/" + player + ".json");
         JSONObject jsonData = (JSONObject) new JSONParser().parse(readPrettyJsonFile(playerFile.toFile()));
-        HashMap<String,Object> playerData = new HashMap<>();
-        playerData.put("name",jsonData.get("name"));
-        playerData.put("guild",guild);
-        if (Utils.isPlayerOnline(player)){
-            playerData.put("online",true);
-        }else {
-            playerData.put("online",false);
-        }
-        Main.getPlayerCache().put(player,playerData);
-        Bukkit.getLogger().warning(Main.getPlayerCache().toString());
+        GuildPlayerMetadata guildPlayerMetadata = new GuildPlayerMetadata(player,Utils.isPlayerOnline(player), (String) jsonData.get("name"),guild);
+        guildPlayerMetadata.setOnline(Utils.isPlayerOnline(player));
+        Main.getPlayerCache().put(player,guildPlayerMetadata);
     }
 
     public static String getPlayerDataFromFile(UUID player) throws IOException, ParseException {
@@ -154,10 +150,10 @@ public class GuildFileSystem {
         return (String) playerData.get("name");
     }
 
-    public static void updatePlayerData(UUID player,HashMap<String,String> newPlayerData) throws IOException {
+    public static void updatePlayerData(UUID player,GuildPlayerMetadata guildPlayerMetadata) throws IOException {
         File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
         JSONObject newPlayerDataInJson = new JSONObject();
-        newPlayerDataInJson.put("name",newPlayerData.get("name"));
+        newPlayerDataInJson.put("name",guildPlayerMetadata.getName());
         FileWriter writeNewData = new FileWriter(personalPlayerFile, StandardCharsets.UTF_8);
         writeNewData.write(JsonUtils.toPrettyJsonString(newPlayerDataInJson.toJSONString()));
         writeNewData.close();

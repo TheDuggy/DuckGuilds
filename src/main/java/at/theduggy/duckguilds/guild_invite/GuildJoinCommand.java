@@ -17,10 +17,12 @@ package at.theduggy.duckguilds.guild_invite;
 
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.metadata.GuildMetadata;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -45,12 +47,17 @@ public class GuildJoinCommand {
                     addGuildToPlayerGuildFile(guildName,player);
                     addPlayerToGuildFile(player,guildName);
                     reindexGuild(player,guildName);
+                    Team team;
                     try {
-                        Main.getScoreboard().registerNewTeam(guildName).addEntry(player.getName());
+                      team = Main.getScoreboard().registerNewTeam(guildName);
                     }catch (IllegalArgumentException e){
-                        Main.getScoreboard().getTeam(guildName).addEntry(player.getName());
+                        team = Main.getScoreboard().getTeam(guildName);
                     }
-                   player.setDisplayName(Main.getGuildCache().get(guildName).get("color") + player.getName() + ChatColor.GRAY + Main.getGuildCache().get(guildName).get("tagColor") + Main.getGuildCache().get(guildName).get("tag") + ChatColor.GRAY + "]" + ChatColor.WHITE);
+                    team.setColor(Main.getGuildCache().get(guildName).getColor());
+                    team.setSuffix(ChatColor.GRAY + "[" +  Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]");
+                    team.addEntry(player.getName());
+                    player.setDisplayName(Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
+
                     for (Player playerFromServer: Bukkit.getOnlinePlayers()){
                         playerFromServer.setScoreboard(Main.getScoreboard());
 
@@ -90,16 +97,10 @@ public class GuildJoinCommand {
         fileWriter.close();
     }
     public static void addGuildToPlayerGuildFile(String name, Player player) throws IOException, ParseException {
-        Main.getPlayerCache().get(player.getUniqueId()).replace("guild",name);
+        Main.getPlayerCache().get(player.getUniqueId()).setGuild(name);
     }
 
     public static void reindexGuild(Player player,String name) throws ParseException {
-        HashMap<String, Object> tempCachedData =Main.getGuildCache().get(name);
-        ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(name).get("players");
-        players.add(player.getUniqueId());
-        tempCachedData.remove("players");
-        tempCachedData.put("players", players);
-        Main.getGuildCache().remove(name);
-        Main.getGuildCache().put(name,tempCachedData);
+        Main.getGuildCache().get(name).getPlayers().add(player.getUniqueId());
     }
 }

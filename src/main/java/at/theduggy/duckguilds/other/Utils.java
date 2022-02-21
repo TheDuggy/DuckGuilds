@@ -96,13 +96,13 @@ public class Utils {
     }
 
     public static String getPlayerGuild(Player player){
-        return (String) Main.getPlayerCache().get(player.getUniqueId()).get("guild");
+        return (String) Main.getPlayerCache().get(player.getUniqueId()).getGuild();
     }
 
     public static boolean getIfPlayerIsHeadOfGuild(String name, Player player) {
         boolean isTrue = false;
         if (Main.getGuildCache().containsKey(name)){
-            if (Main.getGuildCache().get(name).get("head").equals(player.getUniqueId())){
+            if (Main.getGuildCache().get(name).getHead().equals(player.getUniqueId())){
                 isTrue = true;
             }
         }
@@ -114,7 +114,7 @@ public class Utils {
     }
 
     public static UUID getHeadOfGuild(String guildName){
-        return (UUID) Main.getGuildCache().get(guildName).get("head");
+        return Main.getGuildCache().get(guildName).getHead();
     }
 
     public static ArrayList<String> getPlayerGuildInvites(Player player){
@@ -140,10 +140,6 @@ public class Utils {
 
     //TODO Check if all for-loops use the correct player!!!
 
-    public static int getGuildSize(String guild) {
-        ArrayList<UUID> players = new ArrayList<>((ArrayList<UUID>) Main.getGuildCache().get(guild).get("players"));
-        return players.size();
-    }
 
     public static String centerText(String text) {
         int maxWidth = 80,
@@ -173,14 +169,6 @@ public class Utils {
             }
         }
         return invites;
-    }
-
-   public static ChatColor getGuildChatColor(String guildName) throws ParseException {
-       return Utils.translateFromStringToChatColor((String) Main.getGuildCache().get(guildName).get("color"));
-    }
-
-    public static ChatColor getTagColor(String guildName) throws ParseException {
-        return Utils.translateFromStringToChatColor((String) Main.getGuildCache().get(guildName).get("color"));
     }
 
     public static String getChatColorCode(ChatColor color){
@@ -293,7 +281,7 @@ public class Utils {
     }
 
     public static boolean isPlayerInGuild(Player player){
-        return !Main.getPlayerCache().get(player.getUniqueId()).get("guild").equals("");
+        return !Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("");
     }
 
     public static boolean isStringUUID(String s){
@@ -365,7 +353,7 @@ public class Utils {
 
     public static int getOnlinePlayersOfGuild(String guildName){
         int onlinePlayers =0;
-        for (UUID player: (ArrayList<UUID>) Main.getGuildCache().get(guildName).get("players")){
+        for (UUID player: Main.getGuildCache().get(guildName).getPlayers()){
             if (Bukkit.getPlayer(player)!=null){
                 onlinePlayers+=1;
             }

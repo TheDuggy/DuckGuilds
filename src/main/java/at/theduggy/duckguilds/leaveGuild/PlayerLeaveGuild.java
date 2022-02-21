@@ -40,8 +40,7 @@ public class PlayerLeaveGuild {
 
     public static void leaveGuild(Player player, String name) throws IOException, ParseException {
         if (Main.getGuildCache().containsKey(name)) {
-            HashMap<String, Object> playersList = Main.getGuildCache().get(name);
-            ArrayList<UUID> players = (ArrayList<UUID>) playersList.get("players");
+            ArrayList<UUID> players = Main.getGuildCache().get(name).getPlayers();
             if (players.contains(player.getUniqueId())) {
                     removePlayerFromScoreboard(player, name);
                     updatePlayerCache(player);
@@ -60,19 +59,14 @@ public class PlayerLeaveGuild {
 
     public static void updatePlayerCache(Player player) throws IOException, ParseException {
         UUID uuidFromPlayer = player.getUniqueId();
-        HashMap<String,Object> tempCachedPlayerData = new HashMap<>();
-        tempCachedPlayerData.put("name", Main.getPlayerCache().get(uuidFromPlayer).get("name"));
-        tempCachedPlayerData.put("guild","");
-        tempCachedPlayerData.put("online", Main.getPlayerCache().get(uuidFromPlayer).get("online"));
-        Main.getPlayerCache().remove(uuidFromPlayer);
-        Main.getPlayerCache().put(uuidFromPlayer, tempCachedPlayerData);
+        Main.getPlayerCache().get(uuidFromPlayer).setGuild("");
     }
 
     public static void reindexAndChangeFile(String name,UUID player) throws IOException, ParseException {
-        ArrayList<UUID> oldPlayers = (ArrayList<UUID>) Main.getGuildCache().get(name).get("players");
+        ArrayList<UUID> oldPlayers = Main.getGuildCache().get(name).getPlayers();
         for (int i=0; i!=oldPlayers.size();i++){
             if (oldPlayers.get(i).equals(player)){
-                ((ArrayList<?>) Main.getGuildCache().get(name).get("players")).remove(i);
+                Main.getGuildCache().get(name).getPlayers().remove(i);
                 break;
             }
         }

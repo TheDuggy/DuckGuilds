@@ -383,7 +383,7 @@ public class GuildCommand implements TabExecutor {
                                 if (args[2].equals("playerList")){
                                     ArrayList<String> pagesIndexes = new ArrayList<>();
                                     if (Main.getGuildCache().containsKey(args[1])) {
-                                        ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(args[1]).get("players");
+                                        ArrayList<UUID> players = Main.getGuildCache().get(args[1]).getPlayers();
                                         int pageCount = (int) Math.ceil((double) players.size() / 8.0);
                                         for (int i = 1; i <= pageCount; i++) {
                                             pagesIndexes.add(String.valueOf(i));

@@ -2,6 +2,8 @@ package at.theduggy.duckguilds.startUp;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.files.GuildFiles;
+import at.theduggy.duckguilds.metadata.GuildMetadata;
+import at.theduggy.duckguilds.metadata.GuildPlayerMetadata;
 import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,15 +23,12 @@ public class GuildPlayers implements Listener {
     public static void handlePlayersOnReload() throws IOException, ParseException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
             if (!GuildFiles.checkForPersonalPlayerFile(player.getUniqueId())){
-                GuildFiles.createPersonalPlayerFile(player);
-                HashMap<String,Object> playerData = new HashMap<>();
-                playerData.put("name",player.getName());
-                playerData.put("guild","");
-                playerData.put("online",true);
-                Main.getPlayerCache().put(player.getUniqueId(),playerData);
+                GuildFiles.createPersonalPlayerFile(player);//TODO Remo IO createFile!!!!
+                GuildPlayerMetadata guildPlayerMetadata = new GuildPlayerMetadata(player.getUniqueId(),true,player.getName(),"");
+                Main.getPlayerCache().put(player.getUniqueId(),guildPlayerMetadata);
                 Bukkit.getLogger().warning(Main.getPlayerCache().toString());
             }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
-                Main.getPlayerCache().get(player.getUniqueId()).replace("online",true);
+                Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
             }else {
                 Storage.cachePlayer(player.getUniqueId(),"");
             }
@@ -41,31 +40,18 @@ public class GuildPlayers implements Listener {
         Player player = e.getPlayer();
         if (!GuildFiles.checkForPersonalPlayerFile(player.getUniqueId())){
             GuildFiles.createPersonalPlayerFile(player);
-            HashMap<String,Object> playerData = new HashMap<>();
-            playerData.put("name",player.getName());
-            playerData.put("guild","");
-            playerData.put("online",true);
-            Main.getPlayerCache().put(player.getUniqueId(),playerData);
-            Bukkit.getLogger().warning("Breakpoint 1: " +  Main.getPlayerCache().toString());
-        }else if (!Main.getPlayerCache().get(player.getUniqueId()).get("guild").equals("")){
-            String oldName = Storage.getPlayerDataFromStorage(player.getUniqueId());
-            if (!oldName.equals(player.getName())) {
-                HashMap<String, String> newPlayerData = new HashMap<>();
-                newPlayerData.put("name", player.getName());
-                Storage.updatePlayerData(player.getUniqueId(), newPlayerData);
-                Main.getPlayerCache().get(player.getUniqueId()).replace("name","TestName");
-                Main.getPlayerCache().get(player.getUniqueId()).replace("online",true);
-            }
+            GuildPlayerMetadata guildPlayerMetadata = new GuildPlayerMetadata(player.getUniqueId(),true,player.getName(),"");
+            Main.getPlayerCache().put(player.getUniqueId(),guildPlayerMetadata);
             Team team;
-            String guildName = (String) Main.getPlayerCache().get(player.getUniqueId()).get("guild");
+            String guildName =  Main.getPlayerCache().get(player.getUniqueId()).getGuild();
             try {
                 team = Main.getScoreboard().registerNewTeam(guildName);
             }catch (IllegalArgumentException exception){
                 team = Main.getScoreboard().getTeam(guildName);
             }
-            String newPlayerName = Main.getGuildCache().get(guildName).get("color") + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).get("tagColor") + Main.getGuildCache().get(guildName).get("tag") + ChatColor.GRAY + "]" + ChatColor.WHITE;
-            team.setColor((ChatColor) Main.getGuildCache().get(guildName).get("color"));
-            team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).get("tagColor") + Main.getGuildCache().get(guildName).get("tag") + ChatColor.GRAY + "]" + ChatColor.WHITE);
+            String newPlayerName = Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE;
+            team.setColor( Main.getGuildCache().get(guildName).getColor());
+            team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
             team.setDisplayName(guildName);
             team.addEntry(player.getName());
             player.setDisplayName(newPlayerName);
@@ -73,21 +59,54 @@ public class GuildPlayers implements Listener {
             for (Player playerFromServer:Bukkit.getServer().getOnlinePlayers()){
                 playerFromServer.setScoreboard(Main.getScoreboard());
             }
-
-
+        }else if (!Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("")){
+            String oldName = Storage.getPlayerDataFromStorage(player.getUniqueId());
+            if (!oldName.equals(player.getName())) {
+                HashMap<String, String> newPlayerData = new HashMap<>();
+                newPlayerData.put("name", player.getName());
+                Storage.updatePlayerData(player.getUniqueId(), Main.getPlayerCache().get(player.getUniqueId()));
+                Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
+            }
+            Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
+            Team team;
+            String guildName =  Main.getPlayerCache().get(player.getUniqueId()).getGuild();
+            try {
+                team = Main.getScoreboard().registerNewTeam(guildName);
+            }catch (IllegalArgumentException exception){
+                team = Main.getScoreboard().getTeam(guildName);
+            }
+            String newPlayerName = Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE;
+            team.setColor( Main.getGuildCache().get(guildName).getColor());
+            team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
+            team.setDisplayName(guildName);
+            team.addEntry(player.getName());
+            player.setDisplayName(newPlayerName);
+            player.setCustomName(newPlayerName);
+            for (Player playerFromServer:Bukkit.getServer().getOnlinePlayers()){
+                playerFromServer.setScoreboard(Main.getScoreboard());
+            }
+            System.out.println("Breakpoint 2!");
         }else {
             HashMap<String,Object> playerData = new HashMap<>();
             playerData.put("name",player.getName());
             playerData.put("online",true);
             playerData.put("guild","");
-            Bukkit.getLogger().warning("Breakpoint 3: " + Main.getPlayerCache().toString());
+            String oldName = Storage.getPlayerDataFromStorage(player.getUniqueId());
+            if (!oldName.equals(player.getName())) {
+                HashMap<String, String> newPlayerData = new HashMap<>();
+                newPlayerData.put("name", player.getName());
+                Storage.updatePlayerData(player.getUniqueId(), Main.getPlayerCache().get(player.getUniqueId()));
+                Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
+            }
+            Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
+            Bukkit.getLogger().warning("Breakpoint 3: " + Main.getPlayerCache().get(player.getUniqueId()).getGuild());
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e){
         Player player = e.getPlayer();
-        Main.getPlayerCache().get(player.getUniqueId()).replace("online",false);
+        Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
         Bukkit.getLogger().warning(Main.getPlayerCache().toString());
     }
 }

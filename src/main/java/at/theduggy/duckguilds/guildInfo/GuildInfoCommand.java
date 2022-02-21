@@ -21,12 +21,12 @@ creationDate,
             StringBuilder msg = new StringBuilder();
             msg.append(Main.prefix + ChatColor.GREEN + "General information about " + ChatColor.YELLOW + guildName + ChatColor.GREEN + ": \n");
             msg.append(ChatColor.WHITE + "-".repeat(35) + "\n");
-            ChatColor color = (ChatColor) Main.getGuildCache().get(guildName).get("color");
-            ChatColor tagColor = (ChatColor) Main.getGuildCache().get(guildName).get("tagColor");
+            ChatColor color = Main.getGuildCache().get(guildName).getColor();
+            ChatColor tagColor =  Main.getGuildCache().get(guildName).getTagColor();
             msg.append(ChatColor.GREEN + "Name: " + color + guildName + " (" + Utils.chatColorToString(color) + ")\n");
-            msg.append(ChatColor.GREEN + "Tag: " + tagColor + Main.getGuildCache().get(guildName).get("tag") + " (" +Utils.chatColorToString(tagColor) + ")\n");
-            msg.append(ChatColor.GREEN + "Head: " + color + Main.getPlayerCache().get(Main.getGuildCache().get(guildName).get("head")).get("name") + "\n");
-            ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(guildName).get("players");
+            msg.append(ChatColor.GREEN + "Tag: " + tagColor + Main.getGuildCache().get(guildName).getTag() + " (" +Utils.chatColorToString(tagColor) + ")\n");
+            msg.append(ChatColor.GREEN + "Head: " + color + Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName() + "\n");
+            ArrayList<UUID> players =  Main.getGuildCache().get(guildName).getPlayers();
             msg.append(ChatColor.GREEN  + "Players: " + color + players.size() + "\n");
             msg.append(ChatColor.GREEN + "└ See /guild info " + guildName + " playerList <page> !\n");
             msg.append(ChatColor.GREEN + "Online-Players: " + color + Utils.getOnlinePlayersOfGuild(guildName) + "\n");
@@ -38,7 +38,7 @@ creationDate,
 
     public static void listPlayersOfGuild(Player player,String guildName,int page){
         if (page>0) {
-            ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(guildName).get("players");
+            ArrayList<UUID> players = Main.getGuildCache().get(guildName).getPlayers();
             int pageCount = (int) Math.ceil((double) players.size() / 8.0);
             if (page<=pageCount) {
                 HashMap<Integer,ArrayList<String>> playerPages = new HashMap<>();
@@ -47,11 +47,11 @@ creationDate,
                 for (int i = 1; i<=pages; i++,lastCheckPoint+=8){
                     playerPages.put(i,new ArrayList<>());
                     for (int i2 = lastCheckPoint; i2 !=lastCheckPoint+8&&i2!=players.size(); i2++){
-                        playerPages.get(i).add((String) Main.getPlayerCache().get(players.get(i2)).get("name"));
+                        playerPages.get(i).add(Main.getPlayerCache().get(players.get(i2)).getName());
                     }
                 }
                 System.out.println(playerPages);
-                String headName = (String) Main.getPlayerCache().get(Main.getGuildCache().get(guildName).get("head")).get("name");
+                String headName = (String) Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName();
                 StringBuilder msg = new StringBuilder();
                 msg.append(Main.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                 msg.append(ChatColor.WHITE + "-".repeat(40) + "\n");//60

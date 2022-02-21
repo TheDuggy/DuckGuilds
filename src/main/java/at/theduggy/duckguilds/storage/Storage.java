@@ -3,6 +3,8 @@ package at.theduggy.duckguilds.storage;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
+import at.theduggy.duckguilds.metadata.GuildMetadata;
+import at.theduggy.duckguilds.metadata.GuildPlayerMetadata;
 import at.theduggy.duckguilds.other.Utils;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import org.bukkit.ChatColor;
@@ -23,7 +25,7 @@ import java.util.UUID;
 public class Storage {
 
 
-    public static void createGuildField(HashMap<String,Object> guildData,String name) throws IOException {
+    public static void createGuildField(GuildMetadata guildData, String name) throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
             GuildFileSystem.createGuildFile(guildData, name);
         }
@@ -54,9 +56,9 @@ public class Storage {
         return null;
     }
 
-    public static void updatePlayerData(UUID player,HashMap<String,String> newPlayerData) throws IOException {
+    public static void updatePlayerData(UUID player, GuildPlayerMetadata guildPlayerMetadata) throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
-            GuildFileSystem.updatePlayerData(player, newPlayerData);
+            GuildFileSystem.updatePlayerData(player, guildPlayerMetadata);
         }
     }
 

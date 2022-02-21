@@ -19,6 +19,7 @@ package at.theduggy.duckguilds.creatGuild;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.logging.AutoLogger;
+import at.theduggy.duckguilds.metadata.GuildMetadata;
 import at.theduggy.duckguilds.other.Utils;
 import at.theduggy.duckguilds.storage.Storage;
 import org.apache.log4j.Level;
@@ -54,7 +55,6 @@ import java.util.UUID;
                                         Bukkit.getLogger().warning(String.valueOf(GuildConfig.getMaxGuildSize()));
                                         if (Main.getGuildCache().size()> GuildConfig.getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
-                                            AutoLogger.logMessage( player.getUniqueId() + "(" + player.getName() + ") created the guild " + name + "!%n Tag: " + tag + "%n Color: " + color + "%n tagColor: " + tag, Level.INFO);;
                                             player.sendMessage(Main.getPlayerCache().get(player.getUniqueId()).toString());
                                         }else {
                                             player.sendMessage(Main.prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfig.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " !" + " You can't create guilds till a minimum of 1 is deleted!");
@@ -94,19 +94,21 @@ import java.util.UUID;
         players.add(player.getUniqueId());
         ArrayList<String> playersForFile = new ArrayList<>();
         playersForFile.add(player.getUniqueId().toString());
+        guild.setColor(color);
         guild.setSuffix(ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]");
         guild.setColor(color);
         guild.setDisplayName(name);
-        HashMap<String, Object> guildData = new HashMap<>();
-        guildData.put("color", Utils.getChatColorCode(color));
-        guildData.put("tag", tag);
-        guildData.put("tagColor", Utils.getChatColorCode(tagColor));
-        guildData.put("players", players);
-        guildData.put("head", player.getUniqueId());
+        GuildMetadata guildMetadata = new GuildMetadata();
+        guildMetadata.setColor(color);
+        guildMetadata.setTag(tag);
+        guildMetadata.setTagColor(tagColor);
+        guildMetadata.setPlayers(players);
+        guildMetadata.setHead(player.getUniqueId());
+        guildMetadata.setName(name);
         System.out.println(name);
         //TODO Make a detailed option to save stuff like creation-time!
-        Storage.createGuildField(guildData,name);
-        Main.getGuildCache().put(name, guildData);
+        Storage.createGuildField(guildMetadata,name);
+        Main.getGuildCache().put(name, guildMetadata);
         reCachePlayer(name, player);
         guild.addEntry(player.getName());
         player.setDisplayName(color + player.getName() + ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]" + ChatColor.WHITE);
@@ -114,16 +116,10 @@ import java.util.UUID;
             playerFromServer.setScoreboard(Main.getScoreboard());
         }
         player.sendMessage(Main.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.UNDERLINE + "" + ChatColor.GOLD + name + ChatColor.GREEN + " has been created!");
-        player.sendMessage(Main.getPlayerCache().get(player.getUniqueId()).toString());
     }
 
     public static void reCachePlayer(String name, Player player){
         UUID uuidFromPlayer = player.getUniqueId();
-        HashMap<String,Object> tempCachedPlayerData = new HashMap<>();
-        tempCachedPlayerData.put("name", Main.getPlayerCache().get(uuidFromPlayer).get("name"));
-        tempCachedPlayerData.put("guild",name);
-        tempCachedPlayerData.put("online", Main.getPlayerCache().get(uuidFromPlayer).get("online"));
-        Main.getPlayerCache().remove(uuidFromPlayer);
-        Main.getPlayerCache().put(uuidFromPlayer, tempCachedPlayerData);
+        Main.getPlayerCache().get(uuidFromPlayer).setGuild(name);
     }
 }
