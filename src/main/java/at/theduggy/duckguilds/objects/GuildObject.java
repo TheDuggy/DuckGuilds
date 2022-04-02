@@ -1,22 +1,30 @@
-package at.theduggy.duckguilds.metadata;
+package at.theduggy.duckguilds.objects;
 
 import at.theduggy.duckguilds.other.Utils;
+import com.google.gson.GsonBuilder;
 import org.bukkit.ChatColor;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class GuildMetadata {
+public class GuildObject {
 
     private ArrayList<UUID> players;
-    private ChatColor color;
-    private ChatColor tagColor;
+    private GuildColor color;
+    private GuildColor tagColor;
     private String name;
     private String tag;
     private UUID head;
+    private GuildMetadata guildMetadata;
 
+    public GuildMetadata getGuildMetadata() {
+        return guildMetadata;
+    }
 
+    public void setGuildMetadata(GuildMetadata guildMetadata) {
+        this.guildMetadata = guildMetadata;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -35,16 +43,12 @@ public class GuildMetadata {
         this.players = players;
     }
 
-    public void setColor(ChatColor color) {
+    public void setColor(GuildColor color) {
         this.color = color;
     }
 
-    public void setTagColor(ChatColor tagColor) {
+    public void setTagColor(GuildColor tagColor) {
         this.tagColor = tagColor;
-    }
-
-    public void addPlayer(UUID playerToAdd){
-        players.add(playerToAdd);
     }
 
     public String getName() {
@@ -63,26 +67,17 @@ public class GuildMetadata {
         return players;
     }
 
-    public ChatColor getColor() {
+    public GuildColor getColor() {
         return color;
     }
 
-    public ChatColor getTagColor() {
+    public GuildColor getTagColor() {
         return tagColor;
     }
 
     public String toString(){
-        JSONObject data = new JSONObject();
-        data.put("name",name);
-        data.put("tag",tag);
-        data.put("head",head.toString());
-        ArrayList<String> newUUIDs = new ArrayList<>();
-        for (UUID uuid:players){
-            newUUIDs.add(uuid.toString());
-        }
-        data.put("players", newUUIDs);
-        data.put("color", Utils.getChatColorCode(color));
-        data.put("tagColor",Utils.getChatColorCode(tagColor));
-        return data.toJSONString();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        return gsonBuilder.create().toJson(this);
     }
 }

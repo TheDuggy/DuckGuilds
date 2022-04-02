@@ -61,29 +61,4 @@ public class GuildFiles {
         Files.createDirectories(guildPlayerFolder);
         Files.createDirectory(guildGuildsFolder);
     }
-    public static boolean checkForPersonalPlayerFile(UUID player){
-        return Files.exists(Path.of(GuildFiles.guildPlayerFolder + "/" + player + ".json"));
-    }
-
-    public static void createPersonalPlayerFile(Player player) throws IOException {
-        Files.createFile(Path.of(guildPlayerFolder + "/"+ player.getUniqueId() + ".json"));
-        JSONObject rawJsonData = new JSONObject();
-        rawJsonData.put("name",player.getName());
-        FileWriter writeJsonData = new FileWriter(guildPlayerFolder + "/" + player.getUniqueId() + ".json");
-        writeJsonData.write(JsonUtils.toPrettyJsonString(rawJsonData.toJSONString()));
-        writeJsonData.close();
-    }
-
-    public static boolean checkForPlayerDataFile(Player player){
-        return Files.exists(Paths.get(guildPlayerFolder + "/" + player.getUniqueId() + "/data.json"));
-    }
-
-    public static void createPlayerDataFile(Player player) throws IOException {
-        JSONObject playerBlankData = new JSONObject();
-        playerBlankData.put("name", player.getName());
-        Files.createFile(Paths.get(guildPlayerFolder + "/" + player.getUniqueId() +".json"));
-        FileWriter blankDataWriter = new FileWriter(guildPlayerFolder + "/" + player.getUniqueId() + "/data.json", StandardCharsets.UTF_8);
-        blankDataWriter.write(playerBlankData.toJSONString());
-        blankDataWriter.close();
-    }
 }

@@ -17,7 +17,6 @@ package at.theduggy.duckguilds.guild_invite;
 
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.metadata.GuildMetadata;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,8 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class GuildJoinCommand {
 
@@ -53,20 +50,15 @@ public class GuildJoinCommand {
                     }catch (IllegalArgumentException e){
                         team = Main.getScoreboard().getTeam(guildName);
                     }
-                    team.setColor(Main.getGuildCache().get(guildName).getColor());
+                    team.setColor(Main.getGuildCache().get(guildName).getColor().getChatColor());
                     team.setSuffix(ChatColor.GRAY + "[" +  Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]");
                     team.addEntry(player.getName());
                     player.setDisplayName(Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
-
+                    player.sendMessage(Main.prefix + ChatColor.GREEN + " You successfully joined " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!");
                     for (Player playerFromServer: Bukkit.getOnlinePlayers()){
                         playerFromServer.setScoreboard(Main.getScoreboard());
-
                         if (Utils.getPlayerGuild(playerFromServer).equals(guildName)){
-                            if (Utils.getIfPlayerIsHeadOfGuild(guildName, playerFromServer)){
-                                playerFromServer.sendMessage(Main.prefix + " " + ChatColor.YELLOW + player.getName() + ChatColor.RED + " has joined your guild!");
-                            }else {
-                                playerFromServer.sendMessage(Main.prefix + ChatColor.GREEN + player.getName() + " joined your guild!");
-                            }
+                            player.sendMessage(Main.prefix + ChatColor.YELLOW  + player.getName() + ChatColor.GREEN + " has joined your guild!");
                         }
                     }
                     Main.guildInvites.get(guildName).remove(player.getName());
@@ -77,7 +69,7 @@ public class GuildJoinCommand {
                 player.sendMessage(Main.guildDoesntExists);
             }
         }else {
-            player.sendMessage(Main.prefix + ChatColor.RED + "You are already in a guild! You can leave it and if you are the head, you can delete it! See more options with /guild help!");
+            player.sendMessage(Main.playerAlreadyInGuild);
         }
     }
 

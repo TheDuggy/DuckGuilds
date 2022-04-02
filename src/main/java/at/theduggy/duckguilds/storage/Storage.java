@@ -1,31 +1,32 @@
 package at.theduggy.duckguilds.storage;
 
-import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
-import at.theduggy.duckguilds.files.GuildFiles;
-import at.theduggy.duckguilds.metadata.GuildMetadata;
-import at.theduggy.duckguilds.metadata.GuildPlayerMetadata;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
-import org.bukkit.ChatColor;
-import org.json.simple.JSONObject;
+import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class Storage {
 
+    public static boolean personalGuildPlayerStorageSectionExists(UUID player){
+        if (GuildConfig.getStorageType().equals(StorageType.FILE)){
+            return GuildFileSystem.personalGuildPlayerFileExists(player);
+        }else{
+            return false;
+        }
+    }
 
-    public static void createGuildField(GuildMetadata guildData, String name) throws IOException {
+    public static void createPersonalPlayerStorageSection(Player player) throws IOException {
+        if (GuildConfig.getStorageType().equals(StorageType.FILE)){
+            GuildFileSystem.createPersonalPlayerFile(player);
+        }
+    }
+
+    public static void createGuildStorageSection(GuildObject guildData, String name) throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
             GuildFileSystem.createGuildFile(guildData, name);
         }
@@ -56,9 +57,9 @@ public class Storage {
         return null;
     }
 
-    public static void updatePlayerData(UUID player, GuildPlayerMetadata guildPlayerMetadata) throws IOException {
+    public static void updatePlayerData(UUID player, GuildPlayerObject guildPlayerObject) throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
-            GuildFileSystem.updatePlayerData(player, guildPlayerMetadata);
+            GuildFileSystem.updatePlayerData(player, guildPlayerObject);
         }
     }
 
@@ -72,5 +73,9 @@ public class Storage {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
             GuildFileSystem.cachePlayer(player,guild);
         }
+    }
+
+    public enum StorageType{
+        FILE,DATABASE
     }
 }

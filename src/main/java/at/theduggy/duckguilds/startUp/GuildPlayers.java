@@ -1,9 +1,7 @@
 package at.theduggy.duckguilds.startUp;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.files.GuildFiles;
-import at.theduggy.duckguilds.metadata.GuildMetadata;
-import at.theduggy.duckguilds.metadata.GuildPlayerMetadata;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,10 +20,10 @@ public class GuildPlayers implements Listener {
 
     public static void handlePlayersOnReload() throws IOException, ParseException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
-            if (!GuildFiles.checkForPersonalPlayerFile(player.getUniqueId())){
-                GuildFiles.createPersonalPlayerFile(player);//TODO Remo IO createFile!!!!
-                GuildPlayerMetadata guildPlayerMetadata = new GuildPlayerMetadata(player.getUniqueId(),true,player.getName(),"");
-                Main.getPlayerCache().put(player.getUniqueId(),guildPlayerMetadata);
+            if (!Storage.personalGuildPlayerStorageSectionExists(player.getUniqueId())){
+                Storage.createPersonalPlayerStorageSection(player);//TODO Remo IO createFile!!!!
+                GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
+                Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
                 Bukkit.getLogger().warning(Main.getPlayerCache().toString());
             }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
                 Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
@@ -38,10 +36,10 @@ public class GuildPlayers implements Listener {
     @EventHandler
     public void handlePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException {
         Player player = e.getPlayer();
-        if (!GuildFiles.checkForPersonalPlayerFile(player.getUniqueId())){
-            GuildFiles.createPersonalPlayerFile(player);
-            GuildPlayerMetadata guildPlayerMetadata = new GuildPlayerMetadata(player.getUniqueId(),true,player.getName(),"");
-            Main.getPlayerCache().put(player.getUniqueId(),guildPlayerMetadata);
+        if (!Storage.personalGuildPlayerStorageSectionExists(player.getUniqueId())){
+            Storage.createPersonalPlayerStorageSection(player);
+            GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
+            Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
             Team team;
             String guildName =  Main.getPlayerCache().get(player.getUniqueId()).getGuild();
             try {
@@ -50,7 +48,7 @@ public class GuildPlayers implements Listener {
                 team = Main.getScoreboard().getTeam(guildName);
             }
             String newPlayerName = Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE;
-            team.setColor( Main.getGuildCache().get(guildName).getColor());
+            team.setColor( Main.getGuildCache().get(guildName).getColor().getChatColor());
             team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
             team.setDisplayName(guildName);
             team.addEntry(player.getName());
@@ -76,7 +74,7 @@ public class GuildPlayers implements Listener {
                 team = Main.getScoreboard().getTeam(guildName);
             }
             String newPlayerName = Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE;
-            team.setColor( Main.getGuildCache().get(guildName).getColor());
+            team.setColor( Main.getGuildCache().get(guildName).getColor().getChatColor());
             team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
             team.setDisplayName(guildName);
             team.addEntry(player.getName());

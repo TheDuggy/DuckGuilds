@@ -1,17 +1,25 @@
-package at.theduggy.duckguilds.metadata;
+package at.theduggy.duckguilds.objects;
 
+import com.google.gson.annotations.Expose;
 import org.json.simple.JSONObject;
 
 import java.util.UUID;
 
-public class GuildPlayerMetadata {
+public class GuildPlayerObject {
 
+
+    @Expose(serialize = false,deserialize = false)
     private UUID player;
+
     private String name;
+
+    @Expose(serialize = false,deserialize = false)
     private String guild;
+
+    @Expose(serialize = false,deserialize = false)
     private Boolean online;
 
-    public GuildPlayerMetadata(UUID player, Boolean online, String name, String guild){
+    public GuildPlayerObject(UUID player, Boolean online, String name, String guild){
         this.player=player;
         this.name=name;
         this.guild=guild;
@@ -44,6 +52,10 @@ public class GuildPlayerMetadata {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setPlayer(UUID player) {
+        this.player = player;
     }
 
     public String toString(){

@@ -48,6 +48,8 @@ public class Utils {
         return isTrue;
     }
 
+
+    /*
     public static ChatColor translateFromStringToChatColor(String toTranslate){
         ChatColor color;
 
@@ -94,7 +96,7 @@ public class Utils {
         }
         return null;
     }
-
+*/
     public static String getPlayerGuild(Player player){
         return (String) Main.getPlayerCache().get(player.getUniqueId()).getGuild();
     }
@@ -171,6 +173,7 @@ public class Utils {
         return invites;
     }
 
+/*
     public static String getChatColorCode(ChatColor color){
         String chatColor = null;
         if (color.equals(ChatColor.BLUE)){
@@ -202,7 +205,7 @@ public class Utils {
         }
         return chatColor;
     }
-
+*/
     public static ChatColor translateFromReadableStringToChatColorLightColors(String toTranslate){
         ChatColor color = null;
         switch (toTranslate) {

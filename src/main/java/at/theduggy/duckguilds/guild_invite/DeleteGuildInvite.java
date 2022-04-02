@@ -34,7 +34,7 @@ public class DeleteGuildInvite {
                         if (Main.guildInvites.get(Utils.getPlayerGuild(sender)).contains(playerName)) {
                             int index = Main.guildInvites.get(Utils.getPlayerGuild(sender)).indexOf(playerName);
                             Main.guildInvites.get(Utils.getPlayerGuild(sender)).remove(index);
-                            Bukkit.getPlayerExact(playerName).sendMessage(Main.prefix + ChatColor.RED + "The guild-invite to " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + " was deleted by " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + "!");
+                            Bukkit.getPlayerExact(playerName).sendMessage(Main.prefix + ChatColor.RED + "Your guild-invite to " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + " was deleted by " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + "!");
                             sender.sendMessage(Main.prefix + ChatColor.RED + "The guild-invite for " + ChatColor.YELLOW + playerName + ChatColor.RED + " was deleted!");
                         } else {
                             sender.sendMessage(Main.prefix + ChatColor.RED + "There is no guild-invite for " + ChatColor.YELLOW + playerName + ChatColor.RED + "!");

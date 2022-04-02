@@ -18,10 +18,12 @@ package at.theduggy.duckguilds;
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.files.GuildFiles;
 import at.theduggy.duckguilds.logging.AutoLogger;
-import at.theduggy.duckguilds.metadata.GuildMetadata;
-import at.theduggy.duckguilds.metadata.GuildPlayerMetadata;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.startUp.GuildPlayers;
 import at.theduggy.duckguilds.storage.Storage;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.log4j.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,14 +43,14 @@ import java.util.UUID;
 
 public final class Main extends JavaPlugin {
 
-private static HashMap<UUID, GuildPlayerMetadata> cachedPlayers = new HashMap<>();
+private static HashMap<UUID, GuildPlayerObject> cachedPlayers = new HashMap<>();
 public static ArrayList<String> guildInfo = new ArrayList<>();
 public static FileConfiguration mainFileConfiguration;
 private static Scoreboard scoreboard;
 public static Plugin plugin;
 public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
-private static HashMap<String, GuildMetadata> cachedGuilds = new HashMap<>();
-public static String prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "DuckGuilds" + ChatColor.GRAY + "] ";
+private static HashMap<String, GuildObject> cachedGuilds = new HashMap<>();
+public static String prefix = ChatColor.AQUA + "[" + ChatColor.GOLD + "DuckGuilds" + ChatColor.AQUA + "] ";
 public static String wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!";
 public static String playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!";
 public static String guildDoesntExists = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list to see all guilds!";
@@ -157,11 +159,11 @@ public static Path loggingFolder;
         }
     }
 
-    public static HashMap<String,GuildMetadata> getGuildCache(){
+    public static HashMap<String, GuildObject> getGuildCache(){
         return cachedGuilds;
     }
 
-    public static HashMap<UUID,GuildPlayerMetadata> getPlayerCache(){
+    public static HashMap<UUID, GuildPlayerObject> getPlayerCache(){
         return cachedPlayers;
     }
 
@@ -171,5 +173,11 @@ public static Path loggingFolder;
 
     public static ArrayList<String> getGuildInfo() {
         return guildInfo;
+    }
+
+    public static Gson getGsonInstance(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        return gsonBuilder.create();
     }
 }

@@ -72,8 +72,8 @@ public class ListGuilds {
                     msg.append(Main.prefix  + ChatColor.GREEN + "List of all guilds from server " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                     msg.append(ChatColor.WHITE + "-".repeat(41) + "\n");//60
                     for (String guildName:guildPages.get(page)){
-                        ChatColor color = (ChatColor) Main.getGuildCache().get(guildName).getColor();
-                        ChatColor tagColor = (ChatColor) Main.getGuildCache().get(guildName).getTagColor();
+                        ChatColor color = Main.getGuildCache().get(guildName).getColor().getChatColor();
+                        ChatColor tagColor = Main.getGuildCache().get(guildName).getTagColor().getChatColor();
                         String tag = Main.getGuildCache().get(guildName).getTag();
                         ArrayList<UUID> guildPlayers = Main.getGuildCache().get(guildName).getPlayers();
                         msg.append(ChatColor.GRAY + "   - " + color + guildName + ChatColor.GRAY + " [" + tagColor + tag + ChatColor.GRAY + "] Size: " + ChatColor.DARK_GRAY +  guildPlayers.size() );//TODO Test sorting after guild-size!

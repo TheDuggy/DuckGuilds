@@ -265,20 +265,20 @@ public class GuildCommand implements TabExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length == 1) {
-                List<String> complete = new ArrayList<>();
-                complete.add("help");
-                complete.add("create");
-                complete.add("list");
-                complete.add("leave");
-                complete.add("delete");
-                complete.add("invite");
-                complete.add("join");
-                complete.add("discardInvite");
-                complete.add("deleteInvite");
-                complete.add("kick");
-                complete.add("info");
-                Collections.sort(complete);
-                return complete;
+                List<String> commands = new ArrayList<>();
+                commands.add("help");
+                commands.add("create");
+                commands.add("list");
+                commands.add("leave");
+                commands.add("delete");
+                commands.add("invite");
+                commands.add("join");
+                commands.add("discardInvite");
+                commands.add("deleteInvite");
+                commands.add("kick");
+                commands.add("info");
+                Collections.sort(commands);
+                return commands;
             } else {
                 switch (args[0]){
                     case "create":
@@ -362,11 +362,19 @@ public class GuildCommand implements TabExecutor {
                     case "help":
                         switch (args.length){
                             case 2:
-                                List<String> pages = new ArrayList<>();
-                                pages.add("1");
-                                pages.add("2");
-                                pages.add("3");
-                                return pages;
+                                ArrayList<String> commands = new ArrayList<>();
+                                commands.add("help");
+                                commands.add("create");
+                                commands.add("list");
+                                commands.add("leave");
+                                commands.add("delete");
+                                commands.add("invite");
+                                commands.add("join");
+                                commands.add("discardInvite");
+                                commands.add("deleteInvite");
+                                commands.add("kick");
+                                commands.add("info");
+                                return commands;
                         }
                         break;
                     case "invite":

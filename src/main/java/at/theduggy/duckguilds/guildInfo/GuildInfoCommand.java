@@ -21,8 +21,8 @@ creationDate,
             StringBuilder msg = new StringBuilder();
             msg.append(Main.prefix + ChatColor.GREEN + "General information about " + ChatColor.YELLOW + guildName + ChatColor.GREEN + ": \n");
             msg.append(ChatColor.WHITE + "-".repeat(35) + "\n");
-            ChatColor color = Main.getGuildCache().get(guildName).getColor();
-            ChatColor tagColor =  Main.getGuildCache().get(guildName).getTagColor();
+            ChatColor color = Main.getGuildCache().get(guildName).getColor().getChatColor();
+            ChatColor tagColor =  Main.getGuildCache().get(guildName).getTagColor().getChatColor();
             msg.append(ChatColor.GREEN + "Name: " + color + guildName + " (" + Utils.chatColorToString(color) + ")\n");
             msg.append(ChatColor.GREEN + "Tag: " + tagColor + Main.getGuildCache().get(guildName).getTag() + " (" +Utils.chatColorToString(tagColor) + ")\n");
             msg.append(ChatColor.GREEN + "Head: " + color + Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName() + "\n");
@@ -51,7 +51,7 @@ creationDate,
                     }
                 }
                 System.out.println(playerPages);
-                String headName = (String) Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName();
+                String headName = Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName();
                 StringBuilder msg = new StringBuilder();
                 msg.append(Main.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                 msg.append(ChatColor.WHITE + "-".repeat(40) + "\n");//60

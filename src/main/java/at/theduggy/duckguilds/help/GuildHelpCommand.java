@@ -20,6 +20,22 @@ import org.bukkit.ChatColor;
 
 public class GuildHelpCommand {
 
+    //List<String> complete = new ArrayList<>();
+    //                complete.add("help");
+    //                complete.add("create");
+    //                complete.add("list");
+    //                complete.add("leave");
+    //                complete.add("delete");
+    //                complete.add("invite");
+    //                complete.add("join");
+    //                complete.add("discardInvite");
+    //                complete.add("deleteInvite");
+    //                complete.add("kick");
+    //                complete.add("info");
+    //                Collections.sort(complete);
+    //                return complete;
+
+
     public static String page1 (){
         StringBuilder msg = new StringBuilder();
         msg.append(Utils.centerText(ChatColor.GRAY + "        [" + ChatColor.YELLOW + "Guild-System" + ChatColor.GRAY  + "]"+ ChatColor.WHITE + "\n"));

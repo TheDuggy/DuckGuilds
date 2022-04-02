@@ -47,7 +47,7 @@ public class GuildInviteCommand {
                             }
                             if (!Main.guildInvites.get(guildName).contains(playerNameToInvite)) {
                                 Main.guildInvites.get(guildName).add(playerNameToInvite);
-                                invitedPlayer.spigot().sendMessage(new TextComponent(Main.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.YELLOW + guildName + ChatColor.RED + "!"), clickableMsgJoin(guildName), new TextComponent(" "), clickableMsgDiscard(sender, guildName));
+                                invitedPlayer.spigot().sendMessage(new TextComponent(Main.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.RED + "!\n"), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName));
                                 sender.sendMessage(Main.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
                                 autoDeleteGuildInvite(Bukkit.getPlayerExact(playerNameToInvite), guildName);
 
@@ -72,22 +72,21 @@ public class GuildInviteCommand {
     }
 
     public static TextComponent clickableMsgJoin( String guildName){
-        TextComponent textComponent =new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "join");
+        TextComponent textComponent =new TextComponent( ChatColor.GRAY + " [" +  ChatColor.GREEN + "" + ChatColor.BOLD + "join" + ChatColor.GRAY + "] ");
         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/guild join " + guildName));
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Join " + guildName).color(net.md_5.bungee.api.ChatColor.GREEN).italic(true).create()));
         return textComponent;
     }
 
     public static TextComponent clickableMsgDiscard(Player sender, String guildName){
-        TextComponent textComponent = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "discard");
+        TextComponent textComponent = new TextComponent(ChatColor.GRAY + "[" + ChatColor.RED + "" + ChatColor.BOLD + "discard" + ChatColor.GRAY + "]");
         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/guild discardInvite " + guildName));
-        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Discard invite from " + sender).color(net.md_5.bungee.api.ChatColor.RED).italic(true).create()));
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Discard invite from " + sender.getName()).color(net.md_5.bungee.api.ChatColor.RED).italic(true).create()));
         return textComponent;
     }
 
     public static void autoDeleteGuildInvite(Player invited, String guildName){
         new BukkitRunnable(){
-
             @Override
             public void run() {
                 if (Main.guildInvites.get(guildName).contains(invited.getName())){

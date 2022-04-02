@@ -16,19 +16,17 @@
 package at.theduggy.duckguilds.config;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.storage.StorageType;
-import org.bukkit.Bukkit;
+import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 
 public class GuildConfig {
 
-    public static StorageType storageType;
+    public static Storage.StorageType storageType;
 
     public static int getMaxGuildSize(){
         FileConfiguration f = Main.mainFileConfiguration;
@@ -103,25 +101,21 @@ public class GuildConfig {
         }
     }
 
-    public static Enum<StorageType> getStorageType(){
+    public static Enum<Storage.StorageType> getStorageType(){
         FileConfiguration fileConfiguration = Main.mainFileConfiguration;
         if (storageType==null) {
             switch (fileConfiguration.getString("storageType")) {
                 case "FILE":
-                    storageType=StorageType.FILE;
-                    return StorageType.FILE;
+                    storageType= Storage.StorageType.FILE;
+                    return Storage.StorageType.FILE;
                 case "DATABASE":
-                    storageType=StorageType.DATABASE;
-                    return StorageType.DATABASE;
+                    storageType= Storage.StorageType.DATABASE;
+                    return Storage.StorageType.DATABASE;
                 default:
-                    return StorageType.FILE;
+                    return Storage.StorageType.FILE;
             }
         }else {
             return storageType;
         }
-    }
-
-    public static boolean getIfCheckForPlayerInAllGuilds(){
-        return Main.mainFileConfiguration.getBoolean("checkForPlayerInAllGuilds");
     }
 }
