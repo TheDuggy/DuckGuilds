@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class GuildMetadata {
 
-    public String creationDate;
+    private String creationDate;
 
     public GuildMetadata(String creationDate) {
         this.creationDate = creationDate;

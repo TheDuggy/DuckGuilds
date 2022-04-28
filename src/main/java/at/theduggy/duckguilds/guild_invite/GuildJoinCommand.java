@@ -50,10 +50,10 @@ public class GuildJoinCommand {
                     }catch (IllegalArgumentException e){
                         team = Main.getScoreboard().getTeam(guildName);
                     }
-                    team.setColor(Main.getGuildCache().get(guildName).getColor().getChatColor());
-                    team.setSuffix(ChatColor.GRAY + "[" +  Main.getGuildCache().get(guildName).getTagColor()+ Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]");
+                    team.setColor(Main.getGuildCache().get(guildName).getGuildColor().getChatColor());
+                    team.setSuffix(ChatColor.GRAY + "[" +  Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]");
                     team.addEntry(player.getName());
-                    player.setDisplayName(Main.getGuildCache().get(guildName).getColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
+                    player.setDisplayName(Main.getGuildCache().get(guildName).getGuildColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
                     player.sendMessage(Main.prefix + ChatColor.GREEN + " You successfully joined " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!");
                     for (Player playerFromServer: Bukkit.getOnlinePlayers()){
                         playerFromServer.setScoreboard(Main.getScoreboard());

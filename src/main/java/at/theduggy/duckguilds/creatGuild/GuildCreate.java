@@ -91,7 +91,7 @@ import java.util.UUID;
         guild.setColor(color);
         guild.setDisplayName(name);
         GuildObject guildObject = new GuildObject();
-        guildObject.setColor(new GuildColor(color));
+        guildObject.setGuildColor(new GuildColor(color));
         guildObject.setTag(tag);
         guildObject.setTagColor(new GuildColor(tagColor));
         guildObject.setPlayers(players);

@@ -5,6 +5,8 @@ main: at.theduggy.duckguilds.Main
 commands:
   guild:
     description: The base guild-command
+    guild.help:
+      description: Get help to all guild-commands!
   temp:
     description: wad!
   guildFakePlayer:

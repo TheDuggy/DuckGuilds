@@ -2,14 +2,12 @@ package at.theduggy.duckguilds.guildInfo;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.other.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuildInfoCommand {
 /*
@@ -21,7 +19,7 @@ creationDate,
             StringBuilder msg = new StringBuilder();
             msg.append(Main.prefix + ChatColor.GREEN + "General information about " + ChatColor.YELLOW + guildName + ChatColor.GREEN + ": \n");
             msg.append(ChatColor.WHITE + "-".repeat(35) + "\n");
-            ChatColor color = Main.getGuildCache().get(guildName).getColor().getChatColor();
+            ChatColor color = Main.getGuildCache().get(guildName).getGuildColor().getChatColor();
             ChatColor tagColor =  Main.getGuildCache().get(guildName).getTagColor().getChatColor();
             msg.append(ChatColor.GREEN + "Name: " + color + guildName + " (" + Utils.chatColorToString(color) + ")\n");
             msg.append(ChatColor.GREEN + "Tag: " + tagColor + Main.getGuildCache().get(guildName).getTag() + " (" +Utils.chatColorToString(tagColor) + ")\n");
@@ -30,6 +28,7 @@ creationDate,
             msg.append(ChatColor.GREEN  + "Players: " + color + players.size() + "\n");
             msg.append(ChatColor.GREEN + "└ See /guild info " + guildName + " playerList <page> !\n");
             msg.append(ChatColor.GREEN + "Online-Players: " + color + Utils.getOnlinePlayersOfGuild(guildName) + "\n");
+            msg.append(ChatColor.GREEN + "Creation-Date: " + color + Main.getGuildCache().get(guildName).getGuildMetadata().getCreationDate());
             player.sendMessage(msg.toString());
         }else {
             player.sendMessage(Main.guildDoesntExists);

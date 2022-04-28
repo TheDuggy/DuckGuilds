@@ -55,13 +55,17 @@ public class GuildCommand implements TabExecutor {
 
                 switch (args[0]) {
                     case "help":
-                        if ((args.length == 2 && args[1].equals("1")) || args.length == 1) {
-                            player.sendMessage(GuildHelpCommand.page1());
-                        } else if (args.length == 2 && args[1].equals("2")) {
-                            player.sendMessage(GuildHelpCommand.page2());
-                        } else if (args.length == 2 && args[1].equals("3")) {
-                            player.sendMessage(GuildHelpCommand.page3());
-                        } else {
+                        if ((args.length == 2 && args[1].equals("help"))) {
+                            player.sendMessage(GuildHelpCommand.help());
+                        } else if (args.length == 2 && args[1].equals("create")) {
+                            player.sendMessage(GuildHelpCommand.create());
+                        } else if (args.length == 2 && args[1].equals("delete")) {
+                            player.sendMessage(GuildHelpCommand.delete());
+                        }else if (args.length == 2 && args[1].equals("deleteInvite")){
+                            player.sendMessage(GuildHelpCommand.deleteInvite());
+                        }else if (args.length==2 && args[1].equals("discardInvite")){
+                            player.sendMessage(GuildHelpCommand.discardInvite());
+                        }else {
                             player.sendMessage(Main.wrongUsage);
                         }
 

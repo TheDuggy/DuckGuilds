@@ -16,20 +16,11 @@
 package at.theduggy.duckguilds.listGuilds;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.other.Utils;
-import com.sun.source.tree.IfTree;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class ListGuilds {
@@ -72,7 +63,7 @@ public class ListGuilds {
                     msg.append(Main.prefix  + ChatColor.GREEN + "List of all guilds from server " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                     msg.append(ChatColor.WHITE + "-".repeat(41) + "\n");//60
                     for (String guildName:guildPages.get(page)){
-                        ChatColor color = Main.getGuildCache().get(guildName).getColor().getChatColor();
+                        ChatColor color = Main.getGuildCache().get(guildName).getGuildColor().getChatColor();
                         ChatColor tagColor = Main.getGuildCache().get(guildName).getTagColor().getChatColor();
                         String tag = Main.getGuildCache().get(guildName).getTag();
                         ArrayList<UUID> guildPlayers = Main.getGuildCache().get(guildName).getPlayers();

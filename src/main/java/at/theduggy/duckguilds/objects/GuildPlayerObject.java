@@ -8,15 +8,16 @@ import java.util.UUID;
 public class GuildPlayerObject {
 
 
-    @Expose(serialize = false,deserialize = false)
+    @Expose(serialize = false)
     private UUID player;
 
+    @Expose(serialize = true)
     private String name;
 
-    @Expose(serialize = false,deserialize = false)
+    @Expose(serialize = false)
     private String guild;
 
-    @Expose(serialize = false,deserialize = false)
+    @Expose(serialize = false)
     private Boolean online;
 
     public GuildPlayerObject(UUID player, Boolean online, String name, String guild){

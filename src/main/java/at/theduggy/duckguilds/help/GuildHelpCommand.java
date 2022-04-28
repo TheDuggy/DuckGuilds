@@ -15,6 +15,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds.help;
 
+import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.ChatColor;
 
@@ -35,32 +36,47 @@ public class GuildHelpCommand {
     //                Collections.sort(complete);
     //                return complete;
 
+    public static String help (){
+        StringBuilder msg = new StringBuilder();
+        msg.append(Main.prefix + ChatColor.GREEN + "Help for command"+ChatColor.YELLOW +" 'help'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(31));
+        msg.append( ChatColor.GOLD + "\n→" + ChatColor.GRAY + " Get help to all commands! Usage: '/help <commands>'");
+        return msg.toString();
+    }
 
-    public static String page1 (){
+    public static String create(){
         StringBuilder msg = new StringBuilder();
-        msg.append(Utils.centerText(ChatColor.GRAY + "        [" + ChatColor.YELLOW + "Guild-System" + ChatColor.GRAY  + "]"+ ChatColor.WHITE + "\n"));
-        msg.append(Utils.centerText(ChatColor.BLUE + "" + ChatColor.BOLD + ""  + ChatColor.YELLOW + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE +"Help" + ChatColor.BLUE + "" + ChatColor.BOLD ) + "\n    \n");
-        msg.append(Utils.centerText(ChatColor.GRAY + "" + ChatColor.ITALIC + "Usage: /guild help <page> (There are 3 pages!)" + "\n"));
-        msg.append(ChatColor.RED + "/guild help: " + ChatColor.WHITE + "   Show this list!\n");
-        msg.append(ChatColor.RED + "/guild create: " + ChatColor.WHITE + "This command creates a guild! You need to use it                  like in this example:\n "  +ChatColor.YELLOW +  "/guild create <guildName> <guildColor> <guildTag> <tagColor>\n" +ChatColor.WHITE  + "                  You are automatically the head.The tag can't                        contain unicode-symbols!\n");
+        String nl = "\n" + " ".repeat(3);
+        msg.append(Main.prefix + ChatColor.GREEN + "Help for command"+ChatColor.YELLOW +" 'create'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(33));
+        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild create <name> <color> <tag> <tagColor>'" + nl);
+        //TODO Use maxGuildNameLengthVariable
+        msg.append(ChatColor.GRAY + "This command creates a guild, of which you are automatically" + nl + "the head. The color must be light, the tagColor can be a dark" + nl +"color too! The tag has a max-length of 4, the name 20.");
         return msg.toString();
     }
-    public static String page2(){
+
+    public static String delete(){
         StringBuilder msg = new StringBuilder();
-        msg.append(Utils.centerText(ChatColor.GRAY + "[" + ChatColor.YELLOW + "2" + ChatColor.GRAY + "]" + "\n"));
-        msg.append(ChatColor.RED + "/guild list: " + ChatColor.WHITE + "    Lists all guilds on this server!\n");
-        msg.append(ChatColor.RED + "/guild leave: " + ChatColor.WHITE + " Command to leave a guild! If you are the head,                      you can only delete it!\n");
-        msg.append(ChatColor.RED + "/guild delete: " + ChatColor.WHITE + "Deletes a guild! All players would be kicked!\n");
-        msg.append(ChatColor.RED + "/guild invite: " + ChatColor.WHITE + " Command to invite a player! This player would get                  a clickable message!\n");
-        msg.append(ChatColor.RED + "/guild join: " + ChatColor.WHITE + "  There are 2 ways to join a guild if you are                         invited: click on the message(join) or run this                       command!\n");//"               "
+        String nl = "\n" + " ".repeat(3);
+        msg.append(Main.prefix + ChatColor.GREEN + "Help for command"+ChatColor.YELLOW +" 'delete'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(32));
+        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild delete <name> <conformation>'" + nl);
+        msg.append(ChatColor.GRAY + "This command deletes your guild! You have to confirm it, so" + nl + "you don't delete your guild by mistake. In order to delete it," + nl +"you have to be the head of that guild.");
         return msg.toString();
     }
-    public static String page3(){
+
+    public static String deleteInvite(){
         StringBuilder msg = new StringBuilder();
-        msg.append(Utils.centerText(ChatColor.GRAY + "[" + ChatColor.YELLOW + "3" + ChatColor.GRAY + "]" + "\n"));
-        msg.append(ChatColor.RED+ "/guild kick: " + ChatColor.WHITE + "            To kick a player from your guild, if you                               are the head, run this command!\n");
-        msg.append(ChatColor.RED + "/guild deleteInvite: " + ChatColor.WHITE + "  If you want to delete an invite you sent to                           a player, run this command!\n");
-        msg.append(ChatColor.RED + "/guild discardInvite: " + ChatColor.WHITE + "There are 2 ways to discard a                                         guild-invite: click on the message(discard)                            or run this command!\n   \n   \n");
+        String nl = "\n" + " ".repeat(3);
+        msg.append(Main.prefix + ChatColor.GREEN + "Help for command"+ChatColor.YELLOW +" 'deleteInvite'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(32));
+        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild deleteInvite <nameOfInvitedPlayer>'" + nl);
+        msg.append(ChatColor.GRAY +  "With this command, you can delete a invite you sent. Logical," + nl +"this only works if you have already sent an invite to that" + nl + "player!");//TODO finished
+        return msg.toString();
+    }
+
+    public static String discardInvite(){
+        StringBuilder msg = new StringBuilder();
+        String nl = "\n" + " ".repeat(3);
+        msg.append(Main.prefix + ChatColor.GREEN + "Help for command"+ChatColor.YELLOW +" 'discardInvite'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(38));
+        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild discardInvite <nameOfGuild>'" + nl);
+        msg.append(ChatColor.GRAY +  "With this command, you can discard a invite you became." + nl +"Logical, this only works if you have already got an invite to" + nl +"that guild!");//TODO finished
         return msg.toString();
     }
 }

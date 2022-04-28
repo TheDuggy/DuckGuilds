@@ -16,7 +16,6 @@
 package at.theduggy.duckguilds;
 
 import at.theduggy.duckguilds.config.GuildConfig;
-import at.theduggy.duckguilds.files.GuildFiles;
 import at.theduggy.duckguilds.logging.AutoLogger;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
@@ -33,6 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.json.simple.parser.ParseException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -64,7 +64,7 @@ public static String playerDoesntExists = prefix + ChatColor.RED + "That player 
 public static String playerInstOnline = prefix + ChatColor.RED + "This player isn't online!";
 public static String pageIndexMustBeNumeric = prefix + ChatColor.RED + "The page-index must be numeric!";
 public static String pageIndexOutOfBounds = prefix + ChatColor.RED + "The page-index must be valid!";
-public static Path guildRootFolder;
+public static File guildRootFolder;
 public static Path loggingFolder;
 
     @Override
@@ -83,24 +83,13 @@ public static Path loggingFolder;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if (!GuildFiles.logFolderExists()&& GuildConfig.getLogging()&& GuildConfig.getCustomLogging() instanceof Boolean){
-            try {
-                GuildFiles.createLogFolder();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         addLogFolderPath();
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         try {
             commandRegistration();
             listenerRegistration();
-            if (!GuildFiles.guildFolderStructureExists()) {
-                GuildFiles.createGuildFiles();
-            }
-            Storage.cacheGuilds();
+            Storage.loadStorage();
             GuildPlayers.handlePlayersOnReload();
-            Storage.cachePlayers();
         }catch (IOException|ParseException e){
                 e.printStackTrace();
         }

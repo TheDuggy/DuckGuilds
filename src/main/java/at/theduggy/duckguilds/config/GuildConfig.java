@@ -19,6 +19,7 @@ import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,15 +59,15 @@ public class GuildConfig {
         }
     }
 
-    public static Path getGuildRootFolder() throws FileNotFoundException {
+    public static File getGuildRootFolder() throws FileNotFoundException {
         FileConfiguration f = Main.mainFileConfiguration;
         if (f.getString("guildDirRootPath").equals("default")){
-            return Paths.get(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
+            return new File(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
         }else if (!f.getString("guildDirRootPath").equals("default")){
             if (Files.exists(Paths.get(f.getString("guildDirRootPath")))){
-                return Paths.get(f.getString("guildDirRootPath")+ "/guilds");
+                return new File(f.getString("guildDirRootPath")+ "/guilds");
             }else {
-                return Paths.get(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
+                return new File(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
 
             }
         }
@@ -108,9 +109,9 @@ public class GuildConfig {
                 case "FILE":
                     storageType= Storage.StorageType.FILE;
                     return Storage.StorageType.FILE;
-                case "DATABASE":
-                    storageType= Storage.StorageType.DATABASE;
-                    return Storage.StorageType.DATABASE;
+                case "MySQL":
+                    storageType= Storage.StorageType.MySQL;
+                    return Storage.StorageType.MySQL;
                 default:
                     return Storage.StorageType.FILE;
             }

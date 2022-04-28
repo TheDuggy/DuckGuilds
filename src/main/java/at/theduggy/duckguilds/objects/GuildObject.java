@@ -1,9 +1,6 @@
 package at.theduggy.duckguilds.objects;
 
-import at.theduggy.duckguilds.other.Utils;
 import com.google.gson.GsonBuilder;
-import org.bukkit.ChatColor;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -43,7 +40,7 @@ public class GuildObject {
         this.players = players;
     }
 
-    public void setColor(GuildColor color) {
+    public void setGuildColor(GuildColor color) {
         this.color = color;
     }
 
@@ -67,7 +64,7 @@ public class GuildObject {
         return players;
     }
 
-    public GuildColor getColor() {
+    public GuildColor getGuildColor() {
         return color;
     }
 

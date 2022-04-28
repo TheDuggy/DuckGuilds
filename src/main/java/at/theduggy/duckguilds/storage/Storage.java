@@ -32,11 +32,6 @@ public class Storage {
         }
     }
 
-    public static void cacheGuilds() throws IOException, ParseException {
-        if (GuildConfig.getStorageType().equals(StorageType.FILE)){
-            GuildFileSystem.cacheGuildsFiles();
-        }
-    }
 
     public static void deleteGuildField(String guildName) throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
@@ -57,25 +52,22 @@ public class Storage {
         return null;
     }
 
-    public static void updatePlayerData(UUID player, GuildPlayerObject guildPlayerObject) throws IOException {
+    public static void updatePlayerData(UUID player, GuildPlayerObject guildPlayerObject, String name) throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
-            GuildFileSystem.updatePlayerData(player, guildPlayerObject);
+            GuildFileSystem.updatePlayerData(player, guildPlayerObject, name);
         }
     }
 
-    public static void cachePlayers() throws IOException, ParseException {
+
+    public static void loadStorage() throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
+            GuildFileSystem.initFolders();
+            GuildFileSystem.cacheGuildsFiles();
             GuildFileSystem.cachePlayers();
         }
     }
 
-    public static void cachePlayer(UUID player,String guild) throws IOException, ParseException {
-        if (GuildConfig.getStorageType().equals(StorageType.FILE)){
-            GuildFileSystem.cachePlayer(player,guild);
-        }
-    }
-
     public enum StorageType{
-        FILE,DATABASE
+        FILE,MySQL
     }
 }
