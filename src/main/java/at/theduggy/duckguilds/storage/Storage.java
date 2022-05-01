@@ -62,7 +62,7 @@ public class Storage {
     public static void loadStorage() throws IOException {
         if (GuildConfig.getStorageType().equals(StorageType.FILE)){
             GuildFileSystem.initFolders();
-            GuildFileSystem.cacheGuildsFiles();
+            GuildFileSystem.cacheGuildFiles();
             GuildFileSystem.cachePlayers();
         }
     }

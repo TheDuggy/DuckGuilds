@@ -1,5 +1,6 @@
 package at.theduggy.duckguilds.objects;
 
+import at.theduggy.duckguilds.Main;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
@@ -73,8 +74,7 @@ public class GuildObject {
     }
 
     public String toString(){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        return gsonBuilder.create().toJson(this);
+        return Main.getGsonInstance().toJson(this);
     }
+
 }

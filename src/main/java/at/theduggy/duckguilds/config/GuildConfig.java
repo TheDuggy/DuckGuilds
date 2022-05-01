@@ -22,7 +22,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GuildConfig {
@@ -62,12 +61,12 @@ public class GuildConfig {
     public static File getGuildRootFolder() throws FileNotFoundException {
         FileConfiguration f = Main.mainFileConfiguration;
         if (f.getString("guildDirRootPath").equals("default")){
-            return new File(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
+            return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
         }else if (!f.getString("guildDirRootPath").equals("default")){
             if (Files.exists(Paths.get(f.getString("guildDirRootPath")))){
-                return new File(f.getString("guildDirRootPath")+ "/guilds");
+                return new File(f.getString("guildDirRootPath")+ "/guildStorage");
             }else {
-                return new File(Main.getPlugin(Main.class).getDataFolder() + "/guilds");
+                return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
 
             }
         }

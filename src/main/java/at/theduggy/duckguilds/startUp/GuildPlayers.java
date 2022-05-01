@@ -57,7 +57,8 @@ public class GuildPlayers implements Listener {
             for (Player playerFromServer:Bukkit.getServer().getOnlinePlayers()){
                 playerFromServer.setScoreboard(Main.getScoreboard());
             }
-        }else if (Main.getPlayerCache().get(player.getUniqueId())!=null){
+        }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
+            System.out.println(Main.getGuildCache().size());
             String oldName = Storage.getPlayerDataFromStorage(player.getUniqueId());
             if (!oldName.equals(player.getName())) {
                 Storage.updatePlayerData(player.getUniqueId(), Main.getPlayerCache().get(player.getUniqueId()), player.getName());

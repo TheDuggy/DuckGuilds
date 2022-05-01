@@ -16,7 +16,6 @@
 package at.theduggy.duckguilds.help;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.ChatColor;
 
 public class GuildHelpCommand {

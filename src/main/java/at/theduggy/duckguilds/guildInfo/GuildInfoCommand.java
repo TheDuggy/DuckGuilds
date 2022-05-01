@@ -28,7 +28,7 @@ creationDate,
             msg.append(ChatColor.GREEN  + "Players: " + color + players.size() + "\n");
             msg.append(ChatColor.GREEN + "└ See /guild info " + guildName + " playerList <page> !\n");
             msg.append(ChatColor.GREEN + "Online-Players: " + color + Utils.getOnlinePlayersOfGuild(guildName) + "\n");
-            msg.append(ChatColor.GREEN + "Creation-Date: " + color + Main.getGuildCache().get(guildName).getGuildMetadata().getCreationDate());
+            msg.append(ChatColor.GREEN + "Creation-Date: " + color + Main.getGuildCache().get(guildName).getGuildMetadata().getFormattedCreationDate());
             player.sendMessage(msg.toString());
         }else {
             player.sendMessage(Main.guildDoesntExists);

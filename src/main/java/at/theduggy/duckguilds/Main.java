@@ -17,8 +17,12 @@ package at.theduggy.duckguilds;
 
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.logging.AutoLogger;
+import at.theduggy.duckguilds.objects.GuildColor;
+import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
+import at.theduggy.duckguilds.objects.gson.GuildColorTAdapter;
+import at.theduggy.duckguilds.objects.gson.GuildMetadataTAdapter;
 import at.theduggy.duckguilds.startUp.GuildPlayers;
 import at.theduggy.duckguilds.storage.Storage;
 import com.google.gson.Gson;
@@ -30,6 +34,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
@@ -70,7 +75,6 @@ public static Path loggingFolder;
     @Override
     public void onEnable(){
         this.saveDefaultConfig();
-        this.addColorsTolIst();
         plugin = this;
         mainFileConfiguration = this.getConfig();
         try {
@@ -80,6 +84,7 @@ public static Path loggingFolder;
         }
         try {
             guildRootFolder = GuildConfig.getGuildRootFolder();
+            System.out.println(guildRootFolder.toPath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -92,12 +97,6 @@ public static Path loggingFolder;
             GuildPlayers.handlePlayersOnReload();
         }catch (IOException|ParseException e){
                 e.printStackTrace();
-        }
-        AutoLogger.logMessage("Guild-System started successfully! There are " + cachedGuilds.size() + "guilds on this server!", Level.INFO);
-        try {
-            AutoLogger.logMessage("Following parameters were set in the config.yml: inviteDeleteTime=" + GuildConfig.getTimeTillInviteIsDeleted() + ", guildDirRootPath=" + GuildConfig.getGuildRootFolder(), Level.INFO);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
     
@@ -117,28 +116,6 @@ public static Path loggingFolder;
         Bukkit.getPluginManager().registerEvents(new GuildPlayers(), this);
     }
 
-    public void addColorsTolIst(){
-        GuildCommand.allColorsForColor.add("Blue");
-        GuildCommand.allColorsForColor.add("White");
-        GuildCommand.allColorsForColor.add("Aqua");
-        GuildCommand.allColorsForColor.add("Gold");
-        GuildCommand.allColorsForColor.add("Green");
-        GuildCommand.allColorsForColor.add("Red");
-        GuildCommand.allColorsForColor.add("Yellow");
-
-        GuildCommand.allColorsForColorAndDark.add("Blue");
-        GuildCommand.allColorsForColorAndDark.add("White");
-        GuildCommand.allColorsForColorAndDark.add("Aqua");
-        GuildCommand.allColorsForColorAndDark.add("Gold");
-        GuildCommand.allColorsForColorAndDark.add("Green");
-        GuildCommand.allColorsForColorAndDark.add("Red");
-        GuildCommand.allColorsForColorAndDark.add("Yellow");
-        GuildCommand.allColorsForColorAndDark.add("Dark_Blue");
-        GuildCommand.allColorsForColorAndDark.add("Dark_Purple");
-        GuildCommand.allColorsForColorAndDark.add("Dark_Aqua");
-        GuildCommand.allColorsForColorAndDark.add("Dark_Green");
-        GuildCommand.allColorsForColorAndDark.add("Dark_Red");
-    }
 
     public static void addLogFolderPath(){
         if (GuildConfig.getCustomLogging() instanceof Path){
@@ -164,9 +141,16 @@ public static Path loggingFolder;
         return guildInfo;
     }
 
+    private static Gson gson;
     public static Gson getGsonInstance(){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        return gsonBuilder.create();
+        if (gson==null) {
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.setPrettyPrinting();
+            gsonBuilder.registerTypeAdapter(GuildColor.class, new GuildColorTAdapter());
+            gsonBuilder.registerTypeAdapter(GuildMetadata.class, new GuildMetadataTAdapter());
+            gson=gsonBuilder.create();
+        }
+        return gson;
     }
+
 }

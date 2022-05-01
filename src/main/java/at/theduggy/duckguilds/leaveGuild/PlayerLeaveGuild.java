@@ -17,23 +17,14 @@ package at.theduggy.duckguilds.leaveGuild;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.storage.Storage;
-import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class PlayerLeaveGuild {

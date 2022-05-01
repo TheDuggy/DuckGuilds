@@ -1,30 +1,36 @@
 package at.theduggy.duckguilds.objects;
 
-import org.json.simple.JSONObject;
+import at.theduggy.duckguilds.Main;
+import com.google.gson.annotations.Expose;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GuildMetadata {
 
-    private String creationDate;
+    private final LocalDateTime creationDate;
+    private final String creatorName;
 
-    public GuildMetadata(String creationDate) {
+
+    public GuildMetadata(LocalDateTime creationDate, String creatorName) {
         this.creationDate = creationDate;
+        this.creatorName=creatorName;
     }
 
-    public GuildMetadata(LocalDateTime creationDate) {
-        DateTimeFormatter formatCreationDate = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        this.creationDate = formatCreationDate.format(creationDate);
-    }
-
-    public String getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public String toString(){
-        JSONObject data = new JSONObject();
-        data.put("creationDate",creationDate);
-        return data.toJSONString();
+    public String getFormattedCreationDate(){
+        return DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").format(creationDate);
     }
+
+    public String getCreatorName(){
+        return creatorName;
+    }
+
+    public String toString(){
+        return Main.getGsonInstance().toJson(this);
+    }
+
 }

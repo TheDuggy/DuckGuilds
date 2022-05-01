@@ -35,17 +35,13 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class GuildCommand implements TabExecutor {
 
-    public static List<String> allColorsForColor = new ArrayList<>();
-    public static List<String> allColorsForColorAndDark = new ArrayList<>();
+    public static String[] allColorsForColor = {"Blue","White","Aqua","Gold","Green","Red","Yellow"};
+    public static String[] allColorsForColorAndDark = {"Blue","White","Aqua","Gold","Green","Red","Yellow","Dark_Blue","Dark_Purple","Dark_Aqua","Dark_Green","Dark_Red"};
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -77,9 +73,9 @@ public class GuildCommand implements TabExecutor {
                             String tag;
                             String tagColor;
                             if (!args[1].equals("")) {
-                                if (!args[2].equals("") && allColorsForColor.contains(args[2])) {
+                                if (!args[2].equals("") && Arrays.asList(allColorsForColor).contains(args[2])) {
                                     if (!args[3].equals("")) {
-                                        if (!args[4].equals("") && allColorsForColorAndDark.contains(args[4])) {
+                                        if (!args[4].equals("") && Arrays.asList(allColorsForColorAndDark).contains(args[4])) {
                                             try {
                                                 name = args[1];
                                                 color = args[2];

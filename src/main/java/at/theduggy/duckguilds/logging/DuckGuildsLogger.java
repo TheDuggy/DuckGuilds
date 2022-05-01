@@ -6,8 +6,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import java.nio.file.Path;
-
 public class DuckGuildsLogger {
 
     private static Logger duckGuildsLogger;

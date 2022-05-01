@@ -1,7 +1,5 @@
 package at.theduggy.duckguilds.storage.systemTypes;
 
-import at.theduggy.duckguilds.Main;
-
 import java.io.IOException;
 import java.nio.file.Files;
 

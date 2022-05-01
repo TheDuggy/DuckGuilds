@@ -19,4 +19,8 @@ public class GuildColor {
         return Utils.translateFromReadableStringToChatColorAllColors(color);
     }
 
+    public String toString(){
+        return color;
+    }
+
 }

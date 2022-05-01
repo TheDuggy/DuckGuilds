@@ -84,8 +84,6 @@ import java.util.UUID;
         }
         ArrayList<UUID> players = new ArrayList<>();
         players.add(player.getUniqueId());
-        ArrayList<String> playersForFile = new ArrayList<>();
-        playersForFile.add(player.getUniqueId().toString());
         guild.setColor(color);
         guild.setSuffix(ChatColor.GRAY + "[" + tagColor + tag + ChatColor.GRAY + "]");
         guild.setColor(color);
@@ -97,7 +95,7 @@ import java.util.UUID;
         guildObject.setPlayers(players);
         guildObject.setHead(player.getUniqueId());
         guildObject.setName(name);
-        guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now()));
+        guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now(), Main.getPlayerCache().get(player.getUniqueId()).getName()));
         System.out.println(name);
         //TODO Make a detailed option to save stuff like creation-time!
         Storage.createGuildStorageSection(guildObject,name);
