@@ -13,9 +13,10 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.guild_invite;
+package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,8 +37,8 @@ public class DiscardInviteOnPlayerLeave implements Listener {
             ArrayList<String> guildInvitesOfPlayer = Utils.getPlayerGuildInvites(player);
             for (int i =0;i!= guildInvitesOfPlayer.size();i++){
                 Main.guildInvites.get(guildInvitesOfPlayer.get(i)).remove(player.getName());
-                if (Bukkit.getPlayer(Utils.getHeadOfGuild(guildInvitesOfPlayer.get(i))).isOnline()) {
-                    Bukkit.getPlayer(Utils.getHeadOfGuild(guildInvitesOfPlayer.get(i))).sendMessage(Main.prefix + ChatColor.RED + player.getName() + "has left the server and his invite was deleted!");
+                if (Main.getPlayerCache().get(Utils.getHeadOfGuild(guildInvitesOfPlayer.get(i))).isOnline()) {
+                    Bukkit.getPlayerExact(Main.getPlayerCache().get(Utils.getHeadOfGuild(guildInvitesOfPlayer.get(i))).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + player.getName() + "has left the server and his invite was deleted!");
                 }
             }
         }

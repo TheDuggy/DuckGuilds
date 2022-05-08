@@ -13,10 +13,11 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.guild_invite;
+package at.theduggy.duckguilds.commands.invite;
 
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -54,22 +55,22 @@ public class GuildJoinCommand {
                     team.setSuffix(ChatColor.GRAY + "[" +  Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]");
                     team.addEntry(player.getName());
                     player.setDisplayName(Main.getGuildCache().get(guildName).getGuildColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
-                    player.sendMessage(Main.prefix + ChatColor.GREEN + " You successfully joined " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!");
+                    player.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + " You successfully joined " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!");
                     for (Player playerFromServer: Bukkit.getOnlinePlayers()){
                         playerFromServer.setScoreboard(Main.getScoreboard());
                         if (Utils.getPlayerGuild(playerFromServer).equals(guildName)){
-                            player.sendMessage(Main.prefix + ChatColor.YELLOW  + player.getName() + ChatColor.GREEN + " has joined your guild!");
+                            player.sendMessage(GuildTextUtils.prefix + ChatColor.YELLOW  + player.getName() + ChatColor.GREEN + " has joined your guild!");
                         }
                     }
                     Main.guildInvites.get(guildName).remove(player.getName());
                 }else {
-                    player.sendMessage(Main.prefix + ChatColor.RED + "You aren't invited to this guild!");
+                    player.sendMessage(GuildTextUtils.prefix+ ChatColor.RED + "You aren't invited to this guild!");
                 }
             }else {
-                player.sendMessage(Main.guildDoesntExists);
+                player.sendMessage(GuildTextUtils.guildDoesntExist);
             }
         }else {
-            player.sendMessage(Main.playerAlreadyInGuild);
+            player.sendMessage(GuildTextUtils.playerAlreadyInGuild);
         }
     }
 

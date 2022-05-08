@@ -3,12 +3,11 @@ package at.theduggy.duckguilds.storage.systemTypes;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
-import at.theduggy.duckguilds.other.JsonUtils;
+import at.theduggy.duckguilds.other.GuildTextUtils;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
@@ -58,23 +57,23 @@ public class GuildFileSystem {
     public static void cacheGuildFiles() throws IOException{
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         for (File file : guildGuildsFolder.toFile().listFiles()) {
-            if (Utils.getFileExtension(file).equals(".json")) {
+            if (GuildTextUtils.getFileExtension(file).equals(".json")) {
                 System.out.println(readPrettyJsonFile(file));
                 GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
                 Team team;
                 try {
-                    team = Main.getScoreboard().registerNewTeam(Utils.getFileBaseName(file));
+                    team = Main.getScoreboard().registerNewTeam(GuildTextUtils.getFileBaseName(file));
                 }catch (IllegalArgumentException e){
-                    team = Main.getScoreboard().getTeam(Utils.getFileBaseName(file));
+                    team = Main.getScoreboard().getTeam(GuildTextUtils.getFileBaseName(file));
                 }
 
                 team.setColor(guildObject.getGuildColor().getChatColor());
                 team.setSuffix(ChatColor.GRAY + "[" + guildObject.getTagColor().getChatColor() + guildObject.getTag() + ChatColor.GRAY + "]");
-                team.setDisplayName(Utils.getFileBaseName(file));
+                team.setDisplayName(GuildTextUtils.getFileBaseName(file));
                 for (UUID player : guildObject.getPlayers()){
                     cachePlayer(player, guildObject.getName());
                 }
-                Main.getGuildCache().put(Utils.getFileBaseName(file), guildObject); // guild indexed to HasMap
+                Main.getGuildCache().put(GuildTextUtils.getFileBaseName(file), guildObject); // guild indexed to HasMap
             }
         }
     }
@@ -110,9 +109,9 @@ public class GuildFileSystem {
 
     public static void cachePlayers() throws IOException {
         for (File file:GUILD_DATA_FOLDER.listFiles()){
-            if (Utils.isStringUUID(Utils.getFileBaseName(file))) {
-                if (!Main.getPlayerCache().containsKey(UUID.fromString(Utils.getFileBaseName(file)))) {
-                    cachePlayer(UUID.fromString(Utils.getFileBaseName(file)),"");
+            if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
+                if (!Main.getPlayerCache().containsKey(UUID.fromString(GuildTextUtils.getFileBaseName(file)))) {
+                    cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),"");
                 }
             }
         }
@@ -120,10 +119,10 @@ public class GuildFileSystem {
 
     public static void cachePlayer(UUID player,String guild) throws IOException{
         File playerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
-        GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(playerFile), GuildPlayerObject.class);//new GuildPlayerObject(player,Utils.isPlayerOnline(player), (String) jsonData.get("name"),guild);
+        GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(playerFile), GuildPlayerObject.class);//new GuildPlayerObject(player,GuildTextUtils.isPlayerOnline(player), (String) jsonData.get("name"),guild);
         guildPlayerObject.setGuild(guild);
         guildPlayerObject.setOnline(Utils.isPlayerOnline(player));
-        guildPlayerObject.setPlayer(UUID.fromString(Utils.getFileBaseName(playerFile)));
+        guildPlayerObject.setPlayer(UUID.fromString(GuildTextUtils.getFileBaseName(playerFile)));
         Main.getPlayerCache().put(player, guildPlayerObject);
 
     }

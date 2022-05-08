@@ -13,9 +13,10 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.listGuilds;
+package at.theduggy.duckguilds.commands.list;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
@@ -27,7 +28,7 @@ public class ListGuilds {
 
     public static void listGuilds(Player player, int page) throws IOException, ParseException {
         if (Main.getGuildCache().size()==0){
-            player.sendMessage(Main.prefix + ChatColor.RED + "There are no guilds on this server!" );
+            player.sendMessage(GuildTextUtils.prefix+ ChatColor.RED + "There are no guilds on this server!" );
         }else {
             if (page>0) {
                 int pageCount = (int) Math.ceil((double) Main.getGuildCache().size() / 8.0);
@@ -60,7 +61,7 @@ public class ListGuilds {
                         }
                     }
                     StringBuilder msg = new StringBuilder();
-                    msg.append(Main.prefix  + ChatColor.GREEN + "List of all guilds from server " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
+                    msg.append(GuildTextUtils.prefix + ChatColor.GREEN + "List of all guilds from server " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                     msg.append(ChatColor.WHITE + "-".repeat(41) + "\n");//60
                     for (String guildName:guildPages.get(page)){
                         ChatColor color = Main.getGuildCache().get(guildName).getGuildColor().getChatColor();
@@ -76,10 +77,10 @@ public class ListGuilds {
                     }
                     player.sendMessage(msg.toString());
                 }else {
-                    player.sendMessage(Main.pageIndexOutOfBounds);
+                    player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
                 }
             }else {
-                player.sendMessage(Main.pageIndexOutOfBounds);
+                player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
             }
         }
     }

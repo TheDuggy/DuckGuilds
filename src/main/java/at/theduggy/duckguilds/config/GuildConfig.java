@@ -106,13 +106,13 @@ public class GuildConfig {
         if (storageType==null) {
             switch (fileConfiguration.getString("storageType")) {
                 case "FILE":
-                    storageType= Storage.StorageType.FILE;
-                    return Storage.StorageType.FILE;
+                    storageType= Storage.StorageType.File;
+                    return Storage.StorageType.File;
                 case "MySQL":
                     storageType= Storage.StorageType.MySQL;
                     return Storage.StorageType.MySQL;
                 default:
-                    return Storage.StorageType.FILE;
+                    return Storage.StorageType.File;
             }
         }else {
             return storageType;

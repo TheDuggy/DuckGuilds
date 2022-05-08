@@ -13,10 +13,10 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.leaveGuild;
+package at.theduggy.duckguilds.commands.leave;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.storage.Storage;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -35,16 +35,16 @@ public class PlayerLeaveGuild {
             if (players.contains(player.getUniqueId())) {
                     removePlayerFromScoreboard(player, name);
                     updatePlayerCache(player);
-                    Storage.removePlayerFromGuildField(player.getUniqueId(),name);
+                    Main.getMainStorage().removePlayerFromGuildField(player.getUniqueId(),name);
                     player.setDisplayName(ChatColor.WHITE + "<" + player.getName() + ">");
                     reindexAndChangeFile(name,player.getUniqueId());
-                    player.sendMessage(Main.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
+                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
             } else {
-                player.sendMessage(Main.youArentInThatGuild);
+                player.sendMessage(GuildTextUtils.youArentInThatGuild);
 
             }
         }else {
-            player.sendMessage(Main.guildDoesntExists);
+            player.sendMessage(GuildTextUtils.guildDoesntExist);
         }
     }
 

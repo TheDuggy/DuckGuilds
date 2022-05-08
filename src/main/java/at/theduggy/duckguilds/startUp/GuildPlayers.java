@@ -36,8 +36,8 @@ public class GuildPlayers implements Listener {
     }
 
     private static void addPlayerToTeam(Player player) throws IOException, ParseException {
-        if (!Storage.personalGuildPlayerStorageSectionExists(player.getUniqueId())){
-            Storage.createPersonalPlayerStorageSection(player);
+        if (!Main.getMainStorage().personalGuildPlayerStorageSectionExists(player.getUniqueId())){
+            Main.getMainStorage().createPersonalPlayerStorageSection(player);
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
             Team team;
@@ -59,9 +59,9 @@ public class GuildPlayers implements Listener {
             }
         }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
             System.out.println(Main.getGuildCache().size());
-            String oldName = Storage.getPlayerDataFromStorage(player.getUniqueId());
+            String oldName = Main.getMainStorage().getPlayerDataFromStorage(player.getUniqueId());
             if (!oldName.equals(player.getName())) {
-                Storage.updatePlayerData(player.getUniqueId(), Main.getPlayerCache().get(player.getUniqueId()), player.getName());
+                Main.getMainStorage().updatePlayerData(player.getUniqueId(), Main.getPlayerCache().get(player.getUniqueId()), player.getName());
                 Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
             }
             Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);

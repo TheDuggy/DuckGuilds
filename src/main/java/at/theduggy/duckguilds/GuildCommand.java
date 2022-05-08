@@ -15,18 +15,19 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds;
 
-import at.theduggy.duckguilds.creatGuild.GuildCreate;
-import at.theduggy.duckguilds.deletSystem.GuildDelete;
-import at.theduggy.duckguilds.guildInfo.GuildInfoCommand;
-import at.theduggy.duckguilds.guild_invite.DeleteGuildInvite;
-import at.theduggy.duckguilds.guild_invite.GuildInviteCommand;
-import at.theduggy.duckguilds.guild_invite.GuildInviteDiscardCommand;
-import at.theduggy.duckguilds.guild_invite.GuildJoinCommand;
-import at.theduggy.duckguilds.kick.KickPlayerFromGuild;
-import at.theduggy.duckguilds.leaveGuild.PlayerLeaveGuild;
-import at.theduggy.duckguilds.listGuilds.ListGuilds;
+import at.theduggy.duckguilds.commands.kick.KickPlayerFromGuild;
+import at.theduggy.duckguilds.commands.creatGuild.GuildCreate;
+import at.theduggy.duckguilds.commands.deletSystem.GuildDelete;
+import at.theduggy.duckguilds.commands.guildInfo.GuildInfoCommand;
+import at.theduggy.duckguilds.commands.invite.DeleteGuildInvite;
+import at.theduggy.duckguilds.commands.invite.GuildInviteCommand;
+import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
+import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
+import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
+import at.theduggy.duckguilds.commands.list.ListGuilds;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
-import at.theduggy.duckguilds.help.GuildHelpCommand;
+import at.theduggy.duckguilds.commands.help.GuildHelpCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -62,7 +63,7 @@ public class GuildCommand implements TabExecutor {
                         }else if (args.length==2 && args[1].equals("discardInvite")){
                             player.sendMessage(GuildHelpCommand.discardInvite());
                         }else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
 
                         break;
@@ -81,38 +82,38 @@ public class GuildCommand implements TabExecutor {
                                                 color = args[2];
                                                 tag = args[3];
                                                 tagColor = args[4];
-                                                GuildCreate.createGuild(player, Utils.translateFromReadableStringToChatColorLightColors(color), name, tag, Utils.translateFromReadableStringToChatColorAllColors(tagColor));
+                                                GuildCreate.createGuild(player, GuildTextUtils.translateFromReadableStringToChatColorLightColors(color), name, tag, GuildTextUtils.translateFromReadableStringToChatColorAllColors(tagColor));
 
                                             } catch (IOException | ParseException e) {
                                                 e.printStackTrace();
                                             }
 
                                         } else {
-                                            player.sendMessage(Main.wrongUsage);
+                                            player.sendMessage(GuildTextUtils.wrongUsage);
                                         }
                                     } else {
-                                        player.sendMessage(Main.wrongUsage);
+                                        player.sendMessage(GuildTextUtils.wrongUsage);
                                     }
                                 } else {
-                                    player.sendMessage(Main.wrongUsage);
+                                    player.sendMessage(GuildTextUtils.wrongUsage);
                                 }
                             } else {
-                                player.sendMessage(Main.wrongUsage);
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                         } else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
                         break;
                     case "list":
                         try {
                             if (args.length==2) {
-                                if (Utils.isStringInteger(args[1])){
+                                if (GuildTextUtils.isStringInteger(args[1])){
                                     ListGuilds.listGuilds(player,Integer.parseInt(args[1]));
                                 }else {
-                                    player.sendMessage(Main.pageIndexMustBeNumeric);
+                                    player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
                                 }
                             } else {
-                                player.sendMessage(Main.wrongUsage);
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                         } catch (IOException | ParseException e) {
                             e.printStackTrace();
@@ -124,10 +125,10 @@ public class GuildCommand implements TabExecutor {
                                 if (!Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
                                     PlayerLeaveGuild.leaveGuild(player, args[1]);
                                 } else if (Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
-                                    player.sendMessage(Main.youAreTheHeadOfThatGuild);
+                                    player.sendMessage(GuildTextUtils.youAreTheHeadOfThatGuild);
                                 }
                             } else {
-                                player.sendMessage(Main.wrongUsage);
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                         } catch (IOException | ParseException e) {
                             e.printStackTrace();
@@ -139,12 +140,12 @@ public class GuildCommand implements TabExecutor {
                                 if (args[2].equals("-y")) {
                                     GuildDelete.removeGuild(args[1], player);
                                 } else if (args[2].equals("-n")) {
-                                    player.sendMessage(Main.prefix + ChatColor.RED + "To delete your guild use /guild delete -y!");
+                                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "To delete your guild use /guild delete -y!");
                                 } else {
-                                    player.sendMessage(Main.forbiddenArgument);
+                                    player.sendMessage(GuildTextUtils.forbiddenArgument);
                                 }
                             } else {
-                                player.sendMessage(Main.wrongUsage);
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
 
                         } catch (IOException | ParseException | InterruptedException e) {
@@ -160,22 +161,22 @@ public class GuildCommand implements TabExecutor {
                                             if (!Bukkit.getPlayerExact(args[1]).equals(player)) {
                                                 GuildInviteCommand.guildInviteCommand(player, args[1], Utils.getPlayerGuild(player));
                                             } else {
-                                                player.sendMessage(Main.prefix + ChatColor.RED + "You can't invite yourself!");
+                                                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You can't invite yourself!");
                                             }
                                         } else {
-                                            player.sendMessage(Main.prefix + ChatColor.RED + "This player doesn't exist or isn't online!");
+                                            player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "This player doesn't exist or isn't online!");
                                         }
                                     } else {
-                                        player.sendMessage(Main.youAreNotTheHeadOfThatGuild);
+                                        player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
                                     }
                                 } catch (IOException | ParseException e) {
                                     e.printStackTrace();
                                 }
                             } else {
-                                player.sendMessage(Main.youAreNotInAGuild);
+                                player.sendMessage(GuildTextUtils.youAreNotInAGuild);
                             }
                         } else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
                         break;
                     case "info":
@@ -184,18 +185,18 @@ public class GuildCommand implements TabExecutor {
                                     GuildInfoCommand.guildInfoCommandGeneral(player, args[1]);
                                     break;
                                 } else {
-                                    player.sendMessage(Main.wrongUsage);
+                                    player.sendMessage(GuildTextUtils.wrongUsage);
                                 }
                             }else if (args.length==4){//TODO Fix info-command lit-players!
                                 if (args[2].equals("playerList")){
-                                    if (Utils.isStringInteger(args[3])){
+                                    if (GuildTextUtils.isStringInteger(args[3])){
                                         GuildInfoCommand.listPlayersOfGuild(player,args[1], Integer.parseInt(args[3]));
                                     }else {
-                                        player.sendMessage(Main.pageIndexMustBeNumeric);
+                                        player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
                                     }
                                 }
                             }else {
-                                player.sendMessage(Main.wrongUsage);
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                             break;
                     case "join":
@@ -206,7 +207,7 @@ public class GuildCommand implements TabExecutor {
                                 e.printStackTrace();
                             }
                         } else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
                         break;
                     case "discardInvite":
@@ -217,7 +218,7 @@ public class GuildCommand implements TabExecutor {
                                 e.printStackTrace();
                             }
                         } else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
                         break;
                     case "kick":
@@ -229,11 +230,11 @@ public class GuildCommand implements TabExecutor {
                                     e.printStackTrace();
                                 }
                             } else {
-                                player.sendMessage(Main.wrongUsage);
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                                 //TODO Change msg!
                             }
                         } else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
                         break;
                     case "deleteInvite":
@@ -244,15 +245,15 @@ public class GuildCommand implements TabExecutor {
                                 e.printStackTrace();
                             }
                         } else {
-                            player.sendMessage(Main.wrongUsage);
+                            player.sendMessage(GuildTextUtils.wrongUsage);
                         }
                         break;
                     default:
-                        player.sendMessage(Main.wrongUsage);
+                        player.sendMessage(GuildTextUtils.wrongUsage);
                         break;
                 }
             } else {
-                player.sendMessage(Main.wrongUsage);
+                player.sendMessage(GuildTextUtils.wrongUsage);
             }
         } else {
             sender.sendMessage("You are not a player! Use /guild help for all options!");

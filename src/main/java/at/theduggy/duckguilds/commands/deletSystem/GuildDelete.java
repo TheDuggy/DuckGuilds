@@ -13,12 +13,12 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.deletSystem;
+package at.theduggy.duckguilds.commands.deletSystem;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.leaveGuild.PlayerLeaveGuild;
+import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
-import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -36,23 +36,23 @@ public class GuildDelete {
                         if (Utils.getPlayerGuild(playerFromServer).equals(name)) {
                             if (playerFromServer.isOnline()) {
                                 if (Utils.getIfPlayerIsHeadOfGuild(name, playerFromServer)) {
-                                    playerFromServer.sendMessage(Main.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.YELLOW + name + ChatColor.GREEN + " has been deleted!");
+                                    playerFromServer.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.YELLOW + name + ChatColor.GREEN + " has been deleted!");
                                 } else {
-                                    playerFromServer.sendMessage(Main.guildHeadLeftGuild);
+                                    playerFromServer.sendMessage(GuildTextUtils.guildHeadLeftGuild);
                                 }
                             }
                             PlayerLeaveGuild.leaveGuild(playerFromServer, name);
                             playerFromServer.setDisplayName(ChatColor.WHITE  + playerFromServer.getName() );
                         }
                     }
-                    Storage.deleteGuildField(name);
+                    Main.getMainStorage().deleteGuildField(name);
                     Main.getGuildCache().remove(name);
                 } else {
-                    player.sendMessage(Main.youAreNotTheHeadOfThatGuild);
+                    player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
                 }
             }
         }else {
-            player.sendMessage(Main.guildDoesntExists);
+            player.sendMessage(GuildTextUtils.guildDoesntExist);
         }
     }
 }

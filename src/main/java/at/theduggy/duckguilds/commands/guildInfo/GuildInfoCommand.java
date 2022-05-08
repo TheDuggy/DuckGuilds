@@ -1,6 +1,7 @@
-package at.theduggy.duckguilds.guildInfo;
+package at.theduggy.duckguilds.commands.guildInfo;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -17,12 +18,12 @@ creationDate,
     public static void guildInfoCommandGeneral(Player player,String guildName){
         if (Main.getGuildCache().containsKey(guildName)){
             StringBuilder msg = new StringBuilder();
-            msg.append(Main.prefix + ChatColor.GREEN + "General information about " + ChatColor.YELLOW + guildName + ChatColor.GREEN + ": \n");
+            msg.append(GuildTextUtils.prefix + ChatColor.GREEN + "General information about " + ChatColor.YELLOW + guildName + ChatColor.GREEN + ": \n");
             msg.append(ChatColor.WHITE + "-".repeat(35) + "\n");
             ChatColor color = Main.getGuildCache().get(guildName).getGuildColor().getChatColor();
             ChatColor tagColor =  Main.getGuildCache().get(guildName).getTagColor().getChatColor();
-            msg.append(ChatColor.GREEN + "Name: " + color + guildName + " (" + Utils.chatColorToString(color) + ")\n");
-            msg.append(ChatColor.GREEN + "Tag: " + tagColor + Main.getGuildCache().get(guildName).getTag() + " (" +Utils.chatColorToString(tagColor) + ")\n");
+            msg.append(ChatColor.GREEN + "Name: " + color + guildName + " (" + GuildTextUtils.chatColorToString(color) + ")\n");
+            msg.append(ChatColor.GREEN + "Tag: " + tagColor + Main.getGuildCache().get(guildName).getTag() + " (" +GuildTextUtils.chatColorToString(tagColor) + ")\n");
             msg.append(ChatColor.GREEN + "Head: " + color + Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName() + "\n");
             ArrayList<UUID> players =  Main.getGuildCache().get(guildName).getPlayers();
             msg.append(ChatColor.GREEN  + "Players: " + color + players.size() + "\n");
@@ -31,7 +32,7 @@ creationDate,
             msg.append(ChatColor.GREEN + "Creation-Date: " + color + Main.getGuildCache().get(guildName).getGuildMetadata().getFormattedCreationDate());
             player.sendMessage(msg.toString());
         }else {
-            player.sendMessage(Main.guildDoesntExists);
+            player.sendMessage(GuildTextUtils.guildDoesntExist);
         }
     }
 
@@ -52,7 +53,7 @@ creationDate,
                 System.out.println(playerPages);
                 String headName = Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName();
                 StringBuilder msg = new StringBuilder();
-                msg.append(Main.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
+                msg.append(GuildTextUtils.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                 msg.append(ChatColor.WHITE + "-".repeat(40) + "\n");//60
                 putHeadToFirstPosition(playerPages,headName);
                 for (String name:playerPages.get(page)){
@@ -64,10 +65,10 @@ creationDate,
                 }
                 player.sendMessage(msg.toString());
             }else {
-                player.sendMessage(Main.pageIndexOutOfBounds);
+                player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
             }
         }else {
-            player.sendMessage(Main.pageIndexOutOfBounds);
+            player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
         }
     }
 

@@ -55,21 +55,8 @@ private static Scoreboard scoreboard;
 public static Plugin plugin;
 public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
 private static HashMap<String, GuildObject> cachedGuilds = new HashMap<>();
-public static String prefix = ChatColor.AQUA + "[" + ChatColor.GOLD + "DuckGuilds" + ChatColor.AQUA + "] ";
-public static String wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!";
-public static String playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!";
-public static String guildDoesntExists = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list to see all guilds!";
-public static String youArentInThatGuild = prefix + ChatColor.RED + "Your aren't in that guild.";
-public static String guildHeadLeftGuild = prefix +  ChatColor.RED + "Your guild-head had left the guild and the guild was deleted!";
-public static String youAreNotInAGuild = prefix + ChatColor.RED + "You are not in a guild!";
-public static String youAreTheHeadOfThatGuild = prefix + ChatColor.RED + "You are the head of that guild! You can't leave it, but delete it with /guild delete -y!";
-public static String youAreNotTheHeadOfThatGuild = prefix + ChatColor.RED + "You are not the head of that guild!";
-public static String forbiddenArgument = prefix + ChatColor.RED + "This command do not take this argument!";
-public static String playerDoesntExists = prefix + ChatColor.RED + "That player doesn't exist!";
-public static String playerInstOnline = prefix + ChatColor.RED + "This player isn't online!";
-public static String pageIndexMustBeNumeric = prefix + ChatColor.RED + "The page-index must be numeric!";
-public static String pageIndexOutOfBounds = prefix + ChatColor.RED + "The page-index must be valid!";
 public static File guildRootFolder;
+private static Storage mainStorage ;
 public static Path loggingFolder;
 
     @Override
@@ -77,6 +64,7 @@ public static Path loggingFolder;
         this.saveDefaultConfig();
         plugin = this;
         mainFileConfiguration = this.getConfig();
+        mainStorage=new Storage(GuildConfig.storageType);
         try {
             FakePlayerData.initFakePlayer();
         } catch (FileNotFoundException e) {
@@ -93,7 +81,7 @@ public static Path loggingFolder;
         try {
             commandRegistration();
             listenerRegistration();
-            Storage.loadStorage();
+            mainStorage.loadStorage();
             GuildPlayers.handlePlayersOnReload();
         }catch (IOException|ParseException e){
                 e.printStackTrace();
@@ -151,6 +139,10 @@ public static Path loggingFolder;
             gson=gsonBuilder.create();
         }
         return gson;
+    }
+
+    public static Storage getMainStorage(){
+        return mainStorage;
     }
 
 }

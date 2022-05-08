@@ -13,9 +13,10 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.guild_invite;
+package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,14 +29,14 @@ public class GuildInviteDiscardCommand {
         if (Main.guildInvites.containsKey(guildName)){
             if (Main.guildInvites.get(guildName).contains(player.getName())){
                 Main.guildInvites.get(guildName).remove(player.getName());
-                Player head = Bukkit.getPlayer(Utils.getHeadOfGuild(guildName));
-                head.sendMessage(Main.prefix + ChatColor.RED  + player.getName() + "has discarded your guild-invite!");
-                player.sendMessage(Main.prefix + ChatColor.RED + "You discarded the invite of " + head.getName() + " to " + guildName + "!" );
+                Player head = Bukkit.getPlayerExact(Main.getPlayerCache().get(Utils.getHeadOfGuild(guildName)).getName());
+                head.sendMessage(GuildTextUtils.prefix + ChatColor.RED  + player.getName() + "has discarded your guild-invite!");
+                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You discarded the invite of " + head.getName() + " to " + guildName + "!" );
             }else {
-                player.sendMessage(Main.prefix + ChatColor.RED + "You are not invited to this guild!");
+                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You are not invited to this guild!");
             }
         }else {
-            player.sendMessage(Main.guildDoesntExists);
+            player.sendMessage(GuildTextUtils.guildDoesntExist);
         }
     }
 }

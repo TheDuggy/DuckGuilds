@@ -13,10 +13,11 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.guild_invite;
+package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -46,27 +47,27 @@ public class GuildInviteCommand {
                             }
                             if (!Main.guildInvites.get(guildName).contains(playerNameToInvite)) {
                                 Main.guildInvites.get(guildName).add(playerNameToInvite);
-                                invitedPlayer.spigot().sendMessage(new TextComponent(Main.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.RED + "!\n"), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName));
-                                sender.sendMessage(Main.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
+                                invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix+ " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.RED + "!\n"), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName));
+                                sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
                                 autoDeleteGuildInvite(Bukkit.getPlayerExact(playerNameToInvite), guildName);
 
                             } else {
-                                sender.sendMessage(Main.prefix + ChatColor.RED + "You already sent an invite to this player!");
+                                sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");
                             }
                         } else {
-                            sender.sendMessage(Main.playerInstOnline);
+                            sender.sendMessage(GuildTextUtils.playerIsntOnline);
                         }
                     } else {
-                        sender.sendMessage(Main.playerDoesntExists);
+                        sender.sendMessage(GuildTextUtils.playerDoesntExists);
                     }
                 }else {
-                    sender.sendMessage(Main.prefix + ChatColor.RED + "That player is already in your guild!");
+                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "That player is already in your guild!");
                 }
             }else {
-                sender.sendMessage(Main.youAreNotTheHeadOfThatGuild);
+                sender.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
             }
         }else {
-            sender.sendMessage(Main.guildDoesntExists);
+            sender.sendMessage(GuildTextUtils.guildDoesntExist);
         }
     }
 
@@ -90,8 +91,8 @@ public class GuildInviteCommand {
             public void run() {
                 if (Main.guildInvites.get(guildName).contains(invited.getName())){
                     Main.guildInvites.get(guildName).remove(invited.getName());
-                    invited.sendMessage(Main.prefix + ChatColor.RED + "The invite from " + Bukkit.getPlayer(Utils.getHeadOfGuild(guildName)).getName() + " to " + guildName + " has expired!");
-                    Bukkit.getPlayer(Utils.getHeadOfGuild(guildName)).sendMessage(Main.prefix + ChatColor.RED+ "The invite for " +invited.getName() + " has expired!");
+                    invited.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The invite from " + Main.getPlayerCache().get(Utils.getHeadOfGuild(guildName)).getName() + " to " + guildName + " has expired!");
+                    Bukkit.getPlayerExact(Main.getPlayerCache().get(Utils.getHeadOfGuild(guildName)).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED+ "The invite for " +invited.getName() + " has expired!");
 
                 }
             }

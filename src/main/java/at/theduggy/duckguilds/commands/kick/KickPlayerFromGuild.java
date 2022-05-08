@@ -13,11 +13,10 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.kick;
+package at.theduggy.duckguilds.commands.kick;
 
-
-import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.leaveGuild.PlayerLeaveGuild;
+import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,28 +35,28 @@ public class KickPlayerFromGuild {
                 if (sender.getName().equals(player.getName())) {
                     if (guildName.equals(guildNameOfPlayerToKick)) {
                         PlayerLeaveGuild.leaveGuild(player, guildName);
-                        player.sendMessage(Main.prefix  + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
+                        player.sendMessage(GuildTextUtils.prefix  + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
                         for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
                             if (Utils.getPlayerGuild(playerFromServer).equals(guildNameOfPlayerToKick)) {
                                 if (Utils.getIfPlayerIsHeadOfGuild(guildNameOfPlayerToKick, sender)) {
-                                    playerFromServer.sendMessage(Main.prefix + ChatColor.RED + "The player " + ChatColor.YELLOW + playerFromServer.getName() + ChatColor.RED + " has been kicked from your guild!");
+                                    playerFromServer.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The player " + ChatColor.YELLOW + playerFromServer.getName() + ChatColor.RED + " has been kicked from your guild!");
                                 } else {
-                                    playerFromServer.sendMessage(Main.prefix + ChatColor.RED + "The head of your guild, " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has kicked " + ChatColor.YELLOW + player.getName() + ChatColor.RED + " from your guild!");
+                                    playerFromServer.sendMessage(GuildTextUtils.prefix+ ChatColor.RED + "The head of your guild, " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has kicked " + ChatColor.YELLOW + player.getName() + ChatColor.RED + " from your guild!");
                                 }
                             }
                         }
                     } else {
-                        sender.sendMessage(Main.prefix + ChatColor.RED + "You are not in the same guild as this player!");
+                        sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You are not in the same guild as this player!");
                     }
                 }else {
-                    sender.sendMessage(Main.prefix + ChatColor.RED + "You can't kick your self!");
+                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You can't kick your self!");
                 }
 
             } else {
-                sender.sendMessage(Main.youAreNotTheHeadOfThatGuild);
+                sender.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
             }
         }else {
-            sender.sendMessage(Main.youAreNotInAGuild);
+            sender.sendMessage(GuildTextUtils.youAreNotInAGuild);
         }
     }
 }

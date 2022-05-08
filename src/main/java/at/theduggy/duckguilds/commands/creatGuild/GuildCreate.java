@@ -14,15 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package at.theduggy.duckguilds.creatGuild;
+package at.theduggy.duckguilds.commands.creatGuild;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfig;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
-import at.theduggy.duckguilds.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -40,38 +40,36 @@ import java.util.UUID;
             if (name.length() <= 20) {
                 if (!Utils.isPlayerInGuild(player)) {
                     if (!Utils.guildExists(name)) {
-                        if (Utils.isStringReadyToUse(name)) {
-                            if (Utils.isReadyForCreate(tag)) {
+                        if (GuildTextUtils.isStringReadyToUse(name)) {
+                            if (GuildTextUtils.isReadyForCreate(tag)) {
                                 if (tag.length() <= 4) {
                                     if (GuildConfig.getMaxGuildSize()>0){
                                         Bukkit.getLogger().warning(String.valueOf(GuildConfig.getMaxGuildSize()));
                                         if (Main.getGuildCache().size()> GuildConfig.getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
-                                            player.sendMessage(Main.getPlayerCache().get(player.getUniqueId()).toString());
                                         }else {
-                                            player.sendMessage(Main.prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfig.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " !" + " You can't create guilds till a minimum of 1 is deleted!");
+                                            player.sendMessage(GuildTextUtils.maxServerGuildsReached);
                                         }
                                     }else {
                                         addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
                                     }
                                 } else {
-                                    player.sendMessage(Main.prefix + ChatColor.RED + "The tag is " + ChatColor.YELLOW + tag.length() + ChatColor.RED + " characters long, but can only be 4 characters long!");
+                                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The tag is " + ChatColor.YELLOW + tag.length() + ChatColor.RED + " characters long, but can only be 4 characters long!");
                                 }
                             } else {
-                                player.sendMessage(Main.prefix + "The tag contains forbidden symbols!");
+                                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "Tha guild-name " + ChatColor.YELLOW + tag + ChatColor.RED + " is invalid, because it contains other symbols than alphabetic characters or digits!");
                             }
                         } else {
-                            player.sendMessage(Main.prefix + ChatColor.RED + "Tha guild-name " + ChatColor.YELLOW + name + ChatColor.RED + " is invalid, because it contains other symbols than alphabetic characters or digits!");
+                            player.sendMessage( GuildTextUtils.prefix + ChatColor.RED + "Tha guild-name " + ChatColor.YELLOW + name + ChatColor.RED + " is invalid, because it contains other symbols than alphabetic characters or digits!");
                         }
                     } else {
-                        Bukkit.getLogger().info(Main.getGuildCache().toString());
-                        player.sendMessage(Main.prefix + ChatColor.RED + "Guild already exists!");
+                        player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The guild " + name + "already exists!");
                     }
                 }else {
-                    player.sendMessage(Main.playerAlreadyInGuild);
+                    player.sendMessage(GuildTextUtils.playerAlreadyInGuild);
                 }
         }else {
-                player.sendMessage(Main.prefix + ChatColor.RED + "The name of a guild can't be longer that 50 characters!");
+                player.sendMessage(GuildTextUtils.guildNameToLong);
             }
     }
 
@@ -98,7 +96,7 @@ import java.util.UUID;
         guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now(), Main.getPlayerCache().get(player.getUniqueId()).getName()));
         System.out.println(name);
         //TODO Make a detailed option to save stuff like creation-time!
-        Storage.createGuildStorageSection(guildObject,name);
+        Main.getMainStorage().createGuildStorageSection(guildObject,name);
         Main.getGuildCache().put(name, guildObject);
         reCachePlayer(name, player);
         guild.addEntry(player.getName());
@@ -106,7 +104,7 @@ import java.util.UUID;
         for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
             playerFromServer.setScoreboard(Main.getScoreboard());
         }
-        player.sendMessage(Main.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.UNDERLINE + "" + ChatColor.GOLD + name + ChatColor.GREEN + " has been created!");
+        player.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.UNDERLINE + "" + ChatColor.GOLD + name + ChatColor.GREEN + " has been created!");
     }
 
     public static void reCachePlayer(String name, Player player){

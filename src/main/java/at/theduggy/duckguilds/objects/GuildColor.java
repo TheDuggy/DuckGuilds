@@ -1,5 +1,6 @@
 package at.theduggy.duckguilds.objects;
 
+import at.theduggy.duckguilds.other.GuildTextUtils;
 import at.theduggy.duckguilds.other.Utils;
 import org.bukkit.ChatColor;
 
@@ -12,11 +13,11 @@ public class GuildColor {
     }
 
     public GuildColor(ChatColor color){
-        this.color = Utils.chatColorToString(color);
+        this.color = GuildTextUtils.chatColorToString(color);
     }
 
     public ChatColor getChatColor(){
-        return Utils.translateFromReadableStringToChatColorAllColors(color);
+        return GuildTextUtils.translateFromReadableStringToChatColorAllColors(color);
     }
 
     public String toString(){
