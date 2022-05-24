@@ -11,7 +11,6 @@ public class GuildPlayerObject {
     @Expose(serialize = false)
     private UUID player;
 
-    @Expose(serialize = true)
     private String name;
 
     @Expose(serialize = false)

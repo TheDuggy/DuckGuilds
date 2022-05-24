@@ -25,8 +25,9 @@ import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
 import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
 import at.theduggy.duckguilds.commands.list.ListGuilds;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import at.theduggy.duckguilds.commands.help.GuildHelpCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,6 +38,7 @@ import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 public class GuildCommand implements TabExecutor {
@@ -86,6 +88,8 @@ public class GuildCommand implements TabExecutor {
 
                                             } catch (IOException | ParseException e) {
                                                 e.printStackTrace();
+                                            } catch (SQLException | GuildDatabaseException e) {
+                                                throw new RuntimeException(e);
                                             }
 
                                         } else {

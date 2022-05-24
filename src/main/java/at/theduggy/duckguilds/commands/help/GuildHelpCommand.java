@@ -15,7 +15,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds.commands.help;
 
-import at.theduggy.duckguilds.other.GuildTextUtils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
 import org.bukkit.ChatColor;
 
 public class GuildHelpCommand {

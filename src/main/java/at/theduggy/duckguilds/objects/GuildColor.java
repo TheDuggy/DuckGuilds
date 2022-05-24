@@ -1,7 +1,6 @@
 package at.theduggy.duckguilds.objects;
 
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
 import org.bukkit.ChatColor;
 
 public class GuildColor {

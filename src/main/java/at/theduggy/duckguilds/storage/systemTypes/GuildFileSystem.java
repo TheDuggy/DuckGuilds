@@ -3,9 +3,9 @@ package at.theduggy.duckguilds.storage.systemTypes;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.ScoreboardTeamUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.bukkit.ChatColor;
@@ -29,6 +29,12 @@ public class GuildFileSystem {
         return Files.exists(Path.of(PLAYER_DATA_FOLDER + "/" + player + ".json"));
     }
 
+    public static void init() throws IOException {
+        GuildFileSystem.initFolders();
+        GuildFileSystem.cacheGuildFiles();
+        GuildFileSystem.cachePlayers();
+    }
+
     public static void createPersonalPlayerFile(Player player) throws IOException {
         Files.createFile(Path.of(PLAYER_DATA_FOLDER + "/"+ player.getUniqueId() + ".json"));
         JsonObject rawJsonData = new JsonObject();
@@ -38,10 +44,10 @@ public class GuildFileSystem {
         writeJsonData.close();
     }
     
-    public static void createGuildFile(GuildObject guildObject, String name) throws IOException {
+    public static void createGuildFile(GuildObject guildObject) throws IOException {
         try {
             Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
-            Path guildFile = Paths.get(guildGuildsFolder + "/" + name + ".json");
+            Path guildFile = Paths.get(guildGuildsFolder + "/" + guildObject.getName() + ".json");
             Files.createFile(guildFile);
             BufferedWriter fileWriter = new BufferedWriter(new FileWriter(String.valueOf(guildFile), StandardCharsets.UTF_8));
             System.out.println(guildObject.toString());
@@ -58,22 +64,12 @@ public class GuildFileSystem {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         for (File file : guildGuildsFolder.toFile().listFiles()) {
             if (GuildTextUtils.getFileExtension(file).equals(".json")) {
-                System.out.println(readPrettyJsonFile(file));
                 GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
-                Team team;
-                try {
-                    team = Main.getScoreboard().registerNewTeam(GuildTextUtils.getFileBaseName(file));
-                }catch (IllegalArgumentException e){
-                    team = Main.getScoreboard().getTeam(GuildTextUtils.getFileBaseName(file));
-                }
-
-                team.setColor(guildObject.getGuildColor().getChatColor());
-                team.setSuffix(ChatColor.GRAY + "[" + guildObject.getTagColor().getChatColor() + guildObject.getTag() + ChatColor.GRAY + "]");
-                team.setDisplayName(GuildTextUtils.getFileBaseName(file));
+                ScoreboardTeamUtils.addGuild(guildObject);
                 for (UUID player : guildObject.getPlayers()){
                     cachePlayer(player, guildObject.getName());
                 }
-                Main.getGuildCache().put(GuildTextUtils.getFileBaseName(file), guildObject); // guild indexed to HasMap
+                Main.getGuildCache().put(guildObject.getName(), guildObject); // guild indexed to HasMap
             }
         }
     }
@@ -148,15 +144,20 @@ public class GuildFileSystem {
         return guildPlayerObject.getName();
     }
 
-    public static void updatePlayerData(UUID player, GuildPlayerObject guildPlayerObject, String name) throws IOException {
-        File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
-        guildPlayerObject.setName(name);
+    public static void updatePlayerData(GuildPlayerObject guildPlayerObject) throws IOException {
+        File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + guildPlayerObject.getUniqueId() + ".json");
+        guildPlayerObject.setName(guildPlayerObject.getName());
         FileWriter writeNewData = new FileWriter(personalPlayerFile, StandardCharsets.UTF_8);
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name", name);
+        jsonObject.addProperty("name", guildPlayerObject.getGuild());
         writeNewData.write(Main.getGsonInstance().toJson(jsonObject));
         writeNewData.close();
     }
-    
+
+    public static void addPlayerToGuildFile(GuildObject guildObject) throws IOException {
+        FileWriter fileWriter = new FileWriter(GUILD_DATA_FOLDER + "/" + guildObject.getName() + ".json");
+        fileWriter.write(Main.getGsonInstance().toJson(guildObject));
+        fileWriter.close();
+    }
     
 }

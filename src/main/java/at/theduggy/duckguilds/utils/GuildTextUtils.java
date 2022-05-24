@@ -1,15 +1,17 @@
-package at.theduggy.duckguilds.other;
+package at.theduggy.duckguilds.utils;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfig;
+import at.theduggy.duckguilds.config.GuildConfigHandler;
 import org.bukkit.ChatColor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class GuildTextUtils {
 
-   public static String prefix = ChatColor.AQUA + "[" + ChatColor.GOLD + "DuckGuilds" + ChatColor.AQUA + "] ",
+    public static String prefix = ChatColor.AQUA + "[" + ChatColor.GOLD + "DuckGuilds" + ChatColor.AQUA + "] ",
+    prefixWithoutColor =  "[DuckGuilds] ",
     wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!",
     playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!",
     guildDoesntExist = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list to see all guilds!",
@@ -23,7 +25,7 @@ public class GuildTextUtils {
     playerIsntOnline = prefix + ChatColor.RED + "This player isn't online!",
     pageIndexMustBeNumeric = prefix + ChatColor.RED + "The page-index must be numeric!",
     pageIndexOutOfBounds = prefix + ChatColor.RED + "The page-index must be valid!",
-    maxServerGuildsReached = prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfig.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " ! You can't create guilds till a minimum of 1 is deleted!",
+    maxServerGuildsReached = prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfigHandler.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " ! You can't create guilds till a minimum of 1 is deleted!",
     forbiddenTag = prefix + "The tag contains forbidden symbols!",
     guildNameToLong = prefix + ChatColor.RED + "The name of a guild can't be longer that 50 characters!";
 
@@ -193,6 +195,14 @@ public class GuildTextUtils {
         }
 
         return isTrue;
+    }
+
+    public static ArrayList<UUID> uuidPlayerStringListToUUIDS(ArrayList<String> stringList){
+        ArrayList<UUID> uuids = new ArrayList<>();
+        for (String s:stringList){
+            uuids.add(UUID.fromString(s));
+        }
+        return uuids;
     }
 
 }

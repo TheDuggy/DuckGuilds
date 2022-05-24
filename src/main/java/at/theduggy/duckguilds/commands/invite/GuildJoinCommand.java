@@ -17,23 +17,15 @@ package at.theduggy.duckguilds.commands.invite;
 
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class GuildJoinCommand {
 
@@ -42,9 +34,11 @@ public class GuildJoinCommand {
         if (!Utils.isPlayerInGuild(player)){
             if (Main.getGuildCache().containsKey(guildName)){
                 if (Main.guildInvites.get(guildName).contains(player.getName())){
-                    addGuildToPlayerGuildFile(guildName,player);
-                    addPlayerToGuildFile(player,guildName);
-                    reindexGuild(player,guildName);
+                    Main.getGuildCache().get(guildName).getPlayers().add(player.getUniqueId());
+                    Main.getMainStorage().addPlayerToGuildField(Main.getGuildCache().get(guildName));
+                    Main.getPlayerCache().get(player.getUniqueId()).setGuild(guildName);//TODO Work on guildfilesystem!
+
+
                     Team team;
                     try {
                       team = Main.getScoreboard().registerNewTeam(guildName);
@@ -72,28 +66,5 @@ public class GuildJoinCommand {
         }else {
             player.sendMessage(GuildTextUtils.playerAlreadyInGuild);
         }
-    }
-
-    public static void addPlayerToGuildFile(Player player, String guildName) throws IOException, ParseException {
-        Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
-        Path guildFile = Paths.get(guildGuildsFolder + "/" + guildName + ".json");
-        FileReader fileReader = new FileReader(guildFile.toFile(),StandardCharsets.UTF_8);
-        JSONParser jsonParser = new JSONParser();
-        JSONObject oldGuildFile = (JSONObject) jsonParser.parse(fileReader);
-        fileReader.close();
-        ArrayList<String> allPlayersOfThatGuild = (ArrayList<String>) oldGuildFile.get("players");
-        allPlayersOfThatGuild.add(player.getUniqueId().toString());
-        oldGuildFile.remove("players");
-        oldGuildFile.put("players",allPlayersOfThatGuild);
-        FileWriter fileWriter = new FileWriter(guildFile.toFile(), StandardCharsets.UTF_8);
-        fileWriter.write(oldGuildFile.toJSONString());
-        fileWriter.close();
-    }
-    public static void addGuildToPlayerGuildFile(String name, Player player) throws IOException, ParseException {
-        Main.getPlayerCache().get(player.getUniqueId()).setGuild(name);
-    }
-
-    public static void reindexGuild(Player player,String name) throws ParseException {
-        Main.getGuildCache().get(name).getPlayers().add(player.getUniqueId());
     }
 }

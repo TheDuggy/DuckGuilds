@@ -16,7 +16,7 @@
 package at.theduggy.duckguilds.commands.list;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.other.GuildTextUtils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;

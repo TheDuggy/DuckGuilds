@@ -16,9 +16,9 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfig;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -96,6 +96,6 @@ public class GuildInviteCommand {
 
                 }
             }
-        }.runTaskLater(Main.getPlugin(Main.class), GuildConfig.getTimeTillInviteIsDeleted());
+        }.runTaskLater(Main.getPlugin(Main.class), GuildConfigHandler.getTimeTillInviteIsDeleted());
     }
 }

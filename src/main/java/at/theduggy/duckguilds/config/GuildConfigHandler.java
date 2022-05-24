@@ -16,17 +16,21 @@
 package at.theduggy.duckguilds.config;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.storage.Storage;
+import at.theduggy.duckguilds.storage.StorageHandler;
+import com.zaxxer.hikari.HikariConfig;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.*;
 
-public class GuildConfig {
-
-    public static Storage.StorageType storageType;
+public class GuildConfigHandler {
 
     public static int getMaxGuildSize(){
         FileConfiguration f = Main.mainFileConfiguration;
@@ -73,49 +77,63 @@ public class GuildConfig {
         return null;
     }
 
-    public static boolean getLogging(){
+    public static boolean getHighLevelLogging(){
         FileConfiguration f = Main.mainFileConfiguration;
-        return f.getBoolean("log");
+        return f.getBoolean("highLevelLogging");
     }
 
-    public static Object getCustomLogging() {
-        FileConfiguration f = Main.mainFileConfiguration;
-        if (getLogging()) {
-            if (f.get("customLogging") instanceof Boolean) {
-                return false;
-            } else if (f.get("customLogging") instanceof String) {
-                if (Files.exists(Paths.get(f.getString("customLogging")))) {
-                    if (Files.isDirectory(Paths.get(f.getString("customLogging")))) {
-                        return Paths.get(f.getString("customLogging"));
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
+
+    public static HikariConfig getDataBase() throws FileNotFoundException {
+        if (getStorageType().equals(StorageHandler.StorageType.MySQL)){
+            ArrayList<String> fileNames = new ArrayList<>();
+            for (File currentFile : Main.plugin.getDataFolder().listFiles()){
+                fileNames.add(currentFile.getName());
             }
+            if (fileNames.contains("database.yml")){
+                InputStream inputStream = new FileInputStream(Main.plugin.getDataFolder() + "/database.yml");
+                Yaml yaml = new Yaml();
+                HashMap<String,String> mysqlData = yaml.load(inputStream);
+                if (mysqlData.size()==3&&mysqlData.containsKey("password")&&mysqlData.containsKey("username")&&mysqlData.containsKey("url")){
+                    if (mysqlData.get("password")!=null&&mysqlData.get("username")!=null&& mysqlData.get("url")!=null){
+                        HikariConfig hikariConfig = new HikariConfig();
+                        hikariConfig.setPassword(String.valueOf(mysqlData.get("password")));
+                        hikariConfig.setUsername(String.valueOf(mysqlData.get("username")));
+                        hikariConfig.setJdbcUrl(String.valueOf("jdbc:" + mysqlData.get("url")));
+                        return hikariConfig;
+                    }else {
+                        Main.shutDown("Empty database-file!");
+                    }
+                }else {
+                    Main.shutDown("Corrupted database-file!");
+                }
+            }else {
+                Main.shutDown("No database-data-file found!");
+            }
+        }else {
+            return null;
+        }
+        return null;
+    }
+
+    public static StorageHandler.StorageType getStorageType(){
+        FileConfiguration fileConfiguration = Main.mainFileConfiguration;
+        String storageType = fileConfiguration.getString("storageType");
+        switch (storageType) {
+            case "File":
+                return StorageHandler.StorageType.File;
+            case "MySQL":
+                return StorageHandler.StorageType.MySQL;
+            default:
+                return null;
+        }
+    }
+
+    public static boolean useFileSystemOnInvalidConnection() throws FileNotFoundException, SQLException {
+        if (getStorageType()== StorageHandler.StorageType.MySQL){
+            return Main.mainFileConfiguration.getBoolean("useFileSystemOnInvalidConnection");
         }else {
             return false;
         }
     }
 
-    public static Enum<Storage.StorageType> getStorageType(){
-        FileConfiguration fileConfiguration = Main.mainFileConfiguration;
-        if (storageType==null) {
-            switch (fileConfiguration.getString("storageType")) {
-                case "FILE":
-                    storageType= Storage.StorageType.File;
-                    return Storage.StorageType.File;
-                case "MySQL":
-                    storageType= Storage.StorageType.MySQL;
-                    return Storage.StorageType.MySQL;
-                default:
-                    return Storage.StorageType.File;
-            }
-        }else {
-            return storageType;
-        }
-    }
 }

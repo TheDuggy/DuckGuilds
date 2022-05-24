@@ -17,12 +17,13 @@
 package at.theduggy.duckguilds.commands.creatGuild;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfig;
+import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,22 +31,23 @@ import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
 
   public class GuildCreate {
 
-    public static void createGuild(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException {
+    public static void createGuild(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException, SQLException, GuildDatabaseException {
             if (name.length() <= 20) {
                 if (!Utils.isPlayerInGuild(player)) {
                     if (!Utils.guildExists(name)) {
                         if (GuildTextUtils.isStringReadyToUse(name)) {
                             if (GuildTextUtils.isReadyForCreate(tag)) {
                                 if (tag.length() <= 4) {
-                                    if (GuildConfig.getMaxGuildSize()>0){
-                                        Bukkit.getLogger().warning(String.valueOf(GuildConfig.getMaxGuildSize()));
-                                        if (Main.getGuildCache().size()> GuildConfig.getMaxGuildSize()){
+                                    if (GuildConfigHandler.getMaxGuildSize()>0){
+                                        Bukkit.getLogger().warning(String.valueOf(GuildConfigHandler.getMaxGuildSize()));
+                                        if (Main.getGuildCache().size()> GuildConfigHandler.getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
                                         }else {
                                             player.sendMessage(GuildTextUtils.maxServerGuildsReached);
@@ -73,7 +75,7 @@ import java.util.UUID;
             }
     }
 
-    public static void addPlayerToTeamAndCreateFiles(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException {
+    public static void addPlayerToTeamAndCreateFiles(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException, SQLException, GuildDatabaseException {
         Team guild;
         try {
              guild = Main.getScoreboard().registerNewTeam(name);
@@ -94,9 +96,8 @@ import java.util.UUID;
         guildObject.setHead(player.getUniqueId());
         guildObject.setName(name);
         guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now(), Main.getPlayerCache().get(player.getUniqueId()).getName()));
-        System.out.println(name);
         //TODO Make a detailed option to save stuff like creation-time!
-        Main.getMainStorage().createGuildStorageSection(guildObject,name);
+        Main.getMainStorage().createGuildStorageField(guildObject);
         Main.getGuildCache().put(name, guildObject);
         reCachePlayer(name, player);
         guild.addEntry(player.getName());

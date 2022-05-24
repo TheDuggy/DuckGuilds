@@ -16,7 +16,7 @@
 package at.theduggy.duckguilds.commands.leave;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.other.GuildTextUtils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

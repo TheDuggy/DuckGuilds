@@ -1,30 +1,30 @@
 package at.theduggy.duckguilds.startUp;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
-import at.theduggy.duckguilds.storage.Storage;
+import at.theduggy.duckguilds.utils.ScoreboardTeamUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class GuildPlayers implements Listener {
 
-    public static void handlePlayersOnReload() throws IOException, ParseException {
+    public static void handlePlayersOnReload() throws IOException, ParseException, SQLException, GuildDatabaseException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
             addPlayerToTeam(player);
         }
     }
 
     @EventHandler
-    public void handlePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException {
+    public void handlePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException, SQLException, GuildDatabaseException {
         Player player = e.getPlayer();
         addPlayerToTeam(player);
     }
@@ -35,53 +35,20 @@ public class GuildPlayers implements Listener {
         Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
     }
 
-    private static void addPlayerToTeam(Player player) throws IOException, ParseException {
+    private static void addPlayerToTeam(Player player) throws IOException, ParseException, SQLException, GuildDatabaseException {
         if (!Main.getMainStorage().personalGuildPlayerStorageSectionExists(player.getUniqueId())){
             Main.getMainStorage().createPersonalPlayerStorageSection(player);
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
-            Team team;
-            String guildName =  Main.getPlayerCache().get(player.getUniqueId()).getGuild();
-            try {
-                team = Main.getScoreboard().registerNewTeam(guildName);
-            }catch (IllegalArgumentException exception){
-                team = Main.getScoreboard().getTeam(guildName);
-            }
-            String newPlayerName = Main.getGuildCache().get(guildName).getGuildColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE;
-            team.setColor(Main.getGuildCache().get(guildName).getGuildColor().getChatColor());
-            team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
-            team.setDisplayName(guildName);
-            team.addEntry(player.getName());
-            player.setDisplayName(newPlayerName);
-            player.setCustomName(newPlayerName);
-            for (Player playerFromServer:Bukkit.getServer().getOnlinePlayers()){
-                playerFromServer.setScoreboard(Main.getScoreboard());
-            }
         }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
             System.out.println(Main.getGuildCache().size());
             String oldName = Main.getMainStorage().getPlayerDataFromStorage(player.getUniqueId());
             if (!oldName.equals(player.getName())) {
-                Main.getMainStorage().updatePlayerData(player.getUniqueId(), Main.getPlayerCache().get(player.getUniqueId()), player.getName());
+                Main.getMainStorage().updatePlayerData(Main.getPlayerCache().get(player.getUniqueId()));
                 Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
             }
             Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
-            Team team;
-            String guildName =  Main.getPlayerCache().get(player.getUniqueId()).getGuild();
-            try {
-                team = Main.getScoreboard().registerNewTeam(guildName);
-            }catch (IllegalArgumentException exception){
-                team = Main.getScoreboard().getTeam(guildName);
-            }
-            String newPlayerName = Main.getGuildCache().get(guildName).getGuildColor().getChatColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE;
-            team.setColor( Main.getGuildCache().get(guildName).getGuildColor().getChatColor());
-            team.setSuffix(ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
-            team.setDisplayName(guildName);
-            team.addEntry(player.getName());
-            player.setDisplayName(newPlayerName);
-            player.setCustomName(newPlayerName);
-            for (Player playerFromServer:Bukkit.getServer().getOnlinePlayers()){
-                playerFromServer.setScoreboard(Main.getScoreboard());
-            }
+            ScoreboardTeamUtils.updateScoreboardAddPlayer(player, Main.getGuildCache().get(Main.getPlayerCache().get(player.getUniqueId()).getGuild()));
             System.out.println("Breakpoint 2!");
         }else {
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true, player.getName(), "");

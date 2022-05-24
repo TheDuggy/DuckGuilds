@@ -1,8 +1,8 @@
 package at.theduggy.duckguilds.commands.guildInfo;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 

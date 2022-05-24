@@ -16,8 +16,8 @@
 package at.theduggy.duckguilds.commands.kick;
 
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
-import at.theduggy.duckguilds.other.GuildTextUtils;
-import at.theduggy.duckguilds.other.Utils;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
