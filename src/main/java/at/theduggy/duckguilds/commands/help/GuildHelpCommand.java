@@ -20,20 +20,13 @@ import org.bukkit.ChatColor;
 
 public class GuildHelpCommand {
 
-    //List<String> complete = new ArrayList<>();
-    //                complete.add("help");
-    //                complete.add("create");
     //                complete.add("list");
     //                complete.add("leave");
-    //                complete.add("delete");
     //                complete.add("invite");
     //                complete.add("join");
-    //                complete.add("discardInvite");
-    //                complete.add("deleteInvite");
     //                complete.add("kick");
     //                complete.add("info");
     //                Collections.sort(complete);
-    //                return complete;
 
     //TODO Finish help-command
 
@@ -50,7 +43,7 @@ public class GuildHelpCommand {
         msg.append(GuildTextUtils.prefix + ChatColor.GREEN + "Help for command"+ChatColor.YELLOW +" 'create'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(33));
         msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild create <name> <color> <tag> <tagColor>'" + nl);
         //TODO Use maxGuildNameLengthVariable
-        msg.append(ChatColor.GRAY + "This command creates a guild, of which you are automatically" + nl + "the head. The color must be light, the tagColor can be a dark" + nl +"color too! The tag has a max-length of 4, the name 20.");
+        msg.append(ChatColor.GRAY + "This command creates a guild, of which you are automatically" + nl + "the head. The color must be light, the tagColor can be a" + nl + "dark color too! The tag has a max-length of 4, the name 20.");
         return msg.toString();
     }
 

@@ -18,7 +18,7 @@ package at.theduggy.duckguilds;
 import at.theduggy.duckguilds.commands.kick.KickPlayerFromGuild;
 import at.theduggy.duckguilds.commands.creatGuild.GuildCreate;
 import at.theduggy.duckguilds.commands.deletSystem.GuildDelete;
-import at.theduggy.duckguilds.commands.guildInfo.GuildInfoCommand;
+import at.theduggy.duckguilds.commands.info.GuildInfoCommand;
 import at.theduggy.duckguilds.commands.invite.DeleteGuildInvite;
 import at.theduggy.duckguilds.commands.invite.GuildInviteCommand;
 import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
@@ -116,7 +116,9 @@ public class GuildCommand implements TabExecutor {
                                 }else {
                                     player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
                                 }
-                            } else {
+                            } else if (args.length==1){
+                                ListGuilds.listGuilds(player,1);
+                            }else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                         } catch (IOException | ParseException e) {
@@ -184,15 +186,11 @@ public class GuildCommand implements TabExecutor {
                         }
                         break;
                     case "info":
-                            if(args.length==3) {
+                            if(args.length==4) {
                                 if (args[2].equals("general")) {
-                                    GuildInfoCommand.guildInfoCommandGeneral(player, args[1]);
+                                    GuildInfoCommand.guildInfoCommandGeneral(player, args[1], args[3]);
                                     break;
-                                } else {
-                                    player.sendMessage(GuildTextUtils.wrongUsage);
-                                }
-                            }else if (args.length==4){//TODO Fix info-command lit-players!
-                                if (args[2].equals("playerList")){
+                                }else if (args[2].equals("playerList")){
                                     if (GuildTextUtils.isStringInteger(args[3])){
                                         GuildInfoCommand.listPlayersOfGuild(player,args[1], Integer.parseInt(args[3]));
                                     }else {
@@ -405,7 +403,12 @@ public class GuildCommand implements TabExecutor {
                                     }else {
                                         return new ArrayList<>();
                                     }
-                                }else {
+                                }else if (args[2].equals("general")){
+                                    ArrayList<String> pageIndexes = new ArrayList<>();
+                                    pageIndexes.add("1");
+                                    pageIndexes.add("2");
+                                    return pageIndexes;
+                                } else {
                                     return new ArrayList<>();
                                 }
                             case 3:

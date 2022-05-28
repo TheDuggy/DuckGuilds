@@ -3,7 +3,7 @@ package at.theduggy.duckguilds.startUp;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
-import at.theduggy.duckguilds.utils.ScoreboardTeamUtils;
+import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,14 +41,16 @@ public class GuildPlayers implements Listener {
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
         }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
-            System.out.println(Main.getGuildCache().size());
             String oldName = Main.getMainStorage().getPlayerDataFromStorage(player.getUniqueId());
             if (!oldName.equals(player.getName())) {
                 Main.getMainStorage().updatePlayerData(Main.getPlayerCache().get(player.getUniqueId()));
                 Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
             }
+            if (!Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("")){
+                ScoreboardHandler.updateScoreboardAddPlayer(player, Main.getGuildCache().get(Main.getPlayerCache().get(player.getUniqueId()).getGuild()));
+            }
+            System.out.println(Main.getGuildCache().size());
             Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
-            ScoreboardTeamUtils.updateScoreboardAddPlayer(player, Main.getGuildCache().get(Main.getPlayerCache().get(player.getUniqueId()).getGuild()));
             System.out.println("Breakpoint 2!");
         }else {
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true, player.getName(), "");

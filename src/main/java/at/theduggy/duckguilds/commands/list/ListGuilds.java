@@ -16,6 +16,7 @@
 package at.theduggy.duckguilds.commands.list;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -33,11 +34,11 @@ public class ListGuilds {
             if (page>0) {
                 int pageCount = (int) Math.ceil((double) Main.getGuildCache().size() / 8.0);
                 if (page<=pageCount) {
-                    HashMap<Integer,ArrayList<String>> guildPages = new HashMap<>();
+                    HashMap<Integer,ArrayList<Object[]>> guildPages = new HashMap<>();
                     ArrayList<String> keys = new ArrayList<>(Main.getGuildCache().keySet());
                     ArrayList<Integer> values = new ArrayList<>();
                     for (String key : keys) {
-                        ArrayList<UUID> players = (ArrayList<UUID>) Main.getGuildCache().get(key).getPlayers();
+                        ArrayList<UUID> players = Main.getGuildCache().get(key).getPlayers();
                         values.add(players.size());
                     }
                     for (int i =0;i<values.size();i++){
@@ -57,18 +58,30 @@ public class ListGuilds {
                     for (int i = 1; i<=pages; i++,lastCheckPoint+=8){
                         guildPages.put(i,new ArrayList<>());
                         for (int i2 = lastCheckPoint; i2 !=lastCheckPoint+8&&i2!=keys.size(); i2++){
-                            guildPages.get(i).add(keys.get(i2));
+                            Object[] stringValues = new Object[3];
+                            stringValues[0]=keys.get(i2);
+
+                            int pos = calculatePositionOnServer(keys.get(i2));
+                            System.out.println(pos);
+                            switch (pos){
+                                case 1: stringValues[1] = ChatColor.GOLD + ""  +ChatColor.BOLD + 1 + ChatColor.GRAY; break;
+                                case 2: stringValues[1] = ChatColor.GRAY + "" + ChatColor.BOLD + 2 + ChatColor.GRAY;break;
+                                case 3: stringValues[1] = ChatColor.DARK_RED + ""  + ChatColor.BOLD + 3 + ChatColor.GRAY; break;//TODO Enable brown color
+                                default: stringValues[1] = ChatColor.DARK_GRAY + "" + pos + ChatColor.GRAY; break;
+                            }
+                            stringValues[2]=i2+1;
+                            guildPages.get(i).add(stringValues);
                         }
                     }
                     StringBuilder msg = new StringBuilder();
                     msg.append(GuildTextUtils.prefix + ChatColor.GREEN + "List of all guilds from server " + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
                     msg.append(ChatColor.WHITE + "-".repeat(41) + "\n");//60
-                    for (String guildName:guildPages.get(page)){
-                        ChatColor color = Main.getGuildCache().get(guildName).getGuildColor().getChatColor();
-                        ChatColor tagColor = Main.getGuildCache().get(guildName).getTagColor().getChatColor();
-                        String tag = Main.getGuildCache().get(guildName).getTag();
-                        ArrayList<UUID> guildPlayers = Main.getGuildCache().get(guildName).getPlayers();
-                        msg.append(ChatColor.GRAY + "   - " + color + guildName + ChatColor.GRAY + " [" + tagColor + tag + ChatColor.GRAY + "] Size: " + ChatColor.DARK_GRAY +  guildPlayers.size() );//TODO Test sorting after guild-size!
+                    for (Object[] guildDataArray:guildPages.get(page)){
+                        String guildName = (String) guildDataArray[0];
+                        String placement = (String) guildDataArray[1];
+                        int pos = (int) guildDataArray[2];
+                        GuildObject guild = Main.getGuildCache().get(guildName);
+                        msg.append(placement + (pos!=1||pos!=2||pos!=3?" - ":"- ") + guild.getGuildColor().getChatColor() + guildName + ChatColor.GRAY + " [" + guild.getTagColor().getChatColor() + guild.getTag() + ChatColor.GRAY + "] Size: " + ChatColor.DARK_GRAY +  guild.getPlayers().size() );//TODO Test sorting after guild-size!
                         if (Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals(guildName)){
                             msg.append(  ChatColor.BOLD +" "+ ChatColor.WHITE + "← " + ChatColor.WHITE + ChatColor.MAGIC  + "w" + ChatColor.RED + ChatColor.BOLD + "YOU"+ ChatColor.WHITE + ChatColor.MAGIC  + "w" + "\n");
                         }else {
@@ -83,6 +96,36 @@ public class ListGuilds {
                 player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
             }
         }
+    }
+
+    public static int calculatePositionOnServer(String guildName){
+        ArrayList<Integer> sizes = new ArrayList<>();
+        Main.getGuildCache().forEach((s, guildObject) -> sizes.add(guildObject.getPlayers().size()));
+        ArrayList<Integer> sizesWithoutDuplicate = new ArrayList<>();
+        for (Integer integer:sizes){
+            if (!sizesWithoutDuplicate.contains(integer)){
+                sizesWithoutDuplicate.add(integer);
+            }
+        }
+
+
+
+        Collections.sort(sizesWithoutDuplicate);
+        for (int i = 1; i<sizesWithoutDuplicate.size();i++){ //Sort sizesWithoutDuplicate from big to small
+            if (sizesWithoutDuplicate.get(i)>sizesWithoutDuplicate.get(i-1)){
+                int tempSmallerValue = sizesWithoutDuplicate.get(i-1);
+                sizesWithoutDuplicate.set(i-1, sizesWithoutDuplicate.get(i));
+                sizesWithoutDuplicate.set(i, tempSmallerValue);
+            }
+        }
+        System.out.println(sizesWithoutDuplicate);
+
+        for (int i = 1; i<=sizesWithoutDuplicate.size();i++){
+            if (Main.getGuildCache().get(guildName).getPlayers().size()==sizesWithoutDuplicate.get(i-1)){
+                return i;
+            }
+        }
+        return 4;
     }
 }
 

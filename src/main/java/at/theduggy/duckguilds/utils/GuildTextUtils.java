@@ -14,7 +14,7 @@ public class GuildTextUtils {
     prefixWithoutColor =  "[DuckGuilds] ",
     wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!",
     playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!",
-    guildDoesntExist = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list to see all guilds!",
+    guildDoesntExist = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list <page> to see all guilds!",
     youArentInThatGuild = prefix + ChatColor.RED + "Your aren't in that guild.",
     guildHeadLeftGuild = prefix +  ChatColor.RED + "Your guild-head had left the guild and the guild was deleted!",
     youAreNotInAGuild = prefix + ChatColor.RED + "You are not in a guild!",
@@ -27,7 +27,7 @@ public class GuildTextUtils {
     pageIndexOutOfBounds = prefix + ChatColor.RED + "The page-index must be valid!",
     maxServerGuildsReached = prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfigHandler.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " ! You can't create guilds till a minimum of 1 is deleted!",
     forbiddenTag = prefix + "The tag contains forbidden symbols!",
-    guildNameToLong = prefix + ChatColor.RED + "The name of a guild can't be longer that 50 characters!";
+    guildNameToLong = prefix + ChatColor.RED + "The name of a guild can't be longer that 25 characters!";
 
     //Utility-Methods
     public static boolean isStringInteger(String toCheck){
@@ -203,6 +203,23 @@ public class GuildTextUtils {
             uuids.add(UUID.fromString(s));
         }
         return uuids;
+    }
+
+    public static String trimUUID(UUID uuid){
+        return uuid.toString().replace("-","");
+    }
+
+    public static UUID untrimUUID(String trimmedUUID){
+        StringBuilder uuidString = new StringBuilder();
+        char[] chars = trimmedUUID.toCharArray();
+        for (int i = 0; i<chars.length;i++){
+            if (i==8||i==12||i==16||i==20) {
+                uuidString.append("-" + chars[i]);
+            }else {
+                uuidString.append(chars[i]);
+            }
+        }
+        return UUID.fromString(uuidString.toString());
     }
 
 }

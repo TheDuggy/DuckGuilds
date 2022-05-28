@@ -4,13 +4,11 @@ import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
-import at.theduggy.duckguilds.utils.ScoreboardTeamUtils;
+import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import at.theduggy.duckguilds.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -30,9 +28,11 @@ public class GuildFileSystem {
     }
 
     public static void init() throws IOException {
+        long begin = System.currentTimeMillis();
         GuildFileSystem.initFolders();
         GuildFileSystem.cacheGuildFiles();
         GuildFileSystem.cachePlayers();
+        System.out.println("Elapsed time: " +(double)  ((System.currentTimeMillis()-begin)/100)/60 + "Seconds: " + (double)  ((System.currentTimeMillis()-begin)/1000));
     }
 
     public static void createPersonalPlayerFile(Player player) throws IOException {
@@ -64,8 +64,9 @@ public class GuildFileSystem {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         for (File file : guildGuildsFolder.toFile().listFiles()) {
             if (GuildTextUtils.getFileExtension(file).equals(".json")) {
+                System.out.println("Caching " + file.getName());
                 GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
-                ScoreboardTeamUtils.addGuild(guildObject);
+                ScoreboardHandler.addGuild(guildObject);
                 for (UUID player : guildObject.getPlayers()){
                     cachePlayer(player, guildObject.getName());
                 }

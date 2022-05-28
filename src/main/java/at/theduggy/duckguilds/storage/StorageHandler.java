@@ -8,6 +8,7 @@ import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import at.theduggy.duckguilds.storage.systemTypes.MySql.MySqlSystem;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -33,32 +34,50 @@ public class StorageHandler {
     }
 
     public void createPersonalPlayerStorageSection(Player player) throws IOException, SQLException, GuildDatabaseException {
-        if (storageType.equals(StorageType.File)){
-            GuildFileSystem.createPersonalPlayerFile(player);
-        }else if (storageType == StorageType.MySQL){
-            MySqlSystem.createPersonalPlayerTable(player);
-        }
+        new Thread(() -> {
+            if (storageType.equals(StorageType.File)){
+                try {
+                    GuildFileSystem.createPersonalPlayerFile(player);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else if (storageType == StorageType.MySQL){
+                try {
+                    MySqlSystem.createPersonalPlayerTable(player);
+                } catch (SQLException | GuildDatabaseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
     public void createGuildStorageField(GuildObject guildData) throws IOException, SQLException, GuildDatabaseException {
         if (storageType.equals(StorageType.File)){
             GuildFileSystem.createGuildFile(guildData);
         }if (storageType.equals(StorageType.MySQL)){
-            MySqlSystem.createGuildTable(guildData);
+            MySqlSystem.createGuildRecord(guildData);
         }
     }
 
 
     public void deleteGuildField(String guildName) throws IOException {
-        if (storageType.equals(StorageType.File)){
-            GuildFileSystem.deleteGuildFile(guildName);
-        }
+        new Thread(() -> {
+            if (storageType.equals(StorageType.File)){
+                GuildFileSystem.deleteGuildFile(guildName);
+            }
+        }).start();
     }
 
     public void removePlayerFromGuildField(UUID player,String guildName) throws IOException, ParseException {
-        if (storageType.equals(StorageType.File)){
-            GuildFileSystem.removePlayerFromGuildFile(player, guildName);
-        }
+        new Thread(() -> {
+            if (storageType.equals(StorageType.File)){
+                try {
+                    GuildFileSystem.removePlayerFromGuildFile(player, guildName);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
     public String getPlayerDataFromStorage(UUID player) throws IOException, ParseException {
@@ -69,9 +88,15 @@ public class StorageHandler {
     }
 
     public void updatePlayerData(GuildPlayerObject guildPlayerObject) throws IOException {
-        if (storageType.equals(StorageType.File)){
-            GuildFileSystem.updatePlayerData(guildPlayerObject);
-        }
+        new Thread(() -> {
+            if (storageType.equals(StorageType.File)){
+                try {
+                    GuildFileSystem.updatePlayerData(guildPlayerObject);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
 
@@ -89,10 +114,17 @@ public class StorageHandler {
         }
     }
 
-    public void addPlayerToGuildField(GuildObject player) throws IOException {
-        if (storageType.equals(StorageType.File)){
-            GuildFileSystem.addPlayerToGuildFile(player);
-        }
+    public void addPlayerToGuildField(GuildObject player) {
+        new Thread(() -> {
+            if (storageType.equals(StorageType.File)){
+                try {
+                    GuildFileSystem.addPlayerToGuildFile(player);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+
     }
 
     public enum StorageType{

@@ -7,9 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 
-import java.util.UUID;
-
-public class ScoreboardTeamUtils {
+public class ScoreboardHandler {
 
     public static void addGuild(GuildObject guildObject){
         Team team;

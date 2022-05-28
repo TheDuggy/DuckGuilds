@@ -39,7 +39,7 @@ import java.util.UUID;
   public class GuildCreate {
 
     public static void createGuild(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException, SQLException, GuildDatabaseException {
-            if (name.length() <= 20) {
+            if (name.length() <= 25) {
                 if (!Utils.isPlayerInGuild(player)) {
                     if (!Utils.guildExists(name)) {
                         if (GuildTextUtils.isStringReadyToUse(name)) {
