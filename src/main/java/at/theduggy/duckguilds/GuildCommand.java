@@ -24,7 +24,7 @@ import at.theduggy.duckguilds.commands.invite.GuildInviteCommand;
 import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
 import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
-import at.theduggy.duckguilds.commands.list.ListGuilds;
+import at.theduggy.duckguilds.commands.list.GuildListCommand;
 import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
@@ -112,12 +112,12 @@ public class GuildCommand implements TabExecutor {
                         try {
                             if (args.length==2) {
                                 if (GuildTextUtils.isStringInteger(args[1])){
-                                    ListGuilds.listGuilds(player,Integer.parseInt(args[1]));
+                                    GuildListCommand.listGuilds(player,Integer.parseInt(args[1]));
                                 }else {
                                     player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
                                 }
                             } else if (args.length==1){
-                                ListGuilds.listGuilds(player,1);
+                                GuildListCommand.listGuilds(player,1);
                             }else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
@@ -321,7 +321,7 @@ public class GuildCommand implements TabExecutor {
                             case 2:
                                 List<String> guilds = new ArrayList<>();
                                 if (Utils.isPlayerInGuild(player)) {
-                                    if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild( player),player)) {
+                                    if (Utils.getIfPlayerIsHeadOfGuild(Main.getGuildCache().get(Main.getPlayerCache().get(player.getUniqueId()).getGuild()).getName(),player)) {
                                         guilds.add(Utils.getPlayerGuild(player));
                                     }
 

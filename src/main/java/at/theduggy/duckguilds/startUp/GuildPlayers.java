@@ -19,7 +19,9 @@ public class GuildPlayers implements Listener {
 
     public static void handlePlayersOnReload() throws IOException, ParseException, SQLException, GuildDatabaseException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
+            Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
             addPlayerToTeam(player);
+            System.out.println(Main.getPlayerCache().get(player.getUniqueId()));
         }
     }
 
@@ -38,24 +40,20 @@ public class GuildPlayers implements Listener {
     private static void addPlayerToTeam(Player player) throws IOException, ParseException, SQLException, GuildDatabaseException {
         if (!Main.getMainStorage().personalGuildPlayerStorageSectionExists(player.getUniqueId())){
             Main.getMainStorage().createPersonalPlayerStorageSection(player);
-            GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
+            GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),null);
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
-        }else if (Main.getPlayerCache().containsKey(player.getUniqueId())){
-            String oldName = Main.getMainStorage().getPlayerDataFromStorage(player.getUniqueId());
+        }else{
+            String oldName = Main.getMainStorage().getPlayerNameFromPlayerField(Main.getPlayerCache().get(player.getUniqueId()));
             if (!oldName.equals(player.getName())) {
                 Main.getMainStorage().updatePlayerData(Main.getPlayerCache().get(player.getUniqueId()));
                 Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
             }
-            if (!Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("")){
+            if (Main.getPlayerCache().get(player.getUniqueId()).getGuild()!=null){
+                System.out.println("Test");
                 ScoreboardHandler.updateScoreboardAddPlayer(player, Main.getGuildCache().get(Main.getPlayerCache().get(player.getUniqueId()).getGuild()));
             }
-            System.out.println(Main.getGuildCache().size());
             Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
             System.out.println("Breakpoint 2!");
-        }else {
-            GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true, player.getName(), "");
-            Main.getPlayerCache().put(player.getUniqueId(),guildPlayerObject);
-            Bukkit.getLogger().warning("Breakpoint 3: " + Main.getPlayerCache().size());
         }
     }
 }

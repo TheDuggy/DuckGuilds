@@ -80,7 +80,7 @@ public class Utils {
     }
 
     public static boolean isPlayerInGuild(Player player){
-        return !Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("");
+        return Main.getPlayerCache().get(player.getUniqueId()).getGuild()!=null;
     }
 
 

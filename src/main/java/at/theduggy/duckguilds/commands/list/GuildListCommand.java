@@ -25,7 +25,7 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 import java.util.*;
 
-public class ListGuilds {
+public class GuildListCommand {
 
     public static void listGuilds(Player player, int page) throws IOException, ParseException {
         if (Main.getGuildCache().size()==0){
@@ -64,10 +64,10 @@ public class ListGuilds {
                             int pos = calculatePositionOnServer(keys.get(i2));
                             System.out.println(pos);
                             switch (pos){
-                                case 1: stringValues[1] = ChatColor.GOLD + ""  +ChatColor.BOLD + 1 + ChatColor.GRAY; break;
-                                case 2: stringValues[1] = ChatColor.GRAY + "" + ChatColor.BOLD + 2 + ChatColor.GRAY;break;
-                                case 3: stringValues[1] = ChatColor.DARK_RED + ""  + ChatColor.BOLD + 3 + ChatColor.GRAY; break;//TODO Enable brown color
-                                default: stringValues[1] = ChatColor.DARK_GRAY + "" + pos + ChatColor.GRAY; break;
+                                case 1: stringValues[1] = ChatColor.GOLD + "#"  +ChatColor.BOLD +  1 + ChatColor.GRAY + "."; break;
+                                case 2: stringValues[1] = ChatColor.GRAY + "#" + ChatColor.BOLD + 2  + ChatColor.GRAY + ".";break;
+                                case 3: stringValues[1] = ChatColor.DARK_RED +  "#"  + ChatColor.BOLD  + 3 + ChatColor.GRAY ; break;//TODO Enable brown color
+                                default: stringValues[1] = ChatColor.DARK_GRAY + "" + pos + ChatColor.GRAY ; break;
                             }
                             stringValues[2]=i2+1;
                             guildPages.get(i).add(stringValues);
@@ -108,14 +108,13 @@ public class ListGuilds {
             }
         }
 
-
-
-        Collections.sort(sizesWithoutDuplicate);
-        for (int i = 1; i<sizesWithoutDuplicate.size();i++){ //Sort sizesWithoutDuplicate from big to small
-            if (sizesWithoutDuplicate.get(i)>sizesWithoutDuplicate.get(i-1)){
-                int tempSmallerValue = sizesWithoutDuplicate.get(i-1);
-                sizesWithoutDuplicate.set(i-1, sizesWithoutDuplicate.get(i));
-                sizesWithoutDuplicate.set(i, tempSmallerValue);
+        for (int i = 0; i<sizesWithoutDuplicate.size();i++){ //Sort sizesWithoutDuplicate from big to small
+            for (int j = i; j>0;j--) {
+                if (j-1!=-1&&sizesWithoutDuplicate.get(j) > sizesWithoutDuplicate.get(j - 1)) {
+                    int tempSmallerValue = sizesWithoutDuplicate.get(j - 1);
+                    sizesWithoutDuplicate.set(j - 1, sizesWithoutDuplicate.get(j));
+                    sizesWithoutDuplicate.set(j, tempSmallerValue);
+                }
             }
         }
         System.out.println(sizesWithoutDuplicate);

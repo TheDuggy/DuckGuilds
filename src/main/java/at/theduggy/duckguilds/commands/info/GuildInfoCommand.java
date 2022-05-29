@@ -1,7 +1,7 @@
 package at.theduggy.duckguilds.commands.info;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.commands.list.ListGuilds;
+import at.theduggy.duckguilds.commands.list.GuildListCommand;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
@@ -56,14 +56,14 @@ creationDate,
                 msg.append(ChatColor.WHITE + "-".repeat(35) + "\n");
                 int amongWithOtherGuilds = 0; //Guilds with which that guild to get the info about is in the same position!
                 for (String guildName1 : Main.getGuildCache().keySet()) {
-                    if (ListGuilds.calculatePositionOnServer(guildName1) == ListGuilds.calculatePositionOnServer(guildName)) {
+                    if (GuildListCommand.calculatePositionOnServer(guildName1) == GuildListCommand.calculatePositionOnServer(guildName)) {
                         amongWithOtherGuilds++;
                     }
                 }
 
 
                 String posColor;
-                switch (ListGuilds.calculatePositionOnServer(guildName)) {
+                switch (GuildListCommand.calculatePositionOnServer(guildName)) {
                     case 1:
                         posColor = ChatColor.GOLD + "" + ChatColor.BOLD;
                         break;
@@ -77,7 +77,7 @@ creationDate,
                         posColor = ChatColor.DARK_GRAY + "";
                         break;
                 }
-                msg.append(ChatColor.GREEN + "Server-Position: " + posColor + "" + ListGuilds.calculatePositionOnServer(guildName) + " " + ChatColor.GREEN + "(among with " + amongWithOtherGuilds + " other guilds)");
+                msg.append(ChatColor.GREEN + "Server-Position: " + posColor + "" + GuildListCommand.calculatePositionOnServer(guildName) + " " + ChatColor.GREEN + "(among with " + amongWithOtherGuilds + " other guilds)");
                 player.sendMessage(msg.toString());
             } else {
                 player.sendMessage(GuildTextUtils.wrongUsage);

@@ -29,7 +29,8 @@ import java.io.*;
 public class GuildDelete {
 
     public static void removeGuild(String name, Player player) throws IOException, ParseException, InterruptedException {
-        if (Utils.guildExists(name)) {
+        System.out.println(Main.getGuildCache().keySet().contains(name));
+        if (Main.getGuildCache().keySet().contains(name)) {
             if (Utils.isPlayerInGuild(player)) {
                 if (Utils.getIfPlayerIsHeadOfGuild(name,player)) {
                     for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
@@ -45,11 +46,13 @@ public class GuildDelete {
                             playerFromServer.setDisplayName(ChatColor.WHITE  + playerFromServer.getName() );
                         }
                     }
-                    Main.getMainStorage().deleteGuildField(name);
+                    Main.getMainStorage().deleteGuildField(Main.getGuildCache().get(name));
                     Main.getGuildCache().remove(name);
                 } else {
                     player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
                 }
+            }else {
+                player.sendMessage(GuildTextUtils.youAreNotInAGuild);
             }
         }else {
             player.sendMessage(GuildTextUtils.guildDoesntExist);

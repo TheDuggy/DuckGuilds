@@ -8,7 +8,6 @@ import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import at.theduggy.duckguilds.storage.systemTypes.MySql.MySqlSystem;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -60,29 +59,43 @@ public class StorageHandler {
     }
 
 
-    public void deleteGuildField(String guildName) throws IOException {
+    public void deleteGuildField(GuildObject guildObject) throws IOException {
         new Thread(() -> {
             if (storageType.equals(StorageType.File)){
-                GuildFileSystem.deleteGuildFile(guildName);
-            }
-        }).start();
-    }
-
-    public void removePlayerFromGuildField(UUID player,String guildName) throws IOException, ParseException {
-        new Thread(() -> {
-            if (storageType.equals(StorageType.File)){
+                GuildFileSystem.deleteGuildFile(guildObject);
+            }else if (storageType.equals(StorageType.MySQL)){
                 try {
-                    GuildFileSystem.removePlayerFromGuildFile(player, guildName);
-                } catch (IOException e) {
+                    MySqlSystem.deleteGuildRecord(guildObject);
+                } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
         }).start();
     }
 
-    public String getPlayerDataFromStorage(UUID player) throws IOException, ParseException {
+    public void removePlayerFromGuildField(GuildPlayerObject player,GuildObject guild) throws IOException, ParseException {
+        new Thread(() -> {
+            if (storageType.equals(StorageType.File)){
+                try {
+                    GuildFileSystem.removePlayerFromGuildFile(player, guild);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else if (storageType.equals(StorageType.MySQL)){
+                try {
+                    MySqlSystem.removePlayerFromGuildRecord(player,guild);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+    }
+
+    public String getPlayerNameFromPlayerField(GuildPlayerObject player) throws IOException, SQLException {
         if (storageType.equals(StorageType.File)){
-            return GuildFileSystem.getPlayerDataFromFile(player);
+            return GuildFileSystem.getPlayerNameFromPlayerFile(player);
+        }else if (storageType.equals(StorageType.MySQL)){
+            return MySqlSystem.getPlayerNameFromPlayerRecord(player);
         }
         return null;
     }
@@ -91,8 +104,14 @@ public class StorageHandler {
         new Thread(() -> {
             if (storageType.equals(StorageType.File)){
                 try {
-                    GuildFileSystem.updatePlayerData(guildPlayerObject);
+                    GuildFileSystem.updatePlayerFile(guildPlayerObject);
                 } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else if (storageType.equals(StorageType.MySQL)){
+                try {
+                    MySqlSystem.updatePlayerRecord(guildPlayerObject);
+                } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -114,12 +133,18 @@ public class StorageHandler {
         }
     }
 
-    public void addPlayerToGuildField(GuildObject player) {
+    public void addPlayerToGuildField(GuildObject guild, GuildPlayerObject player) {
         new Thread(() -> {
             if (storageType.equals(StorageType.File)){
                 try {
-                    GuildFileSystem.addPlayerToGuildFile(player);
+                    GuildFileSystem.addPlayerToGuildFile(guild,player);
                 } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else if (storageType.equals(StorageType.MySQL)){
+                try {
+                    MySqlSystem.addPlayerToGuildRecord(guild,player);
+                } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }

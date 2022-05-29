@@ -35,7 +35,7 @@ public class GuildJoinCommand {
             if (Main.getGuildCache().containsKey(guildName)){
                 if (Main.guildInvites.get(guildName).contains(player.getName())){
                     Main.getGuildCache().get(guildName).getPlayers().add(player.getUniqueId());
-                    Main.getMainStorage().addPlayerToGuildField(Main.getGuildCache().get(guildName));
+                    Main.getMainStorage().addPlayerToGuildField(Main.getGuildCache().get(guildName), Main.getPlayerCache().get(player.getUniqueId()));
                     Main.getPlayerCache().get(player.getUniqueId()).setGuild(guildName);//TODO Work on guildfilesystem!
 
 

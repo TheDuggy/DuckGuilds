@@ -35,7 +35,7 @@ public class PlayerLeaveGuild {
             if (players.contains(player.getUniqueId())) {
                     removePlayerFromScoreboard(player, name);
                     updatePlayerCache(player);
-                    Main.getMainStorage().removePlayerFromGuildField(player.getUniqueId(),name);
+                    Main.getMainStorage().removePlayerFromGuildField(Main.getPlayerCache().get(player.getUniqueId()), Main.getGuildCache().get(name));
                     player.setDisplayName(ChatColor.WHITE + "<" + player.getName() + ">");
                     reindexAndChangeFile(name,player.getUniqueId());
                     player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
