@@ -19,6 +19,7 @@ import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.storage.StorageHandler;
 import com.zaxxer.hikari.HikariConfig;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -77,9 +78,14 @@ public class GuildConfigHandler {
         return null;
     }
 
-    public static boolean getHighLevelLogging(){
+    public static LoggingType getLoggingType(){
         FileConfiguration f = Main.mainFileConfiguration;
-        return f.getBoolean("highLevelLogging");
+        String loggingType =f.getString("logging");
+        switch (loggingType){
+            case "ALL": return LoggingType.ALL;
+            case "NOTHING": return LoggingType.NOTHING;
+            default: return LoggingType.WARNINGS_ONLY;
+        }
     }
 
 
@@ -134,6 +140,10 @@ public class GuildConfigHandler {
         }else {
             return false;
         }
+    }
+
+    public enum LoggingType{
+        WARNINGS_ONLY, ALL, NOTHING
     }
 
 }

@@ -1,7 +1,6 @@
 package at.theduggy.duckguilds.startUp;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import org.bukkit.Bukkit;
@@ -15,7 +14,7 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class GuildPlayers implements Listener {
+public class GuildPlayerHandler implements Listener {
 
     public static void handlePlayersOnReload() throws IOException, ParseException, SQLException, GuildDatabaseException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
@@ -43,9 +42,9 @@ public class GuildPlayers implements Listener {
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),null);
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
         }else{
-            String oldName = Main.getMainStorage().getPlayerNameFromPlayerField(Main.getPlayerCache().get(player.getUniqueId()));
+            String oldName = Main.getMainStorage().getPlayerNameFromPlayerSection(Main.getPlayerCache().get(player.getUniqueId()));
             if (!oldName.equals(player.getName())) {
-                Main.getMainStorage().updatePlayerData(Main.getPlayerCache().get(player.getUniqueId()));
+                Main.getMainStorage().updatePlayerSection(Main.getPlayerCache().get(player.getUniqueId()));
                 Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
             }
             if (Main.getPlayerCache().get(player.getUniqueId()).getGuild()!=null){

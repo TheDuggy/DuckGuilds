@@ -28,11 +28,10 @@ public class GuildFileSystem {
     }
 
     public static void init() throws IOException {
-        long begin = System.currentTimeMillis();
-        GuildFileSystem.initFolders();
-        GuildFileSystem.cacheGuildFiles();
-        GuildFileSystem.cachePlayers();
-        System.out.println("Elapsed time: " +(double)  ((System.currentTimeMillis()-begin)/100)/60 + "Seconds: " + (double)  ((System.currentTimeMillis()-begin)/1000));
+        initFolders();
+        cacheGuildFiles();
+        cachePlayers();
+        applyGuildsOnPlayers();
     }
 
     public static void createPersonalPlayerFile(Player player) throws IOException {
@@ -45,43 +44,44 @@ public class GuildFileSystem {
     }
     
     public static void createGuildFile(GuildObject guildObject) throws IOException {
-        try {
-            Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
-            Path guildFile = Paths.get(guildGuildsFolder + "/" + guildObject.getName() + ".json");
-            Files.createFile(guildFile);
-            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(String.valueOf(guildFile), StandardCharsets.UTF_8));
-            System.out.println(guildObject.toString());
-            fileWriter.write(Main.getGsonInstance().toJson(guildObject));
-            fileWriter.close();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
+        Path guildFile = Paths.get(guildGuildsFolder + "/" + guildObject.getName() + ".json");
+        Files.createFile(guildFile);
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(String.valueOf(guildFile), StandardCharsets.UTF_8));
+        System.out.println(guildObject);
+        fileWriter.write(Main.getGsonInstance().toJson(guildObject));
+        fileWriter.close();
     }
 
 
 
-    public static void cacheGuildFiles() throws IOException{
+    public static void cacheGuildFiles() {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         for (File file : guildGuildsFolder.toFile().listFiles()) {
             if (GuildTextUtils.getFileExtension(file).equals(".json")) {
-                System.out.println("Caching " + file.getName());
-                GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
-                ScoreboardHandler.addGuild(guildObject);
-                for (UUID player : guildObject.getPlayers()){
-                    cachePlayer(player, guildObject.getName());
+                try {
+                    GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
+                    ScoreboardHandler.addGuild(guildObject);
+                    Main.getGuildCache().put(guildObject.getName(), guildObject); // guild indexed to HasMap
+                    Main.log("Cached " + GuildTextUtils.getFileBaseName(file) + "!", Main.LogLevel.DEFAULT);
+                }catch (Exception e){
+                    Main.log("Failed to cache guild-file for guild " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage()+")", Main.LogLevel.WARNING);
                 }
-                Main.getGuildCache().put(guildObject.getName(), guildObject); // guild indexed to HasMap
             }
         }
     }
 
-    public static void deleteGuildFile(GuildObject guildObject){
-        Path guild = Path.of(GUILD_DATA_FOLDER + "/" + guildObject.getName() + ".json");
-        try {
-            Files.delete(guild);
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static void applyGuildsOnPlayers(){
+        for (GuildObject guildObject:Main.getGuildCache().values()){
+            for (UUID uuid:guildObject.getPlayers()){
+                Main.getPlayerCache().get(uuid).setGuild(guildObject.getName());
+            }
         }
+    }
+
+    public static void deleteGuildFile(GuildObject guildObject) throws IOException {
+        Path guild = Path.of(GUILD_DATA_FOLDER + "/" + guildObject.getName() + ".json");
+        Files.delete(guild);
 
     }
 
@@ -105,37 +105,60 @@ public class GuildFileSystem {
     }
 
     public static void cachePlayers() throws IOException {
-        for (File file:GUILD_DATA_FOLDER.listFiles()){
+        for (File file:PLAYER_DATA_FOLDER.listFiles()){
             if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
-                if (!Main.getPlayerCache().containsKey(UUID.fromString(GuildTextUtils.getFileBaseName(file)))) {
-                    cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),null);
-                }
+                cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),null);
             }
         }
     }
 
-    public static void cachePlayer(UUID player,String guild) throws IOException{
-        File playerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
-        GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(playerFile), GuildPlayerObject.class);//new GuildPlayerObject(player,GuildTextUtils.isPlayerOnline(player), (String) jsonData.get("name"),guild);
-        guildPlayerObject.setGuild(guild);
-        guildPlayerObject.setOnline(Utils.isPlayerOnline(player));
-        guildPlayerObject.setPlayer(UUID.fromString(GuildTextUtils.getFileBaseName(playerFile)));
-        Main.getPlayerCache().put(player, guildPlayerObject);
+    public static void cachePlayer(UUID player,String guild) {
+        try {
+            File playerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
+            GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(playerFile), GuildPlayerObject.class);//new GuildPlayerObject(player,GuildTextUtils.isPlayerOnline(player), (String) jsonData.get("name"),guild);
+            guildPlayerObject.setGuild(guild);
+            guildPlayerObject.setOnline(false);
+            guildPlayerObject.setPlayer(UUID.fromString(GuildTextUtils.getFileBaseName(playerFile)));
+            Main.getPlayerCache().put(player, guildPlayerObject);
+        }catch (Exception e){
+            Main.log("Failed to cache player " + player + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+        }
 
     }
 
-    public static void initFolders() throws IOException {
+    public static void initFolders()  {
         if (Main.guildRootFolder.exists()){
             if (!GUILD_DATA_FOLDER.exists()){
-                Files.createDirectory(GUILD_DATA_FOLDER.toPath());
+                try {
+                    Files.createDirectory(GUILD_DATA_FOLDER.toPath());
+                }catch (Exception e){
+                    Main.log("Failed to create guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                }
             }
             if (!PLAYER_DATA_FOLDER.exists()){
-                Files.createDirectory(PLAYER_DATA_FOLDER.toPath());
+                try {
+                    Files.createDirectory(PLAYER_DATA_FOLDER.toPath());
+                }catch (Exception e){
+                    Main.log("Failed to create player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                }
             }
         }else {
-            Files.createDirectory(Main.guildRootFolder.toPath());
-            Files.createDirectory(PLAYER_DATA_FOLDER.toPath());
-            Files.createDirectory(GUILD_DATA_FOLDER.toPath());
+            try {
+                Files.createDirectory(Main.guildRootFolder.toPath());
+            }catch (Exception e){
+                Main.log("Failed to create guild-root-folder " + Main.guildRootFolder.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            }
+
+            try {
+                Files.createDirectory(PLAYER_DATA_FOLDER.toPath());
+            }catch (Exception e){
+                Main.log("Failed to create player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            }
+            try {
+                Files.createDirectory(GUILD_DATA_FOLDER.toPath());
+            }catch (Exception e){
+                Main.log("Failed to create guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            }
         }
     }
 
@@ -143,6 +166,7 @@ public class GuildFileSystem {
         File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
         GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(personalPlayerFile),GuildPlayerObject.class);
         return guildPlayerObject.getName();
+
     }
 
     public static void updatePlayerFile(GuildPlayerObject guildPlayerObject) throws IOException {

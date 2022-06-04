@@ -1,23 +1,11 @@
-#This option sets which type of storage should be used! On small server, File (which is the default)
-#is strong enough, but if you've got a server with >100 players it's highly recommended using a
-#database (MySQL)!
-storageType: File
+##############################
+#-----------Server-----------#
+##############################
 
 #The inviteDeleteTime is the length of time since a guild-invite was created until it is deleted.
 #IMPORTANT! This is in ticks(1 sec = 20 ticks)
 #By default it is set to 15 min(18000 ticks)
 inviteDeleteTime: 18000
-
-#This is the folder where all guild-data is stored! By default, it's the root-folder of the server.
-#If the path doesn't exist than it automatically uses the root-folder of the server.
-#If you change this, and you already created a few guilds, they would be lost!
-#The old guild-folder isn't deleted automatically, so you can copy all guild-files to the new folder!
-guildDirRootPath: default
-
-#If this is set to true, the plugin will automatically start in the file-system-mode if db-connection is not
-#available. By default, it is set to false, which means that the plugin will show a small warning-msg in the
-#consol and then disable itself!
-useFileSystemOnInvalidConnection: false
 
 #This option sets hoe many guilds can be created! By default, it is set to false. It must between 1 and
 #9223372036854775807. If it is 0 or bigger than 9223372036854775807,it will take the default value
@@ -25,6 +13,30 @@ useFileSystemOnInvalidConnection: false
 #would ignore it!
 maxGuilds: false
 
-#If this option is set to true, the plugin will og all guilds that are cached! This can be very annoying, but
-#helpful too, if you need to fin out if there is a corrupted guild-file or things like that!
-highLevelLogging: false
+#This configuration has three options: ALL (logs everything, can be very annoying),
+#WARNINGS_ONLY (logs only if anything went wrong, this is the default) and
+#NOTHING (doesn't log anything)!
+logging: WARNINGS_ONLY
+
+
+
+
+##############################
+#-----------Storage----------#
+##############################
+
+#If this is set to true, the plugin will automatically start in the file-system-mode if db-connection is not
+#available. By default, it is set to false, which means that the plugin will show a small warning-msg in the
+#consol and then disable itself!
+useFileSystemOnInvalidConnection: false
+
+#This is the folder where all guild-data is stored! By default, it's the root-folder of the server.
+#If the path doesn't exist than it automatically uses the root-folder of the server.
+#If you change this, and you already created a few guilds, they would be lost!
+#The old guild-folder isn't deleted automatically, so you can copy all guild-files to the new folder!
+guildDirRootPath: default
+
+#This option sets which type of storage should be used! On small server, File (which is the default)
+#is strong enough, but if you've got a server with >100 players it's highly recommended using a
+#database (MySQL)!
+storageType: File

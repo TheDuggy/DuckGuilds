@@ -25,7 +25,6 @@ import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
 import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
 import at.theduggy.duckguilds.commands.list.GuildListCommand;
-import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import at.theduggy.duckguilds.commands.help.GuildHelpCommand;

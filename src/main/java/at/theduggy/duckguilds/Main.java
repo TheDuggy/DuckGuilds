@@ -16,14 +16,13 @@
 package at.theduggy.duckguilds;
 
 import at.theduggy.duckguilds.config.GuildConfigHandler;
-import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.objects.gson.GuildColorTAdapter;
 import at.theduggy.duckguilds.objects.gson.GuildMetadataTAdapter;
-import at.theduggy.duckguilds.startUp.GuildPlayers;
+import at.theduggy.duckguilds.startUp.GuildPlayerHandler;
 import at.theduggy.duckguilds.storage.StorageHandler;
 import at.theduggy.duckguilds.storage.systemTypes.MySql.MySqlSystem;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
@@ -90,10 +89,10 @@ public static Path loggingFolder;
                 commandRegistration();
                 listenerRegistration();
                 mainStorageHandler.loadStorage();
-                GuildPlayers.handlePlayersOnReload();
+                GuildPlayerHandler.handlePlayersOnReload();
             } catch (IOException | ParseException e) {
                 e.printStackTrace();
-            } catch (SQLException | GuildDatabaseException e) {
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }else {
@@ -122,7 +121,7 @@ public static Path loggingFolder;
     }
 
     public void listenerRegistration(){
-        Bukkit.getPluginManager().registerEvents(new GuildPlayers(), this);
+        Bukkit.getPluginManager().registerEvents(new GuildPlayerHandler(), this);
     }
 
 
@@ -165,10 +164,17 @@ public static Path loggingFolder;
     }
 
     public static void log(String msg, LogLevel logLevel){
-        switch (logLevel){
-            case WARNING: Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg); break;
-            case DEFAULT: Bukkit.getLogger().info(GuildTextUtils.prefixWithoutColor + msg); break;
+        if (GuildConfigHandler.getLoggingType()== GuildConfigHandler.LoggingType.ALL){
+            switch (logLevel){
+                case WARNING: Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg); break;
+                case DEFAULT: Bukkit.getLogger().info(GuildTextUtils.prefixWithoutColor + msg); break;
+            }
+        }else if (GuildConfigHandler.getLoggingType()== GuildConfigHandler.LoggingType.WARNINGS_ONLY){
+            if (logLevel==LogLevel.WARNING){
+                Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg);
+            }
         }
+
     }
 
     public enum LogLevel{

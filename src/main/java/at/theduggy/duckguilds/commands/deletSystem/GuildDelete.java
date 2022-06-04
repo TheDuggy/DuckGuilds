@@ -46,7 +46,7 @@ public class GuildDelete {
                             playerFromServer.setDisplayName(ChatColor.WHITE  + playerFromServer.getName() );
                         }
                     }
-                    Main.getMainStorage().deleteGuildField(Main.getGuildCache().get(name));
+                    Main.getMainStorage().deleteGuildSection(Main.getGuildCache().get(name));
                     Main.getGuildCache().remove(name);
                 } else {
                     player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);

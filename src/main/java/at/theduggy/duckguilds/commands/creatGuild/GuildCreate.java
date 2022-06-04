@@ -18,7 +18,6 @@ package at.theduggy.duckguilds.commands.creatGuild;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
-import at.theduggy.duckguilds.exceptions.GuildDatabaseException;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
@@ -97,7 +96,7 @@ import java.util.UUID;
         guildObject.setName(name);
         guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now(), Main.getPlayerCache().get(player.getUniqueId()).getName()));
         //TODO Make a detailed option to save stuff like creation-time!
-        Main.getMainStorage().createGuildStorageField(guildObject);
+        Main.getMainStorage().createGuildStorageSection(guildObject);
         Main.getGuildCache().put(name, guildObject);
         reCachePlayer(name, player);
         guild.addEntry(player.getName());
