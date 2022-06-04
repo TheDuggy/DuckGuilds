@@ -107,7 +107,7 @@ public class GuildFileSystem {
     public static void cachePlayers() throws IOException {
         for (File file:PLAYER_DATA_FOLDER.listFiles()){
             if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
-                cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),null);
+                cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),"");
             }
         }
     }
@@ -163,7 +163,7 @@ public class GuildFileSystem {
     }
 
     public static String getPlayerNameFromPlayerFile(GuildPlayerObject player) throws IOException {
-        File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
+        File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + player.getUniqueId() + ".json");
         GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(personalPlayerFile),GuildPlayerObject.class);
         return guildPlayerObject.getName();
 

@@ -90,10 +90,10 @@ public class GuildListCommand {
                     }
                     player.sendMessage(msg.toString());
                 }else {
-                    player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
+                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The last page is " + ChatColor.YELLOW + pageCount + ChatColor.RED + "!");
                 }
             }else {
-                player.sendMessage(GuildTextUtils.pageIndexOutOfBounds);
+                player.sendMessage(GuildTextUtils.pageIndexCantBe0);
             }
         }
     }

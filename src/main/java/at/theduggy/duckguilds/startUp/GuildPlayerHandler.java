@@ -16,16 +16,15 @@ import java.sql.SQLException;
 
 public class GuildPlayerHandler implements Listener {
 
-    public static void handlePlayersOnReload() throws IOException, ParseException, SQLException, GuildDatabaseException {
+    public static void handlePlayersOnReload() throws IOException, ParseException, SQLException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
-            Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
             addPlayerToTeam(player);
-            System.out.println(Main.getPlayerCache().get(player.getUniqueId()));
+            Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
         }
     }
 
     @EventHandler
-    public void handlePlayersOnJoin(PlayerJoinEvent e) throws IOException, ParseException, SQLException, GuildDatabaseException {
+    public void handlePlayersOnJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
         addPlayerToTeam(player);
     }
@@ -36,23 +35,22 @@ public class GuildPlayerHandler implements Listener {
         Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
     }
 
-    private static void addPlayerToTeam(Player player) throws IOException, ParseException, SQLException, GuildDatabaseException {
+    private static void addPlayerToTeam(Player player) {
         if (!Main.getMainStorage().personalGuildPlayerStorageSectionExists(player.getUniqueId())){
             Main.getMainStorage().createPersonalPlayerStorageSection(player);
-            GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),null);
+            GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
         }else{
+            System.out.println(Main.getPlayerCache().size());
             String oldName = Main.getMainStorage().getPlayerNameFromPlayerSection(Main.getPlayerCache().get(player.getUniqueId()));
             if (!oldName.equals(player.getName())) {
                 Main.getMainStorage().updatePlayerSection(Main.getPlayerCache().get(player.getUniqueId()));
                 Main.getPlayerCache().get(player.getUniqueId()).setName(player.getName());
             }
-            if (Main.getPlayerCache().get(player.getUniqueId()).getGuild()!=null){
-                System.out.println("Test");
+            if (!Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("")){
                 ScoreboardHandler.updateScoreboardAddPlayer(player, Main.getGuildCache().get(Main.getPlayerCache().get(player.getUniqueId()).getGuild()));
             }
             Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
-            System.out.println("Breakpoint 2!");
         }
     }
 }
