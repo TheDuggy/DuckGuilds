@@ -62,7 +62,6 @@ public class GuildListCommand {
                             stringValues[0]=keys.get(i2);
 
                             int pos = calculatePositionOnServer(keys.get(i2));
-                            System.out.println(pos);
                             switch (pos){
                                 case 1: stringValues[1] = ChatColor.GOLD + "#"  +ChatColor.BOLD +  1 + ChatColor.GRAY + "."; break;
                                 case 2: stringValues[1] = ChatColor.GRAY + "#" + ChatColor.BOLD + 2  + ChatColor.GRAY + ".";break;
@@ -117,7 +116,6 @@ public class GuildListCommand {
                 }
             }
         }
-        System.out.println(sizesWithoutDuplicate);
 
         for (int i = 1; i<=sizesWithoutDuplicate.size();i++){
             if (Main.getGuildCache().get(guildName).getPlayers().size()==sizesWithoutDuplicate.get(i-1)){

@@ -27,7 +27,6 @@ public class MySqlSystem {
     private static Connection connection;
 
     public static void init() throws IOException, SQLException {
-        long begin = System.currentTimeMillis();
         HikariConfig hikariConfig = GuildConfigHandler.getDataBase();
         if (hikariConfig!=null) {
             hikariConfig.setPoolName("GuildConnectionPool");
@@ -37,10 +36,7 @@ public class MySqlSystem {
 
         initTables();
         cacheGuilds();
-        System.out.println("Guilds: " + Main.getGuildCache().size());
         cachePlayers();
-        System.out.println("Elapsed time: " + (double) ((System.currentTimeMillis()-begin)/1000)/60 + "Seconds: " +(double) ((System.currentTimeMillis()-begin)/1000) );
-        System.out.println("Players: " + Main.getPlayerCache().size());
         applyGuildsOnPlayers();
     }
 

@@ -62,7 +62,6 @@ public class GuildFileSystem {
         Path guildFile = Paths.get(guildGuildsFolder + "/" + guildObject.getName() + ".json");
         Files.createFile(guildFile);
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(String.valueOf(guildFile), StandardCharsets.UTF_8));
-        System.out.println(guildObject);
         fileWriter.write(Main.getGsonInstance().toJson(guildObject));
         fileWriter.close();
     }

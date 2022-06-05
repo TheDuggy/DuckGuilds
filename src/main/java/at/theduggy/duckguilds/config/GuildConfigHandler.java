@@ -33,22 +33,22 @@ import java.util.*;
 
 public class GuildConfigHandler {
 
-    public static int getMaxGuildSize(){
+    public static Object getMaxGuildSize(){
         FileConfiguration f = Main.mainFileConfiguration;
         if (f.get("maxGuilds")instanceof Boolean){
-            return 0;
+            return f.get("maxGuilds");
         }else if (f.get("maxGuilds") instanceof Integer){
             if (f.getInt("maxGuilds")>0){
                 if (f.getInt("maxGuilds")<=Main.getGuildCache().size()){
                     return f.getInt("maxGuilds");
                 }else {
-                    return 0;
+                    return false;
                 }
             }else {
-                return 0;
+                return false;
             }
         }else {
-            return 0;
+            return false;
         }
     }
 

@@ -29,7 +29,6 @@ import java.io.*;
 public class GuildDelete {
 
     public static void removeGuild(String name, Player player) throws IOException, ParseException, InterruptedException {
-        System.out.println(Main.getGuildCache().keySet().contains(name));
         if (Main.getGuildCache().keySet().contains(name)) {
             if (Utils.isPlayerInGuild(player)) {
                 if (Utils.getIfPlayerIsHeadOfGuild(name,player)) {

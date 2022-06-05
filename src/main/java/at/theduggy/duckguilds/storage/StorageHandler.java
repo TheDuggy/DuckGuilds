@@ -43,7 +43,6 @@ public class StorageHandler {
                     try {
                         GuildFileSystem.createPersonalPlayerFile(player);
                     } catch (IOException e) {
-                        System.out.println(e.getLocalizedMessage());
                         throw new RuntimeException(e);
                     }
                 }else if (storageType == StorageType.MySQL){
@@ -60,7 +59,6 @@ public class StorageHandler {
                 try {
                     GuildFileSystem.createPersonalPlayerFile(player);
                 } catch (IOException e) {
-                    System.out.println(e.getLocalizedMessage());
                     throw new RuntimeException(e);
                 }
             }else if (storageType == StorageType.MySQL){

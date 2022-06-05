@@ -119,7 +119,6 @@ creationDate,
             }
         }
 
-        System.out.println(guildPages.keySet().size());
         for (int i = 1; i<=guildPages.keySet().size();i++){
             for (String guildNameFromList: guildPages.get(i)){
                 if (guildNameFromList.equals(guildName)){
@@ -147,7 +146,6 @@ creationDate,
                         playerPages.get(i).add(Main.getPlayerCache().get(players.get(i2)).getName());
                     }
                 }
-                System.out.println(playerPages);
                 String headName = Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName();
                 StringBuilder msg = new StringBuilder();
                 msg.append(GuildTextUtils.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");

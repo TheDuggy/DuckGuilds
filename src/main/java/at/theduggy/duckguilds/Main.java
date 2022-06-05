@@ -60,6 +60,24 @@ private static boolean isStorageBusy = false;
 public static Path loggingFolder;
 
     @Override
+    public void onLoad(){
+        this.saveDefaultConfig();
+        plugin = this;
+        mainFileConfiguration = this.getConfig();
+        logIgnoreConfig("---------------config values---------------", LogLevel.WARNING);
+        logIgnoreConfig("               ---Server---", LogLevel.WARNING);
+        logIgnoreConfig("inviteDeleteTime: " + GuildConfigHandler.getTimeTillInviteIsDeleted(), LogLevel.WARNING);
+        logIgnoreConfig("maxGuilds: " + GuildConfigHandler.getMaxGuildSize(), LogLevel.WARNING );
+        logIgnoreConfig("logging: " + GuildConfigHandler.getLoggingType(),LogLevel.WARNING);
+        logIgnoreConfig("               ---Storage---", LogLevel.WARNING);
+        logIgnoreConfig("storageType: " + GuildConfigHandler.getStorageType(), LogLevel.WARNING);
+        logIgnoreConfig("useFileSystemOnInvalidConnection: " + mainFileConfiguration.getBoolean("useFileSystemOnInvalidConnection"), LogLevel.WARNING);
+        logIgnoreConfig("guildDirRootPath: " + mainFileConfiguration.getString("guildDirRootPath"), LogLevel.WARNING);
+        logIgnoreConfig("deleteOldStorageSectionsWhileMigration: " + mainFileConfiguration.getBoolean("deleteOldStorageSectionsWhileMigration"),LogLevel.WARNING);
+
+    }
+
+    @Override
     public void onEnable(){
         try {
             if (!Files.exists(Paths.get(this.getDataFolder() + "/database.yml"))){
@@ -81,7 +99,6 @@ public static Path loggingFolder;
             }
             try {
                 guildRootFolder = GuildConfigHandler.getGuildRootFolder();
-                System.out.println(guildRootFolder.toPath());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -176,6 +193,13 @@ public static Path loggingFolder;
             }
         }
 
+    }
+
+    public static void logIgnoreConfig(String msg, LogLevel logLevel){
+        switch (logLevel){
+            case DEFAULT: Bukkit.getLogger().info(GuildTextUtils.prefixWithoutColor + msg);break;
+            case WARNING: Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg);break;
+        }
     }
 
     public enum LogLevel{

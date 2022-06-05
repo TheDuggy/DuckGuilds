@@ -41,7 +41,6 @@ public class GuildPlayerHandler implements Listener {
             Main.getMainStorage().createPersonalPlayerStorageSection(guildPlayerObject,true);
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
         }else{
-            System.out.println(Main.getPlayerCache().size());
             String oldName = Main.getMainStorage().getPlayerNameFromPlayerSection(Main.getPlayerCache().get(player.getUniqueId()));
             if (!oldName.equals(player.getName())) {
                 Main.getMainStorage().updatePlayerSection(Main.getPlayerCache().get(player.getUniqueId()));

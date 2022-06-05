@@ -44,9 +44,9 @@ import java.util.UUID;
                         if (GuildTextUtils.isStringReadyToUse(name)) {
                             if (GuildTextUtils.isReadyForCreate(tag)) {
                                 if (tag.length() <= 4) {
-                                    if (GuildConfigHandler.getMaxGuildSize()>0){
+                                    if (!(GuildConfigHandler.getMaxGuildSize() instanceof Boolean)){
                                         Bukkit.getLogger().warning(String.valueOf(GuildConfigHandler.getMaxGuildSize()));
-                                        if (Main.getGuildCache().size()> GuildConfigHandler.getMaxGuildSize()){
+                                        if (Main.getGuildCache().size() > (int) GuildConfigHandler.getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
                                         }else {
                                             player.sendMessage(GuildTextUtils.maxServerGuildsReached);
