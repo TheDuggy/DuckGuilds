@@ -10,10 +10,11 @@ import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.bukkit.entity.Player;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,6 +45,16 @@ public class MySqlSystem {
     }
 
 
+    public static void initWithoutCache() throws SQLException, FileNotFoundException {
+        HikariConfig hikariConfig = GuildConfigHandler.getDataBase();
+        if (hikariConfig!=null) {
+            hikariConfig.setPoolName("GuildConnectionPool");
+            dataSource = new HikariDataSource(hikariConfig);
+            connection=dataSource.getConnection();
+        }
+        initTables();
+    }
+
     public static boolean connectionAvailable() throws FileNotFoundException, SQLException {
         try {
             DriverManager.getConnection(GuildConfigHandler.getDataBase().getJdbcUrl(), GuildConfigHandler.getDataBase().getUsername(), GuildConfigHandler.getDataBase().getPassword());
@@ -61,7 +72,6 @@ public class MySqlSystem {
            String name = resultSet.getString("name");
            try {
                GuildObject guildObject = new GuildObject();
-               System.out.println("Caching " + name);
                guildObject.setGuildColor(new GuildColor(resultSet.getString("color")));
                guildObject.setTagColor(new GuildColor(resultSet.getString("tagColor")));
                guildObject.setName(name);
@@ -96,7 +106,7 @@ public class MySqlSystem {
         while (resultSet.next()){
             try {
                 String name = resultSet.getString("name");
-                GuildPlayerObject guildPlayerObject = new GuildPlayerObject(UUID.fromString(resultSet.getString("uuid")), false, name, null);
+                GuildPlayerObject guildPlayerObject = new GuildPlayerObject(UUID.fromString(resultSet.getString("uuid")), false, name, "");
                 Main.getPlayerCache().put(UUID.fromString(resultSet.getString("uuid")), guildPlayerObject);
             }catch (Exception e){
                 Main.log("Failed to cache player " + resultSet.getString("uuid") + "(" + resultSet.getString("name") + ") ! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
@@ -117,7 +127,13 @@ public class MySqlSystem {
         dataSource.close();
     }
 
-    public static void createPersonalPlayerTable(Player player) throws SQLException {
+    public static void deletePersonalPlayerRecord(GuildPlayerObject player) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM guildplayers WHERE uuid=?");
+        preparedStatement.setString(1, player.getUniqueId().toString());
+        preparedStatement.execute();
+    }
+
+    public static void createPersonalPlayerRecord(GuildPlayerObject player) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO guildplayers VALUES (?,?)");
         preparedStatement.setString(1, player.getUniqueId().toString());
         preparedStatement.setString(2, player.getName());
@@ -199,4 +215,12 @@ public class MySqlSystem {
         }
         return players.toString();
     }
+
+    public static void deleteGuildTables() throws SQLException {
+        PreparedStatement deleteGuildTable = connection.prepareStatement("DROP TABLE guilds");
+        deleteGuildTable.execute();
+        PreparedStatement deletePlayerTable = connection.prepareStatement("DROP TABLE guildplayers");
+        deletePlayerTable.execute();
+    }
+
 }

@@ -37,7 +37,7 @@ import java.util.UUID;
 
   public class GuildCreate {
 
-    public static void createGuild(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException, SQLException, GuildDatabaseException {
+    public static void createGuild(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException, SQLException {
             if (name.length() <= 30) {
                 if (!Utils.isPlayerInGuild(player)) {
                     if (!Utils.guildExists(name)) {
@@ -74,7 +74,7 @@ import java.util.UUID;
             }
     }
 
-    public static void addPlayerToTeamAndCreateFiles(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws IOException, ParseException, SQLException, GuildDatabaseException {
+    public static void addPlayerToTeamAndCreateFiles(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws SQLException, IOException {
         Team guild;
         try {
              guild = Main.getScoreboard().registerNewTeam(name);

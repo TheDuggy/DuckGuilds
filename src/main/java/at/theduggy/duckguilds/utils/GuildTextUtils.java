@@ -13,6 +13,7 @@ public class GuildTextUtils {
     public static String prefix = ChatColor.AQUA + "[" + ChatColor.GOLD + "DuckGuilds" + ChatColor.AQUA + "] ",
     prefixWithoutColor =  "[DuckGuilds] ",
     wrongUsage = prefix + ChatColor.RED + "Wrong usage! Use /guild help to see all options!",
+    wrongUsageConsole = GuildTextUtils.prefixWithoutColor + "Wrong usage! Use /guild help for more information!",
     playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!",
     guildDoesntExist = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list <page> to see all guilds!",
     youArentInThatGuild = prefix + ChatColor.RED + "Your aren't in that guild.",
@@ -24,7 +25,7 @@ public class GuildTextUtils {
     playerDoesntExists = prefix +ChatColor.RED + "That player doesn't exist!",
     playerIsntOnline = prefix + ChatColor.RED + "This player isn't online!",
     pageIndexMustBeNumeric = prefix + ChatColor.RED + "The page-index must be numeric!",
-    pageIndexOutOfBounds = prefix + ChatColor.RED + "The page-index must be valid!",
+    pageIndexCantBe0 = prefix + ChatColor.RED + "The page-index can't be 0!",
     maxServerGuildsReached = prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfigHandler.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " ! You can't create guilds till a minimum of 1 is deleted!",
     forbiddenTag = prefix + "The tag contains forbidden symbols!",
     guildNameToLong = prefix + ChatColor.RED + "The name of a guild can't be longer that 25 characters!";

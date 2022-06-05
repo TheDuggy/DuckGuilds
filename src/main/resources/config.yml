@@ -19,11 +19,14 @@ maxGuilds: false
 logging: WARNINGS_ONLY
 
 
-
-
 ##############################
 #-----------Storage----------#
 ##############################
+
+#This option sets which type of storage should be used! On small server, File (which is the default)
+#is strong enough, but if you've got a server with >100 players it's highly recommended using a
+#database (MySQL)!
+storageType: File
 
 #If this is set to true, the plugin will automatically start in the file-system-mode if db-connection is not
 #available. By default, it is set to false, which means that the plugin will show a small warning-msg in the
@@ -36,7 +39,6 @@ useFileSystemOnInvalidConnection: false
 #The old guild-folder isn't deleted automatically, so you can copy all guild-files to the new folder!
 guildDirRootPath: default
 
-#This option sets which type of storage should be used! On small server, File (which is the default)
-#is strong enough, but if you've got a server with >100 players it's highly recommended using a
-#database (MySQL)!
-storageType: File
+#If this option is set to true, the plugin will automatically delete all old files/record while
+#migratiing to a new storage-type!
+deleteOldStorageSectionsWhileMigration: true

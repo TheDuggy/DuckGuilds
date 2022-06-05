@@ -80,23 +80,8 @@ public class Utils {
     }
 
     public static boolean isPlayerInGuild(Player player){
-        return Main.getPlayerCache().get(player.getUniqueId()).getGuild()!=null;
+        return !Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals("");
     }
-
-
-
-    public static boolean isPlayerOnline(UUID uuid){
-        ArrayList<UUID> onlineUUIDS = new ArrayList<>();
-        for (Player player: Bukkit.getOnlinePlayers()){
-            onlineUUIDS.add(player.getUniqueId());
-        }
-        return onlineUUIDS.contains(uuid);
-    }
-
-
-
-
-
 
     public static int getOnlinePlayersOfGuild(String guildName){
         int onlinePlayers =0;

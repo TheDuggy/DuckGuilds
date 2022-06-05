@@ -90,33 +90,29 @@ public class GuildConfigHandler {
 
 
     public static HikariConfig getDataBase() throws FileNotFoundException {
-        if (getStorageType().equals(StorageHandler.StorageType.MySQL)){
-            ArrayList<String> fileNames = new ArrayList<>();
-            for (File currentFile : Main.plugin.getDataFolder().listFiles()){
-                fileNames.add(currentFile.getName());
-            }
-            if (fileNames.contains("database.yml")){
-                InputStream inputStream = new FileInputStream(Main.plugin.getDataFolder() + "/database.yml");
-                Yaml yaml = new Yaml();
-                HashMap<String,String> mysqlData = yaml.load(inputStream);
-                if (mysqlData.size()==3&&mysqlData.containsKey("password")&&mysqlData.containsKey("username")&&mysqlData.containsKey("url")){
-                    if (mysqlData.get("password")!=null&&mysqlData.get("username")!=null&& mysqlData.get("url")!=null){
-                        HikariConfig hikariConfig = new HikariConfig();
-                        hikariConfig.setPassword(String.valueOf(mysqlData.get("password")));
-                        hikariConfig.setUsername(String.valueOf(mysqlData.get("username")));
-                        hikariConfig.setJdbcUrl(String.valueOf("jdbc:" + mysqlData.get("url")));
-                        return hikariConfig;
-                    }else {
-                        Main.shutDown("Empty database-file!");
-                    }
+        ArrayList<String> fileNames = new ArrayList<>();
+        for (File currentFile : Main.plugin.getDataFolder().listFiles()){
+            fileNames.add(currentFile.getName());
+        }
+        if (fileNames.contains("database.yml")){
+            InputStream inputStream = new FileInputStream(Main.plugin.getDataFolder() + "/database.yml");
+            Yaml yaml = new Yaml();
+            HashMap<String,String> mysqlData = yaml.load(inputStream);
+            if (mysqlData.size()==3&&mysqlData.containsKey("password")&&mysqlData.containsKey("username")&&mysqlData.containsKey("url")){
+                if (mysqlData.get("password")!=null&&mysqlData.get("username")!=null&& mysqlData.get("url")!=null){
+                    HikariConfig hikariConfig = new HikariConfig();
+                    hikariConfig.setPassword(String.valueOf(mysqlData.get("password")));
+                    hikariConfig.setUsername(String.valueOf(mysqlData.get("username")));
+                    hikariConfig.setJdbcUrl(String.valueOf("jdbc:" + mysqlData.get("url")));
+                    return hikariConfig;
                 }else {
-                    Main.shutDown("Corrupted database-file!");
+                    Main.shutDown("Empty database-file!");
                 }
             }else {
-                Main.shutDown("No database-data-file found!");
+                Main.shutDown("Corrupted database-file!");
             }
         }else {
-            return null;
+            Main.shutDown("No database-data-file found!");
         }
         return null;
     }
@@ -140,6 +136,10 @@ public class GuildConfigHandler {
         }else {
             return false;
         }
+    }
+
+    public static boolean deleteOldStorageSectionsWhileMigration(){
+        return Main.mainFileConfiguration.getBoolean("deleteOldStorageSectionsWhileMigration");
     }
 
     public enum LoggingType{

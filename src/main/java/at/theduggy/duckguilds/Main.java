@@ -56,6 +56,7 @@ public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
 private static HashMap<String, GuildObject> cachedGuilds = new HashMap<>();
 public static File guildRootFolder;
 private static StorageHandler mainStorageHandler;
+private static boolean isStorageBusy = false;
 public static Path loggingFolder;
 
     @Override
@@ -164,7 +165,7 @@ public static Path loggingFolder;
     }
 
     public static void log(String msg, LogLevel logLevel){
-        if (GuildConfigHandler.getLoggingType()== GuildConfigHandler.LoggingType.ALL){
+        if (GuildConfigHandler.getLoggingType()==GuildConfigHandler.LoggingType.ALL){
             switch (logLevel){
                 case WARNING: Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg); break;
                 case DEFAULT: Bukkit.getLogger().info(GuildTextUtils.prefixWithoutColor + msg); break;
@@ -181,4 +182,13 @@ public static Path loggingFolder;
         DEFAULT,
         WARNING
     }
+
+    public static boolean isIsStorageBusy(){
+        return isStorageBusy;
+    }
+
+    public static void setStorageBusy(boolean busy){
+        isStorageBusy=busy;
+    }
+
 }

@@ -6,8 +6,9 @@ import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import at.theduggy.duckguilds.storage.systemTypes.MySql.MySqlSystem;
-import org.bukkit.entity.Player;
+import at.theduggy.duckguilds.utils.GuildTextUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -34,19 +35,44 @@ public class StorageHandler {
         return false;
     }
 
-    public void createPersonalPlayerStorageSection(Player player) {
-        new Thread(() -> {
-            try {
-                if (storageType.equals(StorageType.File)){
-                    GuildFileSystem.createPersonalPlayerFile(player);
+    public void createPersonalPlayerStorageSection(GuildPlayerObject player, boolean inNewThread) {
+
+        if (inNewThread){
+            new Thread(() -> {
+                if (storageType==StorageType.File){
+                    try {
+                        GuildFileSystem.createPersonalPlayerFile(player);
+                    } catch (IOException e) {
+                        System.out.println(e.getLocalizedMessage());
+                        throw new RuntimeException(e);
+                    }
                 }else if (storageType == StorageType.MySQL){
-                    MySqlSystem.createPersonalPlayerTable(player);
+                    try {
+                        MySqlSystem.createPersonalPlayerRecord(player);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }catch (Exception e){
-                Main.log("Failed to create player-storage-section for player " + player.getUniqueId() + " (" + player.getName() + ") with system-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+
+            }).start();
+        }else {
+            if (storageType==StorageType.File){
+                try {
+                    GuildFileSystem.createPersonalPlayerFile(player);
+                } catch (IOException e) {
+                    System.out.println(e.getLocalizedMessage());
+                    throw new RuntimeException(e);
+                }
+            }else if (storageType == StorageType.MySQL){
+                try {
+                    MySqlSystem.createPersonalPlayerRecord(player);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
-        }).start();
+        }
     }
+
 
     public void createGuildStorageSection(GuildObject guildData) {
         try {
@@ -61,18 +87,30 @@ public class StorageHandler {
     }
 
 
-    public void deleteGuildSection(GuildObject guildObject) {
-        new Thread(() -> {
+    public void deleteGuildSection(GuildObject guildObject, boolean inNewThread) {
+        if (inNewThread) {
+            new Thread(() -> {
+                try {
+                    if (storageType.equals(StorageType.File)) {
+                        GuildFileSystem.deleteGuildFile(guildObject);
+                    } else if (storageType.equals(StorageType.MySQL)) {
+                        MySqlSystem.deleteGuildRecord(guildObject);
+                    }
+                } catch (Exception e) {
+                    Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                }
+            }).start();
+        }else {
             try {
-                if (storageType.equals(StorageType.File)){
+                if (storageType.equals(StorageType.File)) {
                     GuildFileSystem.deleteGuildFile(guildObject);
-                }else if (storageType.equals(StorageType.MySQL)){
+                } else if (storageType.equals(StorageType.MySQL)) {
                     MySqlSystem.deleteGuildRecord(guildObject);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
-        }).start();
+        }
     }
 
     public void removePlayerFromGuildSection(GuildPlayerObject player, GuildObject guild) {
@@ -87,6 +125,18 @@ public class StorageHandler {
                 Main.log("Failed to remove player " + player.getUniqueId() + " (" + player.getName() + ") from guild " + guild.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
         }).start();
+    }
+
+    public void deleteRootStorageSection(){
+        try {
+            if (storageType==StorageType.File){
+                GuildFileSystem.deleteRootFolders();
+            }else if (storageType==StorageType.MySQL){
+                MySqlSystem.deleteGuildTables();
+            }
+        }catch (Exception e){
+            Main.log("Failed to delete guild-rootstroage-sections for storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+        }
     }
 
     public String getPlayerNameFromPlayerSection(GuildPlayerObject player) {
@@ -116,6 +166,13 @@ public class StorageHandler {
         }).start();
     }
 
+    public void loadStorageWithoutCaching(StorageType storageType) throws SQLException, FileNotFoundException {
+        if (storageType==StorageType.File){
+            GuildFileSystem.initWithoutCaching();
+        }else if (storageType==StorageType.MySQL){
+            MySqlSystem.initWithoutCache();
+        }
+    }
 
     public void loadStorage() throws SQLException, IOException {
 
@@ -129,6 +186,18 @@ public class StorageHandler {
             }else {
                 Main.shutDown("Failed to connect to " + GuildConfigHandler.getDataBase().getJdbcUrl() + "!");
             }
+        }
+    }
+
+    public void deletePlayerStorageSection(GuildPlayerObject playerObject){
+        try {
+            if (storageType==StorageType.File){
+                GuildFileSystem.deletePersonalPlayerFile(playerObject);
+            }else if (storageType.equals(StorageType.MySQL)){
+                MySqlSystem.deletePersonalPlayerRecord(playerObject);
+            }
+        }catch (Exception e){
+            Main.log("Failed to delete " + playerObject.getUniqueId() + "(" + playerObject.getName() + ")'s storage section with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
     }
 
@@ -147,8 +216,77 @@ public class StorageHandler {
 
     }
 
+    public void migrateStorage(StorageType newStorageType) throws SQLException, IOException {
+        new Thread(() -> {
+            StorageType oldStorageType = this.storageType;
+            System.out.println(Main.getPlayerCache().size());
+            try {
+            this.storageType = newStorageType;
+            try {
+                loadStorageWithoutCaching(newStorageType);
+            } catch (SQLException | FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            Main.setStorageBusy(true);
+            Main.log("#".repeat(69), Main.LogLevel.WARNING);
+            Main.log("The plugin is not usable until the migration is complete from now on!", Main.LogLevel.WARNING);
+            Main.log("#".repeat(69), Main.LogLevel.WARNING);
+            Main.log("", Main.LogLevel.WARNING);
+            Main.log("------------recreate guild-sections------------", Main.LogLevel.DEFAULT);
+            for (GuildObject guild : Main.getGuildCache().values()){
+                createGuildStorageSection(guild);
+                Main.log("Recreated storage-section for guild " + guild.getName() + " in storage-type " + newStorageType + "!", Main.LogLevel.DEFAULT);
+
+            }
+            Main.log("------------recreate player-sections------------", Main.LogLevel.DEFAULT);
+            for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
+                createPersonalPlayerStorageSection(guildPlayer,false);
+                Main.log("Recreated " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section in storage-type " + newStorageType + "!", Main.LogLevel.DEFAULT);
+            }
+
+            if (GuildConfigHandler.deleteOldStorageSectionsWhileMigration()) {
+                this.storageType = oldStorageType;
+                Main.log("-----------delete guilds-sections-----------", Main.LogLevel.DEFAULT);
+                for (GuildObject guild : Main.getGuildCache().values()) {
+                    deleteGuildSection(guild, false);
+                    Main.log("Deleted storage-section for guild " + guild.getName() + " from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
+                }
+                Main.log("------------delete player-sections------------", Main.LogLevel.DEFAULT);
+                for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
+                    deletePlayerStorageSection(guildPlayer);
+                    Main.log("Deleted " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
+                }
+                Main.log("------------delete root-sections------------", Main.LogLevel.DEFAULT);
+                deleteRootStorageSection();
+                this.storageType=newStorageType;
+            }
+            Main.mainFileConfiguration.set("storageType", newStorageType.toString());
+            Main.plugin.saveConfig();
+            Main.plugin.reloadConfig();
+            Main.log("", Main.LogLevel.WARNING);
+            Main.setStorageBusy(false);
+            Main.log("#".repeat(77), Main.LogLevel.WARNING);
+            Main.log("Migration complete! The plugin is now usable with the new storage-type " + newStorageType + "!", Main.LogLevel.WARNING);
+            Main.log("#".repeat(77), Main.LogLevel.WARNING);
+            System.out.println(Main.getPlayerCache().size());
+        }catch (Exception e){
+            this.storageType=oldStorageType;
+                try {
+                    loadStorage();
+                } catch (SQLException | IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                Main.mainFileConfiguration.set("storageType", oldStorageType.name());
+            Main.plugin.saveConfig();
+            Main.plugin.reloadConfig();
+            Main.log("Failed to migrate from " + oldStorageType + " to " + newStorageType + "! Using old storage-type " + oldStorageType + "! Caused by: " + e.getClass().getSimpleName() + " (" +e.getMessage() + ")", Main.LogLevel.WARNING);
+            //TODO Fix why plugin is recreating guilds in old file-system!
+        }
+
+        }).start();
+    }
+
     public enum StorageType{
         File,MySQL
-
     }
 }

@@ -34,7 +34,21 @@ public class GuildFileSystem {
         applyGuildsOnPlayers();
     }
 
-    public static void createPersonalPlayerFile(Player player) throws IOException {
+    public static void initWithoutCaching(){
+        initFolders();
+    }
+
+    public static void deletePersonalPlayerFile(GuildPlayerObject player) throws IOException {
+        Files.delete(Path.of(PLAYER_DATA_FOLDER + "/" + player.getUniqueId() + ".json"));
+    }
+
+    public static void deleteRootFolders() throws IOException {
+        Files.delete(PLAYER_DATA_FOLDER.toPath());
+        Files.delete(GUILD_DATA_FOLDER.toPath());
+        Files.delete(Main.guildRootFolder.toPath());
+    }
+
+    public static void createPersonalPlayerFile(GuildPlayerObject player) throws IOException {
         Files.createFile(Path.of(PLAYER_DATA_FOLDER + "/"+ player.getUniqueId() + ".json"));
         JsonObject rawJsonData = new JsonObject();
         rawJsonData.addProperty("name", player.getName());
@@ -107,7 +121,12 @@ public class GuildFileSystem {
     public static void cachePlayers() throws IOException {
         for (File file:PLAYER_DATA_FOLDER.listFiles()){
             if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
-                cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),"");
+                try {
+                    cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)),"");
+                }catch (Exception e){
+                    Main.log("Failed to cache player " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                }
+
             }
         }
     }

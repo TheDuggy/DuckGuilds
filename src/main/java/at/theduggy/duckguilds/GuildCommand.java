@@ -25,6 +25,7 @@ import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
 import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
 import at.theduggy.duckguilds.commands.list.GuildListCommand;
+import at.theduggy.duckguilds.storage.StorageHandler;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import at.theduggy.duckguilds.commands.help.GuildHelpCommand;
@@ -47,50 +48,54 @@ public class GuildCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (args.length != 0) {
+        if (!Main.isIsStorageBusy()) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (args.length != 0) {
 
-                switch (args[0]) {
-                    case "help":
-                        if ((args.length == 2 && args[1].equals("help"))) {
-                            player.sendMessage(GuildHelpCommand.help());
-                        } else if (args.length == 2 && args[1].equals("create")) {
-                            player.sendMessage(GuildHelpCommand.create());
-                        } else if (args.length == 2 && args[1].equals("delete")) {
-                            player.sendMessage(GuildHelpCommand.delete());
-                        }else if (args.length == 2 && args[1].equals("deleteInvite")){
-                            player.sendMessage(GuildHelpCommand.deleteInvite());
-                        }else if (args.length==2 && args[1].equals("discardInvite")){
-                            player.sendMessage(GuildHelpCommand.discardInvite());
-                        }else {
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
+                    switch (args[0]) {
+                        case "help":
+                            if ((args.length == 2 && args[1].equals("help"))) {
+                                player.sendMessage(GuildHelpCommand.help());
+                            } else if (args.length == 2 && args[1].equals("create")) {
+                                player.sendMessage(GuildHelpCommand.create());
+                            } else if (args.length == 2 && args[1].equals("delete")) {
+                                player.sendMessage(GuildHelpCommand.delete());
+                            } else if (args.length == 2 && args[1].equals("deleteInvite")) {
+                                player.sendMessage(GuildHelpCommand.deleteInvite());
+                            } else if (args.length == 2 && args[1].equals("discardInvite")) {
+                                player.sendMessage(GuildHelpCommand.discardInvite());
+                            } else {
+                                player.sendMessage(GuildTextUtils.wrongUsage);
+                            }
 
-                        break;
-                    case "create":
-                        if (args.length == 5) {
-                            String name;
-                            String color;
-                            String tag;
-                            String tagColor;
-                            if (!args[1].equals("")) {
-                                if (!args[2].equals("") && Arrays.asList(allColorsForColor).contains(args[2])) {
-                                    if (!args[3].equals("")) {
-                                        if (!args[4].equals("") && Arrays.asList(allColorsForColorAndDark).contains(args[4])) {
-                                            try {
-                                                name = args[1];
-                                                color = args[2];
-                                                tag = args[3];
-                                                tagColor = args[4];
-                                                GuildCreate.createGuild(player, GuildTextUtils.translateFromReadableStringToChatColorLightColors(color), name, tag, GuildTextUtils.translateFromReadableStringToChatColorAllColors(tagColor));
+                            break;
+                        case "create":
+                            if (args.length == 5) {
+                                String name;
+                                String color;
+                                String tag;
+                                String tagColor;
+                                if (!args[1].equals("")) {
+                                    if (!args[2].equals("") && Arrays.asList(allColorsForColor).contains(args[2])) {
+                                        if (!args[3].equals("")) {
+                                            if (!args[4].equals("") && Arrays.asList(allColorsForColorAndDark).contains(args[4])) {
+                                                try {
+                                                    name = args[1];
+                                                    color = args[2];
+                                                    tag = args[3];
+                                                    tagColor = args[4];
+                                                    GuildCreate.createGuild(player, GuildTextUtils.translateFromReadableStringToChatColorLightColors(color), name, tag, GuildTextUtils.translateFromReadableStringToChatColorAllColors(tagColor));
 
-                                            } catch (IOException | ParseException e) {
-                                                e.printStackTrace();
-                                            } catch (SQLException | GuildDatabaseException e) {
-                                                throw new RuntimeException(e);
+                                                } catch (IOException | ParseException e) {
+                                                    e.printStackTrace();
+                                                } catch (SQLException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+
+                                            } else {
+                                                player.sendMessage(GuildTextUtils.wrongUsage);
                                             }
-
                                         } else {
                                             player.sendMessage(GuildTextUtils.wrongUsage);
                                         }
@@ -103,161 +108,215 @@ public class GuildCommand implements TabExecutor {
                             } else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
-                        } else {
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
-                        break;
-                    case "list":
-                        try {
-                            if (args.length==2) {
-                                if (GuildTextUtils.isStringInteger(args[1])){
-                                    GuildListCommand.listGuilds(player,Integer.parseInt(args[1]));
-                                }else {
-                                    player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
-                                }
-                            } else if (args.length==1){
-                                GuildListCommand.listGuilds(player,1);
-                            }else {
-                                player.sendMessage(GuildTextUtils.wrongUsage);
-                            }
-                        } catch (IOException | ParseException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "leave":
-                        try {
-                            if (args.length == 2) {
-                                if (!Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
-                                    PlayerLeaveGuild.leaveGuild(player, args[1]);
-                                } else if (Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
-                                    player.sendMessage(GuildTextUtils.youAreTheHeadOfThatGuild);
-                                }
-                            } else {
-                                player.sendMessage(GuildTextUtils.wrongUsage);
-                            }
-                        } catch (IOException | ParseException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "delete":
-                        try {
-                            if (args.length == 3) {
-                                if (args[2].equals("-y")) {
-                                    GuildDelete.removeGuild(args[1], player);
-                                } else if (args[2].equals("-n")) {
-                                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "To delete your guild use /guild delete -y!");
-                                } else {
-                                    player.sendMessage(GuildTextUtils.forbiddenArgument);
-                                }
-                            } else {
-                                player.sendMessage(GuildTextUtils.wrongUsage);
-                            }
-
-                        } catch (IOException | ParseException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "invite":
-                        if (args.length == 2) {
-                            if (Utils.isPlayerInGuild(player)) {
-                                try {
-                                    if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild(player), player)) {
-                                        if (Bukkit.getServer().getPlayerExact(args[1]) != null) {
-                                            if (!Bukkit.getPlayerExact(args[1]).equals(player)) {
-                                                GuildInviteCommand.guildInviteCommand(player, args[1], Utils.getPlayerGuild(player));
-                                            } else {
-                                                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You can't invite yourself!");
-                                            }
-                                        } else {
-                                            player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "This player doesn't exist or isn't online!");
-                                        }
+                            break;
+                        case "list":
+                            try {
+                                if (args.length == 2) {
+                                    if (GuildTextUtils.isStringInteger(args[1])) {
+                                        GuildListCommand.listGuilds(player, Integer.parseInt(args[1]));
                                     } else {
-                                        player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
-                                    }
-                                } catch (IOException | ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                player.sendMessage(GuildTextUtils.youAreNotInAGuild);
-                            }
-                        } else {
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
-                        break;
-                    case "info":
-                            if(args.length==4) {
-                                if (args[2].equals("general")) {
-                                    GuildInfoCommand.guildInfoCommandGeneral(player, args[1], args[3]);
-                                    break;
-                                }else if (args[2].equals("playerList")){
-                                    if (GuildTextUtils.isStringInteger(args[3])){
-                                        GuildInfoCommand.listPlayersOfGuild(player,args[1], Integer.parseInt(args[3]));
-                                    }else {
                                         player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
                                     }
+                                } else if (args.length == 1) {
+                                    GuildListCommand.listGuilds(player, 1);
+                                } else {
+                                    player.sendMessage(GuildTextUtils.wrongUsage);
                                 }
-                            }else {
+                            } catch (IOException | ParseException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case "leave":
+                            try {
+                                if (args.length == 2) {
+                                    if (!Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
+                                        PlayerLeaveGuild.leaveGuild(player, args[1]);
+                                    } else if (Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
+                                        player.sendMessage(GuildTextUtils.youAreTheHeadOfThatGuild);
+                                    }
+                                } else {
+                                    player.sendMessage(GuildTextUtils.wrongUsage);
+                                }
+                            } catch (IOException | ParseException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case "delete":
+                            try {
+                                if (args.length == 3) {
+                                    if (args[2].equals("-y")) {
+                                        GuildDelete.removeGuild(args[1], player);
+                                    } else if (args[2].equals("-n")) {
+                                        player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "To delete your guild use /guild delete -y!");
+                                    } else {
+                                        player.sendMessage(GuildTextUtils.forbiddenArgument);
+                                    }
+                                } else {
+                                    player.sendMessage(GuildTextUtils.wrongUsage);
+                                }
+
+                            } catch (IOException | ParseException | InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case "invite":
+                            if (args.length == 2) {
+                                if (Utils.isPlayerInGuild(player)) {
+                                    try {
+                                        if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild(player), player)) {
+                                            if (Bukkit.getServer().getPlayerExact(args[1]) != null) {
+                                                if (!Bukkit.getPlayerExact(args[1]).equals(player)) {
+                                                    GuildInviteCommand.guildInviteCommand(player, args[1], Utils.getPlayerGuild(player));
+                                                } else {
+                                                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You can't invite yourself!");
+                                                }
+                                            } else {
+                                                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "This player doesn't exist or isn't online!");
+                                            }
+                                        } else {
+                                            player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
+                                        }
+                                    } catch (IOException | ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    player.sendMessage(GuildTextUtils.youAreNotInAGuild);
+                                }
+                            } else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                             break;
-                    case "join":
-                        if (args.length == 2) {
-                            try {
-                                GuildJoinCommand.inviteReceive((Player) player, args[1]);
-                            } catch (IOException | ParseException e) {
-                                e.printStackTrace();
+                        case "info":
+                            if (args.length == 4) {
+                                if (args[2].equals("general")) {
+                                    GuildInfoCommand.guildInfoCommandGeneral(player, args[1], args[3]);
+                                    break;
+                                } else if (args[2].equals("playerList")) {
+                                    if (GuildTextUtils.isStringInteger(args[3])) {
+                                        GuildInfoCommand.listPlayersOfGuild(player, args[1], args[3]);
+                                    } else {
+                                        player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
+                                    }
+                                }
+                            } else if (args.length == 3) {
+                                if (args[2].equals("general")) {
+                                    GuildInfoCommand.guildInfoCommandGeneral(player, args[1], "");
+                                    break;
+                                } else if (args[2].equals("playerList")) {
+                                    if (GuildTextUtils.isStringInteger(args[3])) {
+                                        GuildInfoCommand.listPlayersOfGuild(player, args[1], "");
+                                    } else {
+                                        player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
+                                    }
+                                }
+                            } else {
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
-                        } else {
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
-                        break;
-                    case "discardInvite":
-                        if (args.length == 2) {
-                            try {
-                                GuildInviteDiscardCommand.discardInvite(player, args[1]);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
-                        break;
-                    case "kick":
-                        if (args.length == 3) {
-                            if (args[2].equals("-y")) {
+                            break;
+                        case "join":
+                            if (args.length == 2) {
                                 try {
-                                    KickPlayerFromGuild.kickPlayerFromGuild(player, Bukkit.getPlayerExact(args[1]));
+                                    GuildJoinCommand.inviteReceive((Player) player, args[1]);
                                 } catch (IOException | ParseException e) {
                                     e.printStackTrace();
                                 }
                             } else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
-                                //TODO Change msg!
                             }
-                        } else {
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
-                        break;
-                    case "deleteInvite":
-                        if (args.length == 2) {
-                            try {
-                                DeleteGuildInvite.deleteInvite(player, args[1]);
-                            } catch (IOException | ParseException e) {
-                                e.printStackTrace();
+                            break;
+                        case "discardInvite":
+                            if (args.length == 2) {
+                                try {
+                                    GuildInviteDiscardCommand.discardInvite(player, args[1]);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                player.sendMessage(GuildTextUtils.wrongUsage);
                             }
-                        } else {
+                            break;
+                        case "kick":
+                            if (args.length == 3) {
+                                if (args[2].equals("-y")) {
+                                    try {
+                                        KickPlayerFromGuild.kickPlayerFromGuild(player, Bukkit.getPlayerExact(args[1]));
+                                    } catch (IOException | ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    player.sendMessage(GuildTextUtils.wrongUsage);
+                                    //TODO Change msg!
+                                }
+                            } else {
+                                player.sendMessage(GuildTextUtils.wrongUsage);
+                            }
+                            break;
+                        case "deleteInvite":
+                            if (args.length == 2) {
+                                try {
+                                    DeleteGuildInvite.deleteInvite(player, args[1]);
+                                } catch (IOException | ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                player.sendMessage(GuildTextUtils.wrongUsage);
+                            }
+                            break;
+                        default:
                             player.sendMessage(GuildTextUtils.wrongUsage);
-                        }
-                        break;
-                    default:
-                        player.sendMessage(GuildTextUtils.wrongUsage);
-                        break;
+                            break;
+                    }
+                } else {
+                    player.sendMessage(GuildTextUtils.wrongUsage);
                 }
+                //
             } else {
-                player.sendMessage(GuildTextUtils.wrongUsage);
+                if (args.length == 3) {
+                    if (args[0].equals("storage")) {
+                        if (args[1].equals("migrate")) {
+                            switch (args[2]) {
+                                case "File_To_MySql":
+                                    if (Main.getMainStorage().storageType!= StorageHandler.StorageType.MySQL){
+                                        try {
+                                            Main.getMainStorage().migrateStorage(StorageHandler.StorageType.MySQL);
+                                        } catch (SQLException | IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }else {
+                                        sender.sendMessage(GuildTextUtils.prefixWithoutColor + "The current storage-type is already MySQL!");
+                                    }
+                                    break;
+
+                                case "MySql_To_File":
+                                    if (Main.getMainStorage().storageType!= StorageHandler.StorageType.File){
+                                        try {
+                                            Main.getMainStorage().migrateStorage(StorageHandler.StorageType.File);
+                                        } catch (SQLException | IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }else {
+                                        sender.sendMessage(GuildTextUtils.prefixWithoutColor + "The current storage-type is already File!");
+                                    }
+                                    break;
+                                default:
+                                    sender.sendMessage(GuildTextUtils.wrongUsageConsole);
+                            }
+                        } else {
+                            sender.sendMessage(GuildTextUtils.wrongUsageConsole);
+                        }
+                    } else {
+                        sender.sendMessage(GuildTextUtils.wrongUsageConsole);
+                    }
+                } else {
+                    sender.sendMessage(GuildTextUtils.wrongUsageConsole);
+                }
             }
-        } else {
-            sender.sendMessage("You are not a player! Use /guild help for all options!");
+        }else {
+            if (sender instanceof Player){
+                sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "Failed to perform action! Wait a bit and try again! If this doesn't go away, report it to an admin!");
+            }else {
+                sender.sendMessage(GuildTextUtils.prefixWithoutColor + "Failed to perform action! Storage is busy!");
+            }
         }
         return false;
     }
@@ -479,8 +538,25 @@ public class GuildCommand implements TabExecutor {
                             default:
                                 return new ArrayList<>();
                         }
+
+                    default:
+                        return new ArrayList<>();
                 }
                 //TODO Add completion on discardInvite
+            }
+        }else {
+            if (args.length==1){
+                return new ArrayList<>(Arrays.asList("storage"));
+            }else {
+                switch (args[0]){
+                    case "storage":
+                        switch (args.length){
+                            case 2: return new ArrayList<>(Arrays.asList("migrate"));
+                            case 3: return new ArrayList<>(Arrays.asList("MySql_To_File","File_To_MySql"));
+                            default:
+                                return new ArrayList<>();
+                        }
+                }
             }
         }
         return null;
