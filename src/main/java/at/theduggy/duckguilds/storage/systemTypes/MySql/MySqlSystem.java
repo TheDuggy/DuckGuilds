@@ -62,11 +62,13 @@ public class MySqlSystem {
 
 
     public static void cacheGuilds() throws SQLException {
+       Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guilds");
        ResultSet resultSet = preparedStatement.executeQuery();//TODO Add try-catch stuff to mysql
        while (resultSet.next()){
            String name = resultSet.getString("name");
            try {
+               Main.log("Caching " + name + " with storage-type File!", Main.LogLevel.DEFAULT);
                GuildObject guildObject = new GuildObject();
                guildObject.setGuildColor(new GuildColor(resultSet.getString("color")));
                guildObject.setTagColor(new GuildColor(resultSet.getString("tagColor")));
@@ -97,6 +99,7 @@ public class MySqlSystem {
     }
 
     public static void cachePlayers() throws SQLException {
+        Main.log("--------------caching players-------------", Main.LogLevel.DEFAULT);
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guildplayers WHERE uuid IS NOT NULL AND name IS NOT NULL");
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){

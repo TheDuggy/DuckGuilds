@@ -19,7 +19,6 @@ public class GuildPlayerHandler implements Listener {
     public static void handlePlayersOnReload() throws IOException, ParseException, SQLException {
         for (Player player:Bukkit.getServer().getOnlinePlayers()){
             addPlayerToTeam(player);
-            Main.getPlayerCache().get(player.getUniqueId()).setOnline(true);
         }
     }
 
@@ -37,6 +36,7 @@ public class GuildPlayerHandler implements Listener {
 
     private static void addPlayerToTeam(Player player) {
         if (!Main.getMainStorage().personalGuildPlayerStorageSectionExists(player.getUniqueId())){
+            System.out.println("Doesn't exist!");
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
             Main.getMainStorage().createPersonalPlayerStorageSection(guildPlayerObject,true);
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);

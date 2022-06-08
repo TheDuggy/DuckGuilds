@@ -7,17 +7,13 @@ import java.util.UUID;
 
 public class GuildPlayerObject {
 
-
-    @Expose(serialize = false)
-    private UUID player;
+    private transient UUID player;
 
     private String name;
 
-    @Expose(serialize = false)
-    private String guild;
+    private transient String guild;
 
-    @Expose(serialize = false)
-    private Boolean online;
+    private transient Boolean online;
 
     public GuildPlayerObject(UUID player, Boolean online, String name, String guild){
         this.player=player;

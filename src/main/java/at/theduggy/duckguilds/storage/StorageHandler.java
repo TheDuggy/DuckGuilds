@@ -173,7 +173,6 @@ public class StorageHandler {
     }
 
     public void loadStorage() throws SQLException, IOException {
-
         if (storageType.equals(StorageType.File)){
             GuildFileSystem.init();
         }else if (storageType.equals(StorageType.MySQL)){

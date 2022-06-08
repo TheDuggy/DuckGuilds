@@ -1,14 +1,20 @@
 package at.theduggy.duckguilds.objects;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.config.GuildConfigHandler;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class GuildObject {
 
     private ArrayList<UUID> players;
+
+    private transient final HashMap<UUID,GuildInviteObject> guildInvites = new HashMap<>();
     private GuildColor color;
     private GuildColor tagColor;
     private String name;
@@ -77,4 +83,17 @@ public class GuildObject {
         return Main.getGsonInstance().toJson(this);
     }
 
+    public void addInvite(GuildInviteObject guildInvite){
+        guildInvites.put(guildInvite.getReceiver().getUniqueId(),guildInvite);
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                guildInvites.remove(guildInvite.getReceiver().getUniqueId());
+            }
+        }.runTaskLater(Main.getPlugin(Main.class), GuildConfigHandler.getTimeTillInviteIsDeleted());
+    }
+
+    public HashMap<UUID,GuildInviteObject> getAllInvites(){
+        return guildInvites;
+    }
 }

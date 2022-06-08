@@ -17,6 +17,8 @@ package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.objects.GuildInviteObject;
+import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -31,37 +33,39 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class GuildInviteCommand {
 
     public static void guildInviteCommand(Player sender, String playerNameToInvite, String guildName) throws IOException, ParseException {
         if (Utils.guildExists(guildName)) {
             if (Utils.getIfPlayerIsHeadOfGuild(guildName,sender)) {
-                if (!Utils.getPlayerGuild(Bukkit.getPlayerExact(playerNameToInvite)).equals(Utils.getPlayerGuild(sender))) {
-                    if (Bukkit.getPlayerExact(playerNameToInvite) != null) {
-                        Player invitedPlayer = Bukkit.getPlayerExact(playerNameToInvite);
-                        if (invitedPlayer != null) {
-                            if (!Main.guildInvites.containsKey(guildName)) {
-                                ArrayList<String> playerInvites = new ArrayList<>();
-                                Main.guildInvites.put(guildName, playerInvites);
-                            }
-                            if (!Main.guildInvites.get(guildName).contains(playerNameToInvite)) {
-                                Main.guildInvites.get(guildName).add(playerNameToInvite);
-                                invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix+ " " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.RED + "!\n"), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName));
-                                sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
-                                autoDeleteGuildInvite(Bukkit.getPlayerExact(playerNameToInvite), guildName);
-
+                if (Bukkit.getPlayerExact(playerNameToInvite)!=null) {
+                    if (!Main.getPlayerCache().get(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId()).getGuild().equals(Utils.getPlayerGuild(sender))) {
+                        if (Bukkit.getPlayerExact(playerNameToInvite) != null) {
+                            Player invitedPlayer = Bukkit.getPlayerExact(playerNameToInvite);
+                            if (invitedPlayer != null) {
+                                GuildObject guildObject = Main.getGuildCache().get(guildName);
+                                HashMap<UUID, GuildInviteObject> allInvites = guildObject.getAllInvites();
+                                System.out.println(allInvites);
+                                if (!allInvites.containsKey(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId())) {
+                                    System.out.println("Inivted!");
+                                    guildObject.addInvite(new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId()));
+                                    invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.GREEN + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!\n"), new TextComponent(" ".repeat(15) + ChatColor.GRAY + "-".repeat(5)), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName), new TextComponent(ChatColor.GRAY + "-".repeat(5)));
+                                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
+                                } else {
+                                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");
+                                }
                             } else {
-                                sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");
+                                sender.sendMessage(GuildTextUtils.playerIsntOnline);
                             }
                         } else {
-                            sender.sendMessage(GuildTextUtils.playerIsntOnline);
+                            sender.sendMessage(GuildTextUtils.playerDoesntExists);
                         }
                     } else {
-                        sender.sendMessage(GuildTextUtils.playerDoesntExists);
+                        sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "That player is already in your guild!");
                     }
-                }else {
-                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "That player is already in your guild!");
                 }
             }else {
                 sender.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
@@ -72,7 +76,7 @@ public class GuildInviteCommand {
     }
 
     public static TextComponent clickableMsgJoin( String guildName){
-        TextComponent textComponent =new TextComponent( ChatColor.GRAY + " [" +  ChatColor.GREEN + "" + ChatColor.BOLD + "join" + ChatColor.GRAY + "] ");
+        TextComponent textComponent =new TextComponent( ChatColor.GRAY + "[" +  ChatColor.GREEN + "" + ChatColor.BOLD + "join" + ChatColor.GRAY + "] ");
         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/guild join " + guildName));
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Join " + guildName).color(net.md_5.bungee.api.ChatColor.GREEN).italic(true).create()));
         return textComponent;
@@ -83,19 +87,5 @@ public class GuildInviteCommand {
         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/guild discardInvite " + guildName));
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Discard invite from " + sender.getName()).color(net.md_5.bungee.api.ChatColor.RED).italic(true).create()));
         return textComponent;
-    }
-
-    public static void autoDeleteGuildInvite(Player invited, String guildName){
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                if (Main.guildInvites.get(guildName).contains(invited.getName())){
-                    Main.guildInvites.get(guildName).remove(invited.getName());
-                    invited.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The invite from " + Main.getPlayerCache().get(Utils.getHeadOfGuild(guildName)).getName() + " to " + guildName + " has expired!");
-                    Bukkit.getPlayerExact(Main.getPlayerCache().get(Utils.getHeadOfGuild(guildName)).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED+ "The invite for " +invited.getName() + " has expired!");
-
-                }
-            }
-        }.runTaskLater(Main.getPlugin(Main.class), GuildConfigHandler.getTimeTillInviteIsDeleted());
     }
 }

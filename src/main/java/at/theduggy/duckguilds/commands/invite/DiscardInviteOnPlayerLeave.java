@@ -16,6 +16,7 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -31,14 +32,13 @@ import java.util.ArrayList;
 public class DiscardInviteOnPlayerLeave implements Listener {
 
     @EventHandler
-    public void playerLeaveEvent(PlayerQuitEvent e) throws ParseException {
+    public void playerLeaveEvent(PlayerQuitEvent e) {
         Player player = e.getPlayer();
         if (Utils.getPlayerGuildInvites(player).size()!=0){
-            ArrayList<String> guildInvitesOfPlayer = Utils.getPlayerGuildInvites(player);
-            for (int i =0;i!= guildInvitesOfPlayer.size();i++){
-                Main.guildInvites.get(guildInvitesOfPlayer.get(i)).remove(player.getName());
-                if (Main.getPlayerCache().get(Utils.getHeadOfGuild(guildInvitesOfPlayer.get(i))).isOnline()) {
-                    Bukkit.getPlayerExact(Main.getPlayerCache().get(Utils.getHeadOfGuild(guildInvitesOfPlayer.get(i))).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + player.getName() + "has left the server and his invite was deleted!");
+            for (GuildInviteObject guildInviteObject:Utils.getPlayerGuildInvites(player)){
+                guildInviteObject.getGuild().getAllInvites().remove(guildInviteObject.getReceiver().getUniqueId());
+                if (Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).isOnline()) {
+                    Bukkit.getPlayerExact(Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + player.getName() + " has left the server and his invite was deleted!");
                 }
             }
         }

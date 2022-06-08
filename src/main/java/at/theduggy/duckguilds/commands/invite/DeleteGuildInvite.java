@@ -31,17 +31,20 @@ public class DeleteGuildInvite {
         if (Utils.isPlayerInGuild(sender)){
             if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild(sender), sender)){
                 if (Bukkit.getPlayerExact(playerName)!=null) {
-                    if (Main.guildInvites.containsKey(Utils.getPlayerGuild(sender))) {
-                        if (Main.guildInvites.get(Utils.getPlayerGuild(sender)).contains(playerName)) {
-                            int index = Main.guildInvites.get(Utils.getPlayerGuild(sender)).indexOf(playerName);
-                            Main.guildInvites.get(Utils.getPlayerGuild(sender)).remove(index);
-                            Bukkit.getPlayerExact(playerName).sendMessage( GuildTextUtils.prefix + ChatColor.RED + "Your guild-invite to " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + " was deleted by " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + "!");
+                    if (Main.getGuildCache().get(Utils.getPlayerGuild(sender)).getAllInvites().size()>0) {
+                        if (Main.getGuildCache().get(Utils.getPlayerGuild(sender)).getAllInvites().containsKey(Utils.getPlayerByName(playerName).getUniqueId())) {
+                            Main.getGuildCache().get(Utils.getPlayerGuild(sender)).getAllInvites().remove(Utils.getPlayerByName(playerName).getUniqueId());
+                            if (Utils.getPlayerByName(playerName).isOnline()){
+                                Bukkit.getPlayerExact(playerName).sendMessage( GuildTextUtils.prefix + ChatColor.RED + "Your guild-invite to " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + " was deleted by " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + "!");
+                            }else {
+                                sender.sendMessage("False");
+                            }
                             sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The guild-invite for " + ChatColor.YELLOW + playerName + ChatColor.RED + " was deleted!");
                         } else {
                             sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "There is no guild-invite for " + ChatColor.YELLOW + playerName + ChatColor.RED + "!");
                         }
                     } else {
-                        sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "There is no guild-invite for " + ChatColor.YELLOW + playerName + ChatColor.RED + "!");
+                        sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "There are no guild-invites for guild " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + "!");
                     }
                 }else {
                     sender.sendMessage(GuildTextUtils.playerDoesntExists);

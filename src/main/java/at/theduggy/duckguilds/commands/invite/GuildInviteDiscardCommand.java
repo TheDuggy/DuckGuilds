@@ -16,6 +16,8 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.objects.GuildInviteObject;
+import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -23,15 +25,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
+import java.util.UUID;
+
 public class GuildInviteDiscardCommand {
 
     public static void discardInvite(Player player, String guildName) throws ParseException {
-        if (Main.guildInvites.containsKey(guildName)){
-            if (Main.guildInvites.get(guildName).contains(player.getName())){
-                Main.guildInvites.get(guildName).remove(player.getName());
-                Player head = Bukkit.getPlayerExact(Main.getPlayerCache().get(Utils.getHeadOfGuild(guildName)).getName());
-                head.sendMessage(GuildTextUtils.prefix + ChatColor.RED  + player.getName() + "has discarded your guild-invite!");
-                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You discarded the invite of " + head.getName() + " to " + guildName + "!" );
+        if (Main.getGuildCache().containsKey(guildName)){
+            if (Main.getGuildCache().get(guildName).getAllInvites().containsKey(player.getUniqueId())){
+                GuildInviteObject guildInvite = Main.getGuildCache().get(guildName).getAllInvites().get(player.getUniqueId());
+                GuildObject guild = Main.getGuildCache().get(guildName);
+                Main.getGuildCache().get(guildName).getAllInvites().remove(player.getUniqueId());
+                if (Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).isOnline()){
+                    Bukkit.getPlayer(guild.getHead()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has discarded your guild-invite!");
+                }
+                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You successfully discarded the invite of " + ChatColor.YELLOW + Main.getPlayerCache().get(guildInvite.getSender().getUniqueId()).getName() + ChatColor.RED + " to " + guildName + "!" );
             }else {
                 player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You are not invited to this guild!");
             }

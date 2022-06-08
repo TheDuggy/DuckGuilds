@@ -47,13 +47,11 @@ import java.util.UUID;
 
 public final class Main extends JavaPlugin {
 
-private static HashMap<UUID, GuildPlayerObject> cachedPlayers = new HashMap<>();
-public static ArrayList<String> guildInfo = new ArrayList<>();
+private static final HashMap<UUID, GuildPlayerObject> cachedPlayers = new HashMap<>();
 public static FileConfiguration mainFileConfiguration;
 private static Scoreboard scoreboard;
 public static Plugin plugin;
-public static HashMap<String,ArrayList<String>> guildInvites = new HashMap<>();
-private static HashMap<String, GuildObject> cachedGuilds = new HashMap<>();
+private static final HashMap<String, GuildObject> cachedGuilds = new HashMap<>();
 public static File guildRootFolder;
 private static StorageHandler mainStorageHandler;
 private static boolean isStorageBusy = false;
@@ -113,6 +111,9 @@ public static Path loggingFolder;
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            for (GuildObject g: getGuildCache().values()){
+                System.out.println(g.getAllInvites());
+            }
         }else {
             shutDown("Invalid storage-type!");
         }
@@ -155,9 +156,6 @@ public static Path loggingFolder;
         return scoreboard;
     }
 
-    public static ArrayList<String> getGuildInfo() {
-        return guildInfo;
-    }
 
     private static Gson gson;
     public static Gson getGsonInstance(){

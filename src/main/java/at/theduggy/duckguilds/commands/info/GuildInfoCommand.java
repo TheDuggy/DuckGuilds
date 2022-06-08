@@ -132,8 +132,9 @@ creationDate,
 
 
     public static void listPlayersOfGuild(Player player,String guildName,String page){
-        int pageIndex = Integer.parseInt(page);
+        int pageIndex = !page.equals("")?Integer.parseInt(page):1;
         if (pageIndex>0) {
+            System.out.println(Main.getGuildCache().keySet());
             ArrayList<UUID> players = Main.getGuildCache().get(guildName).getPlayers();
             int pageCount = (int) Math.ceil((double) players.size() / 8.0);
             if (pageIndex<=pageCount) {
@@ -148,10 +149,10 @@ creationDate,
                 }
                 String headName = Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).getName();
                 StringBuilder msg = new StringBuilder();
-                msg.append(GuildTextUtils.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + "[" + ChatColor.AQUA + page + ChatColor.GRAY + "/"+ pages + "]\n");
+                msg.append(GuildTextUtils.prefix  + ChatColor.GREEN + "List of all players in guild " + ChatColor.YELLOW + guildName + ChatColor.GRAY + " [" + ChatColor.AQUA + pageIndex + ChatColor.GRAY + "/"+ pages + "]\n");
                 msg.append(ChatColor.WHITE + "-".repeat(40) + "\n");//60
                 putHeadToFirstPosition(playerPages,headName);
-                for (String name:playerPages.get(page)){
+                for (String name:playerPages.get(pageIndex)){
                     if (name.equals(headName)) {
                         msg.append(ChatColor.GRAY + "   - " + ChatColor.YELLOW + name +  ChatColor.GRAY + " [" + ChatColor.AQUA+ "HEAD" + ChatColor.GRAY + "]\n");
                     }else {

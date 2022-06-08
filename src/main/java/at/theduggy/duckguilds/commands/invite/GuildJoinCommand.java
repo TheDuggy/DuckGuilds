@@ -17,7 +17,10 @@ package at.theduggy.duckguilds.commands.invite;
 
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,6 +29,7 @@ import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class GuildJoinCommand {
 
@@ -33,32 +37,21 @@ public class GuildJoinCommand {
 
         if (!Utils.isPlayerInGuild(player)){
             if (Main.getGuildCache().containsKey(guildName)){
-                if (Main.guildInvites.get(guildName).contains(player.getName())){
+                GuildObject guildObject = Main.getGuildCache().get(guildName);
+                if (guildObject.getAllInvites().containsKey(player.getUniqueId())){
                     Main.getGuildCache().get(guildName).getPlayers().add(player.getUniqueId());
                     Main.getMainStorage().addPlayerToGuildField(Main.getGuildCache().get(guildName), Main.getPlayerCache().get(player.getUniqueId()));
-                    Main.getPlayerCache().get(player.getUniqueId()).setGuild(guildName);//TODO Work on guildfilesystem!
-
-
-                    Team team;
-                    try {
-                      team = Main.getScoreboard().registerNewTeam(guildName);
-                    }catch (IllegalArgumentException e){
-                        team = Main.getScoreboard().getTeam(guildName);
-                    }
-                    team.setColor(Main.getGuildCache().get(guildName).getGuildColor().getChatColor());
-                    team.setSuffix(ChatColor.GRAY + "[" +  Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]");
-                    team.addEntry(player.getName());
-                    player.setDisplayName(Main.getGuildCache().get(guildName).getGuildColor() + player.getName() + ChatColor.GRAY + "[" + Main.getGuildCache().get(guildName).getTagColor().getChatColor() + Main.getGuildCache().get(guildName).getTag() + ChatColor.GRAY + "]" + ChatColor.WHITE);
-                    player.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + " You successfully joined " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!");
-                    for (Player playerFromServer: Bukkit.getOnlinePlayers()){
-                        playerFromServer.setScoreboard(Main.getScoreboard());
-                        if (Utils.getPlayerGuild(playerFromServer).equals(guildName)){
-                            player.sendMessage(GuildTextUtils.prefix + ChatColor.YELLOW  + player.getName() + ChatColor.GREEN + " has joined your guild!");
+                    Main.getPlayerCache().get(player.getUniqueId()).setGuild(guildName);
+                    ScoreboardHandler.updateScoreboardAddPlayer(player, Main.getGuildCache().get(guildName));
+                    player.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You successfully accepted the guild-invite from " + guildObject.getAllInvites().get(player.getUniqueId()).getSender().getName() + " to " + ChatColor.YELLOW + guildName + ChatColor.GREEN + "!");
+                    for (UUID guildPlayer:guildObject.getPlayers()){
+                        if (Main.getPlayerCache().get(guildPlayer).isOnline()&&guildPlayer!=player.getUniqueId()){
+                            Bukkit.getPlayer(guildPlayer).sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + ">>> " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has joined your guild!");
                         }
                     }
-                    Main.guildInvites.get(guildName).remove(player.getName());
+                    Main.getGuildCache().get(guildName).getAllInvites().remove(player.getUniqueId());
                 }else {
-                    player.sendMessage(GuildTextUtils.prefix+ ChatColor.RED + "You aren't invited to this guild!");
+                    player.sendMessage(GuildTextUtils.prefix+ ChatColor.RED + "You aren't invited to this guild or the invite expired/was deleted!");
                 }
             }else {
                 player.sendMessage(GuildTextUtils.guildDoesntExist);

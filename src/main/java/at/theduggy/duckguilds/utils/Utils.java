@@ -16,6 +16,9 @@
 package at.theduggy.duckguilds.utils;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.objects.GuildInviteObject;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
@@ -48,12 +51,11 @@ public class Utils {
         return Main.getGuildCache().get(guildName).getHead();
     }
 
-    public static ArrayList<String> getPlayerGuildInvites(Player player){
-        ArrayList<String> keys = new ArrayList<>(Main.guildInvites.keySet());
-        ArrayList<String> guilds = new ArrayList<>();
-        for (int i = 0;i!=keys.size();i++){
-            if (Main.guildInvites.get(keys.get(i)).contains(player.getName())){
-                guilds.add(keys.get(i));
+    public static ArrayList<GuildInviteObject> getPlayerGuildInvites(Player player){
+        ArrayList<GuildInviteObject> guilds = new ArrayList<>();
+        for (GuildObject guildObject:Main.getGuildCache().values()){
+            if (guildObject.getAllInvites().containsKey(player.getUniqueId())){
+                guilds.add(guildObject.getAllInvites().get(player.getUniqueId()));
             }
         }
         return guilds;
@@ -69,14 +71,12 @@ public class Utils {
         return players;
     }
 
-    public static ArrayList<String> getAllPlayerGuildInvitesForAGuild(String guildName){
-        ArrayList<String> invites = new ArrayList<>();
-        if  (Main.guildInvites.get(guildName)!=null) {
-            for (int i = 0; i != Main.guildInvites.get(guildName).size(); i++) {
-                invites.add(Main.guildInvites.get(guildName).get(i));
-            }
+    public static ArrayList<String> getAllPlayerNamesOfInvitedPlayers(String guildName){
+        ArrayList<String> names = new ArrayList<>();
+        for (GuildInviteObject guildInviteObject:Main.getGuildCache().get(guildName).getAllInvites().values()){
+            names.add(Main.getPlayerCache().get(guildInviteObject.getReceiver().getUniqueId()).getName());
         }
-        return invites;
+        return names;
     }
 
     public static boolean isPlayerInGuild(Player player){
@@ -91,5 +91,14 @@ public class Utils {
             }
         }
         return onlinePlayers;
+    }
+
+    public static GuildPlayerObject getPlayerByName(String playerName){
+        for (GuildPlayerObject guildPlayerObject:Main.getPlayerCache().values()){
+            if (guildPlayerObject.getName().equals(playerName)){
+                return guildPlayerObject;
+            }
+        }
+        return null;
     }
 }

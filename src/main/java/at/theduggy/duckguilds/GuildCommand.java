@@ -25,6 +25,8 @@ import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
 import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
 import at.theduggy.duckguilds.commands.list.GuildListCommand;
+import at.theduggy.duckguilds.commands.versionInfo.GuildVersionInfoCommand;
+import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.storage.StorageHandler;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
@@ -65,6 +67,20 @@ public class GuildCommand implements TabExecutor {
                                 player.sendMessage(GuildHelpCommand.deleteInvite());
                             } else if (args.length == 2 && args[1].equals("discardInvite")) {
                                 player.sendMessage(GuildHelpCommand.discardInvite());
+                            } else if (args.length == 2 && args[1].equals("list")){
+                                player.sendMessage(GuildHelpCommand.list());
+                            }else if (args.length == 2 && args[1].equals("leave")){
+                                player.sendMessage(GuildHelpCommand.leave());
+                            }else if (args.length == 2 && args[1].equals("invite")){
+                                player.sendMessage(GuildHelpCommand.invite());
+                            }else if (args.length == 2 && args[1].equals("join")){
+                                player.sendMessage(GuildHelpCommand.join());
+                            }else if (args.length == 2 && args[1].equals("kick")){
+                                player.sendMessage(GuildHelpCommand.kick());
+                            }else if (args.length == 2 && args[1].equals("info")){
+                                player.sendMessage(GuildHelpCommand.info());
+                            }else if (args.length == 2 && args[1].equals("versionInfo")){
+                                player.sendMessage(GuildHelpCommand.versionInfo());
                             } else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
@@ -203,11 +219,7 @@ public class GuildCommand implements TabExecutor {
                                     GuildInfoCommand.guildInfoCommandGeneral(player, args[1], "");
                                     break;
                                 } else if (args[2].equals("playerList")) {
-                                    if (GuildTextUtils.isStringInteger(args[3])) {
-                                        GuildInfoCommand.listPlayersOfGuild(player, args[1], "");
-                                    } else {
-                                        player.sendMessage(GuildTextUtils.pageIndexMustBeNumeric);
-                                    }
+                                    GuildInfoCommand.listPlayersOfGuild(player, args[1], "");
                                 }
                             } else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
@@ -262,6 +274,12 @@ public class GuildCommand implements TabExecutor {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
                             break;
+                        case "versionInfo":
+                            if (args.length==1){
+                                player.spigot().sendMessage(GuildVersionInfoCommand.guildVersionInfo());
+                            }else {
+                                player.sendMessage(GuildTextUtils.wrongUsage);
+                            }
                         default:
                             player.sendMessage(GuildTextUtils.wrongUsage);
                             break;
@@ -338,6 +356,7 @@ public class GuildCommand implements TabExecutor {
                 commands.add("deleteInvite");
                 commands.add("kick");
                 commands.add("info");
+                commands.add("versionInfo");
                 Collections.sort(commands);
                 return commands;
             } else {
@@ -402,7 +421,7 @@ public class GuildCommand implements TabExecutor {
                             case 2:
                                 if (Utils.isPlayerInGuild(player)) {
                                     if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild( player), player)) {
-                                        return Utils.getAllPlayerGuildInvitesForAGuild(Utils.getPlayerGuild(player));
+                                        return Utils.getAllPlayerNamesOfInvitedPlayers(Utils.getPlayerGuild(player));
                                     }
                                 }
                             default:
@@ -411,7 +430,11 @@ public class GuildCommand implements TabExecutor {
                     case "discardInvite":
                         switch (args.length){
                             case 2:
-                                return Utils.getPlayerGuildInvites(player);
+                                ArrayList<String> guildInvites = new ArrayList<>();
+                                for (GuildInviteObject guildInviteObject : Utils.getPlayerGuildInvites(player)){
+                                    guildInvites.add(guildInviteObject.getGuild().getName());
+                                }
+                                return guildInvites;
                             case 3:
                                 ArrayList<String> no_yes = new ArrayList<>();
                                 no_yes.add("no");
@@ -435,9 +458,11 @@ public class GuildCommand implements TabExecutor {
                                 commands.add("deleteInvite");
                                 commands.add("kick");
                                 commands.add("info");
+                                commands.add("versionInfo");
                                 return commands;
+                            default:
+                                return new ArrayList<>();
                         }
-                        break;
                     case "invite":
                         switch (args.length){
                             case 2:
@@ -482,7 +507,10 @@ public class GuildCommand implements TabExecutor {
                     case "join":
                         switch (args.length){
                             case 2:
-                                ArrayList<String> guildInvites = new ArrayList<>(Utils.getPlayerGuildInvites((Player) player));
+                                ArrayList<String> guildInvites = new ArrayList<>();
+                                for (GuildInviteObject guildInviteObject : Utils.getPlayerGuildInvites(player)){
+                                    guildInvites.add(guildInviteObject.getGuild().getName());
+                                }
                                 return guildInvites;
                             default:
                                 return new ArrayList<>();
@@ -492,7 +520,7 @@ public class GuildCommand implements TabExecutor {
                             case 2:
                                 if (Utils.isPlayerInGuild(player)) {
                                     if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild(player),player)) {
-                                        ArrayList<String> guildInvites = Utils.getAllPlayerGuildInvitesForAGuild(Utils.getPlayerGuild(player));
+                                        ArrayList<String> guildInvites = Utils.getAllPlayerNamesOfInvitedPlayers(Utils.getPlayerGuild(player));
                                         return guildInvites;
                                     } else {
                                         return new ArrayList<>();
@@ -538,7 +566,6 @@ public class GuildCommand implements TabExecutor {
                             default:
                                 return new ArrayList<>();
                         }
-
                     default:
                         return new ArrayList<>();
                 }
