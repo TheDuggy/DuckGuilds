@@ -15,6 +15,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds;
 
+import at.theduggy.duckguilds.commands.GuildCommand;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
@@ -41,7 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -90,11 +90,13 @@ public static Path loggingFolder;
         mainFileConfiguration = this.getConfig();
         if (GuildConfigHandler.getStorageType()!=null) {
             mainStorageHandler = new StorageHandler(GuildConfigHandler.getStorageType());
+/*
             try {
                 FakePlayerData.initFakePlayer();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+ */
             try {
                 guildRootFolder = GuildConfigHandler.getGuildRootFolder();
             } catch (FileNotFoundException e) {

@@ -41,7 +41,7 @@ public class GuildHelpCommand {
         StringBuilder msg = new StringBuilder();
         String nl = "\n" + " ".repeat(3);
         msg.append(GuildTextUtils.prefix + ChatColor.GREEN + "Help for command" + ChatColor.YELLOW + " 'delete'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(32));
-        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild delete <name> <conformation>'" + nl);
+        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild delete <name> <conformation(yes/no)>'" + nl);
         msg.append(ChatColor.GRAY + "This command deletes your guild! You have to confirm it, so" + nl + "you don't delete your guild by mistake. In order to delete it," + nl + "you have to be the head of that guild.");
         return msg.toString();
     }
@@ -105,7 +105,7 @@ public class GuildHelpCommand {
         StringBuilder msg = new StringBuilder();
         String nl = "\n" + " ".repeat(3);
         msg.append(GuildTextUtils.prefix + ChatColor.GREEN + "Help for command" + ChatColor.YELLOW + " 'kick'" + ChatColor.GREEN + ":\n" + ChatColor.WHITE + "-".repeat(30));
-        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild kick <player>'" + nl);
+        msg.append(ChatColor.GOLD + "\n→ " + ChatColor.GRAY + "Usage:" + ChatColor.YELLOW + " '/guild kick <player> <conformation(yes/no)>'" + nl);
         msg.append(ChatColor.GRAY + "With this command, you can kick a player from your guild." + nl + "This only works if you are the head!");
         return msg.toString();
     }

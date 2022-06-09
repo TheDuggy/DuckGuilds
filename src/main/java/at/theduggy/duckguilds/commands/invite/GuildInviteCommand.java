@@ -51,7 +51,7 @@ public class GuildInviteCommand {
                                 if (!allInvites.containsKey(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId())) {
                                     guildObject.addInvite(new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId()));
                                     invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.GREEN + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!\n"), new TextComponent(" ".repeat(15) + ChatColor.GRAY + "-".repeat(5)), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName), new TextComponent(ChatColor.GRAY + "-".repeat(5)));
-                                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");
+                                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.GREEN + " to your guild!");
                                 } else {
                                     sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");
                                 }

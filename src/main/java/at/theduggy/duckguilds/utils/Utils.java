@@ -101,4 +101,14 @@ public class Utils {
         }
         return null;
     }
+
+    public static ArrayList<String> getAllPlayerNamesOfGuildWithoutHead(String name){
+        ArrayList<String> names = new ArrayList<>();
+        for (UUID player:Main.getGuildCache().get(name).getPlayers()){
+            if (!player.equals(Main.getGuildCache().get(name).getHead())){
+                names.add(Main.getPlayerCache().get(player).getName());
+            }
+        }
+        return names;
+    }
 }

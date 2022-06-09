@@ -13,8 +13,9 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds;
+package at.theduggy.duckguilds.commands;
 
+import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.commands.kick.KickPlayerFromGuild;
 import at.theduggy.duckguilds.commands.creatGuild.GuildCreate;
 import at.theduggy.duckguilds.commands.deletSystem.GuildDelete;
@@ -280,9 +281,6 @@ public class GuildCommand implements TabExecutor {
                             }else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
-                        default:
-                            player.sendMessage(GuildTextUtils.wrongUsage);
-                            break;
                     }
                 } else {
                     player.sendMessage(GuildTextUtils.wrongUsage);
@@ -466,8 +464,8 @@ public class GuildCommand implements TabExecutor {
                     case "invite":
                         switch (args.length){
                             case 2:
-                                ArrayList<String> players = new ArrayList<>(Utils.getPlayersThatArentInAGuild());
-                                return players;
+
+                                return new ArrayList<>(Utils.getPlayersThatArentInAGuild());
                             default:
                                 return new ArrayList<>();
                         }
@@ -520,8 +518,7 @@ public class GuildCommand implements TabExecutor {
                             case 2:
                                 if (Utils.isPlayerInGuild(player)) {
                                     if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild(player),player)) {
-                                        ArrayList<String> guildInvites = Utils.getAllPlayerNamesOfInvitedPlayers(Utils.getPlayerGuild(player));
-                                        return guildInvites;
+                                        return Utils.getAllPlayerNamesOfGuildWithoutHead(Utils.getPlayerGuild(player));
                                     } else {
                                         return new ArrayList<>();
                                     }
