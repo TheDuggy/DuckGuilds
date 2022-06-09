@@ -134,7 +134,6 @@ creationDate,
     public static void listPlayersOfGuild(Player player,String guildName,String page){
         int pageIndex = !page.equals("")?Integer.parseInt(page):1;
         if (pageIndex>0) {
-            System.out.println(Main.getGuildCache().keySet());
             ArrayList<UUID> players = Main.getGuildCache().get(guildName).getPlayers();
             int pageCount = (int) Math.ceil((double) players.size() / 8.0);
             if (pageIndex<=pageCount) {

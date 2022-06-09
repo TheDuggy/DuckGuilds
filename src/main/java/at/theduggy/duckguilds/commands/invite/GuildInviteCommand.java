@@ -48,9 +48,7 @@ public class GuildInviteCommand {
                             if (invitedPlayer != null) {
                                 GuildObject guildObject = Main.getGuildCache().get(guildName);
                                 HashMap<UUID, GuildInviteObject> allInvites = guildObject.getAllInvites();
-                                System.out.println(allInvites);
                                 if (!allInvites.containsKey(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId())) {
-                                    System.out.println("Inivted!");
                                     guildObject.addInvite(new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId()));
                                     invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.GREEN + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!\n"), new TextComponent(" ".repeat(15) + ChatColor.GRAY + "-".repeat(5)), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName), new TextComponent(ChatColor.GRAY + "-".repeat(5)));
                                     sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.RED + " to your guild!");

@@ -111,9 +111,6 @@ public static Path loggingFolder;
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            for (GuildObject g: getGuildCache().values()){
-                System.out.println(g.getAllInvites());
-            }
         }else {
             shutDown("Invalid storage-type!");
         }

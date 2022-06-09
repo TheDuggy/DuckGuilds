@@ -216,7 +216,6 @@ public class StorageHandler {
     public void migrateStorage(StorageType newStorageType) throws SQLException, IOException {
         new Thread(() -> {
             StorageType oldStorageType = this.storageType;
-            System.out.println(Main.getPlayerCache().size());
             try {
             this.storageType = newStorageType;
             try {
@@ -265,7 +264,6 @@ public class StorageHandler {
             Main.log("#".repeat(77), Main.LogLevel.WARNING);
             Main.log("Migration complete! The plugin is now usable with the new storage-type " + newStorageType + "!", Main.LogLevel.WARNING);
             Main.log("#".repeat(77), Main.LogLevel.WARNING);
-            System.out.println(Main.getPlayerCache().size());
         }catch (Exception e){
             this.storageType=oldStorageType;
                 try {

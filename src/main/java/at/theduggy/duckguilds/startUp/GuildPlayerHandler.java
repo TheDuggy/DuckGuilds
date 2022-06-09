@@ -36,7 +36,6 @@ public class GuildPlayerHandler implements Listener {
 
     private static void addPlayerToTeam(Player player) {
         if (!Main.getMainStorage().personalGuildPlayerStorageSectionExists(player.getUniqueId())){
-            System.out.println("Doesn't exist!");
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
             Main.getMainStorage().createPersonalPlayerStorageSection(guildPlayerObject,true);
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);

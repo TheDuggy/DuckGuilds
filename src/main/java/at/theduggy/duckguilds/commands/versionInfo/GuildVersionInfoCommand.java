@@ -29,7 +29,6 @@ public class GuildVersionInfoCommand {
         TextComponent line4 = new TextComponent(line4String,githubLink,new TextComponent(ChatColor.GRAY + ","),spigotLink);
 
         ComponentBuilder msg = new ComponentBuilder(new TextComponent(line1));
-        System.out.println(line1.getText());
         msg.append(line1);
         msg.append(line2);
         msg.append(line3);
