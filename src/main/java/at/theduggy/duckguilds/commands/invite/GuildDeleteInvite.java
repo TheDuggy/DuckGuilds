@@ -26,7 +26,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 
-public class DeleteGuildInvite {
+public class GuildDeleteInvite {
     public static void deleteInvite(Player sender, String playerName) throws IOException, ParseException {
         if (Utils.isPlayerInGuild(sender)){
             if (Utils.getIfPlayerIsHeadOfGuild(Utils.getPlayerGuild(sender), sender)){
@@ -47,7 +47,7 @@ public class DeleteGuildInvite {
                         sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "There are no guild-invites for guild " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + "!");
                     }
                 }else {
-                    sender.sendMessage(GuildTextUtils.playerDoesntExists);
+                    sender.sendMessage(GuildTextUtils.playerNotFound);
                 }
             }else {
                 sender.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);

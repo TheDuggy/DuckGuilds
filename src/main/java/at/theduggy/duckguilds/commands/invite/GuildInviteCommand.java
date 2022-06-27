@@ -16,7 +16,6 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfigHandler;
 import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
@@ -27,12 +26,10 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.parser.ParseException;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -41,29 +38,23 @@ public class GuildInviteCommand {
     public static void guildInviteCommand(Player sender, String playerNameToInvite, String guildName) throws IOException, ParseException {
         if (Utils.guildExists(guildName)) {
             if (Utils.getIfPlayerIsHeadOfGuild(guildName,sender)) {
-                if (Bukkit.getPlayerExact(playerNameToInvite)!=null) {
+                if (Utils.getPlayerByName(playerNameToInvite).isOnline()) {
                     if (!Main.getPlayerCache().get(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId()).getGuild().equals(Utils.getPlayerGuild(sender))) {
-                        if (Bukkit.getPlayerExact(playerNameToInvite) != null) {
-                            Player invitedPlayer = Bukkit.getPlayerExact(playerNameToInvite);
-                            if (invitedPlayer != null) {
-                                GuildObject guildObject = Main.getGuildCache().get(guildName);
-                                HashMap<UUID, GuildInviteObject> allInvites = guildObject.getAllInvites();
-                                if (!allInvites.containsKey(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId())) {
-                                    guildObject.addInvite(new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId()));
-                                    invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.GREEN + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!\n"), new TextComponent(" ".repeat(15) + ChatColor.GRAY + "-".repeat(5)), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName), new TextComponent(ChatColor.GRAY + "-".repeat(5)));
-                                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.GREEN + " to your guild!");
-                                } else {
-                                    sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");
-                                }
-                            } else {
-                                sender.sendMessage(GuildTextUtils.playerIsntOnline);
-                            }
+                        Player invitedPlayer = Bukkit.getPlayerExact(playerNameToInvite);
+                        GuildObject guildObject = Main.getGuildCache().get(guildName);
+                        HashMap<UUID, GuildInviteObject> allInvites = guildObject.getAllInvites();
+                        if (!allInvites.containsKey(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId())) {
+                            guildObject.addInvite(new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId()));
+                            invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.GREEN + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!\n"), new TextComponent(" ".repeat(15) + ChatColor.GRAY + "-".repeat(5)), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName), new TextComponent(ChatColor.GRAY + "-".repeat(5)));
+                            sender.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.GREEN + " to your guild!");
                         } else {
-                            sender.sendMessage(GuildTextUtils.playerDoesntExists);
+                            sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");
                         }
                     } else {
                         sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "That player is already in your guild!");
                     }
+                } else {
+                    sender.sendMessage(GuildTextUtils.playerNotFound);
                 }
             }else {
                 sender.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);

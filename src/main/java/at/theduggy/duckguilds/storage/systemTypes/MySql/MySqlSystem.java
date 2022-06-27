@@ -100,7 +100,7 @@ public class MySqlSystem {
 
     public static void cachePlayers() throws SQLException {
         Main.log("--------------caching players-------------", Main.LogLevel.DEFAULT);
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guildplayers WHERE uuid IS NOT NULL AND name IS NOT NULL");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guildPlayers WHERE uuid IS NOT NULL AND name IS NOT NULL");
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
             try {
@@ -127,13 +127,13 @@ public class MySqlSystem {
     }
 
     public static void deletePersonalPlayerRecord(GuildPlayerObject player) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM guildplayers WHERE uuid=?");
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM guildPlayers WHERE uuid=?");
         preparedStatement.setString(1, player.getUniqueId().toString());
         preparedStatement.execute();
     }
 
     public static void createPersonalPlayerRecord(GuildPlayerObject player) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO guildplayers VALUES (?,?)");
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO guildPlayers VALUES (?,?)");
         preparedStatement.setString(1, player.getUniqueId().toString());
         preparedStatement.setString(2, player.getName());
         preparedStatement.execute();
@@ -174,14 +174,14 @@ public class MySqlSystem {
     }
 
     public static void updatePlayerRecord(GuildPlayerObject newGuildPlayerObject) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE guildplayers SET name=? WHERE uuid=");
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE guildPlayers SET name=? WHERE uuid=");
         preparedStatement.setString(1,newGuildPlayerObject.getName());
         preparedStatement.setString(2, newGuildPlayerObject.getUniqueId().toString());
         preparedStatement.execute();
     }
 
     public static String getPlayerNameFromPlayerRecord(GuildPlayerObject guildPlayerObject) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT name FROM guildplayers WHERE uuid=?");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT name FROM guildPlayers WHERE uuid=?");
         preparedStatement.setString(1, guildPlayerObject.getUniqueId().toString());
         ResultSet resultSet = preparedStatement.executeQuery();
         String name = null;
@@ -218,8 +218,10 @@ public class MySqlSystem {
     public static void deleteGuildTables() throws SQLException {
         PreparedStatement deleteGuildTable = connection.prepareStatement("DROP TABLE guilds");
         deleteGuildTable.execute();
-        PreparedStatement deletePlayerTable = connection.prepareStatement("DROP TABLE guildplayers");
+        Main.log("Deleted guild-data-table!", Main.LogLevel.DEFAULT);
+        PreparedStatement deletePlayerTable = connection.prepareStatement("DROP TABLE guildPlayers");
         deletePlayerTable.execute();
+        Main.log("Deleted guild-player-data-table!", Main.LogLevel.DEFAULT);
     }
 
 }

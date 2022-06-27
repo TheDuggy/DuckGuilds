@@ -13,14 +13,14 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-package at.theduggy.duckguilds.commands;
+package at.theduggy.duckguilds.commands.basCommand;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.commands.kick.KickPlayerFromGuild;
 import at.theduggy.duckguilds.commands.creatGuild.GuildCreate;
 import at.theduggy.duckguilds.commands.deletSystem.GuildDelete;
 import at.theduggy.duckguilds.commands.info.GuildInfoCommand;
-import at.theduggy.duckguilds.commands.invite.DeleteGuildInvite;
+import at.theduggy.duckguilds.commands.invite.GuildDeleteInvite;
 import at.theduggy.duckguilds.commands.invite.GuildInviteCommand;
 import at.theduggy.duckguilds.commands.invite.GuildInviteDiscardCommand;
 import at.theduggy.duckguilds.commands.invite.GuildJoinCommand;
@@ -267,7 +267,7 @@ public class GuildCommand implements TabExecutor {
                         case "deleteInvite":
                             if (args.length == 2) {
                                 try {
-                                    DeleteGuildInvite.deleteInvite(player, args[1]);
+                                    GuildDeleteInvite.deleteInvite(player, args[1]);
                                 } catch (IOException | ParseException e) {
                                     e.printStackTrace();
                                 }

@@ -44,8 +44,11 @@ public class GuildFileSystem {
 
     public static void deleteRootFolders() throws IOException {
         Files.delete(PLAYER_DATA_FOLDER.toPath());
+        Main.log("Deleted player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "!", Main.LogLevel.DEFAULT);
         Files.delete(GUILD_DATA_FOLDER.toPath());
+        Main.log("Deleted guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "!", Main.LogLevel.DEFAULT);
         Files.delete(Main.guildRootFolder.toPath());
+        Main.log("Deleted root-guild-folder " + Main.guildRootFolder.toPath() + "!", Main.LogLevel.DEFAULT);
     }
 
     public static void createPersonalPlayerFile(GuildPlayerObject player) throws IOException {

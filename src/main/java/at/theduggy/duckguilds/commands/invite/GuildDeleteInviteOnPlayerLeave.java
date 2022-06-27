@@ -25,22 +25,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.json.simple.parser.ParseException;
 
-import java.util.ArrayList;
-
-public class DiscardInviteOnPlayerLeave implements Listener {
+public class GuildDeleteInviteOnPlayerLeave implements Listener {
 
     @EventHandler
     public void playerLeaveEvent(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        if (Utils.getPlayerGuildInvites(player).size()!=0){
-            for (GuildInviteObject guildInviteObject:Utils.getPlayerGuildInvites(player)){
-                guildInviteObject.getGuild().getAllInvites().remove(guildInviteObject.getReceiver().getUniqueId());
-                if (Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).isOnline()) {
-                    Bukkit.getPlayerExact(Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + player.getName() + " has left the server and his invite was deleted!");
-                }
+        for (GuildInviteObject guildInviteObject:Utils.getPlayerGuildInvites(player)){
+            guildInviteObject.getGuild().getAllInvites().remove(guildInviteObject.getReceiver().getUniqueId());
+            if (Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).isOnline()) {
+                Bukkit.getPlayerExact(Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + player.getName() + " has left the server and his invite was deleted!");
             }
         }
+
     }
 }

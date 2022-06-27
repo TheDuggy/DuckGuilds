@@ -7,7 +7,3 @@ commands:
     description: The base guild-command
     guild.help:
       description: Get help to all guild-commands!
-  temp:
-    description: wad!
-  guildFakePlayer:
-    description: Guild-Fake-Player!

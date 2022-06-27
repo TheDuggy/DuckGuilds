@@ -40,7 +40,7 @@ public class GuildInviteDiscardCommand {
                 }
                 player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You successfully discarded the invite of " + ChatColor.YELLOW + Main.getPlayerCache().get(guildInvite.getSender().getUniqueId()).getName() + ChatColor.RED + " to " + guildName + "!" );
             }else {
-                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You are not invited to this guild!");
+                player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You are not invited to this guild or you have accepted the invite/it was deleted!");
             }
         }else {
             player.sendMessage(GuildTextUtils.guildDoesntExist);

@@ -22,7 +22,7 @@ public class StorageHandler {
     }
 
 
-    public boolean personalGuildPlayerStorageSectionExists(UUID player) {
+    public boolean personalguildPlayerstorageSectionExists(UUID player) {
         try {
             if (storageType.equals(StorageType.File)){
                 return GuildFileSystem.personalGuildPlayerFileExists(player);
@@ -133,7 +133,7 @@ public class StorageHandler {
                 MySqlSystem.deleteGuildTables();
             }
         }catch (Exception e){
-            Main.log("Failed to delete guild-rootstroage-sections for storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to delete guild-root-storage-sections for storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
     }
 
@@ -228,13 +228,13 @@ public class StorageHandler {
             Main.log("The plugin is not usable until the migration is complete from now on!", Main.LogLevel.WARNING);
             Main.log("#".repeat(69), Main.LogLevel.WARNING);
             Main.log("", Main.LogLevel.WARNING);
-            Main.log("------------recreate guild-sections------------", Main.LogLevel.DEFAULT);
+            Main.log("------------recreate guild-sections------------", Main.LogLevel.WARNING);
             for (GuildObject guild : Main.getGuildCache().values()){
                 createGuildStorageSection(guild);
                 Main.log("Recreated storage-section for guild " + guild.getName() + " in storage-type " + newStorageType + "!", Main.LogLevel.DEFAULT);
 
             }
-            Main.log("------------recreate player-sections------------", Main.LogLevel.DEFAULT);
+            Main.log("------------recreate player-sections------------", Main.LogLevel.WARNING);
             for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
                 createPersonalPlayerStorageSection(guildPlayer,false);
                 Main.log("Recreated " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section in storage-type " + newStorageType + "!", Main.LogLevel.DEFAULT);
@@ -242,17 +242,17 @@ public class StorageHandler {
 
             if (GuildConfigHandler.deleteOldStorageSectionsWhileMigration()) {
                 this.storageType = oldStorageType;
-                Main.log("-----------delete guilds-sections-----------", Main.LogLevel.DEFAULT);
+                Main.log("-----------delete guilds-sections-----------", Main.LogLevel.WARNING);
                 for (GuildObject guild : Main.getGuildCache().values()) {
                     deleteGuildSection(guild, false);
                     Main.log("Deleted storage-section for guild " + guild.getName() + " from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
                 }
-                Main.log("------------delete player-sections------------", Main.LogLevel.DEFAULT);
+                Main.log("------------delete player-sections------------", Main.LogLevel.WARNING);
                 for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
                     deletePlayerStorageSection(guildPlayer);
                     Main.log("Deleted " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
                 }
-                Main.log("------------delete root-sections------------", Main.LogLevel.DEFAULT);
+                Main.log("------------delete root-sections------------", Main.LogLevel.WARNING);
                 deleteRootStorageSection();
                 this.storageType=newStorageType;
             }
@@ -265,6 +265,7 @@ public class StorageHandler {
             Main.log("Migration complete! The plugin is now usable with the new storage-type " + newStorageType + "!", Main.LogLevel.WARNING);
             Main.log("#".repeat(77), Main.LogLevel.WARNING);
         }catch (Exception e){
+                e.printStackTrace();
             this.storageType=oldStorageType;
                 try {
                     loadStorage();
@@ -274,8 +275,8 @@ public class StorageHandler {
                 Main.mainFileConfiguration.set("storageType", oldStorageType.name());
             Main.plugin.saveConfig();
             Main.plugin.reloadConfig();
+            Main.setStorageBusy(false);
             Main.log("Failed to migrate from " + oldStorageType + " to " + newStorageType + "! Using old storage-type " + oldStorageType + "! Caused by: " + e.getClass().getSimpleName() + " (" +e.getMessage() + ")", Main.LogLevel.WARNING);
-            //TODO Fix why plugin is recreating guilds in old file-system!
         }
 
         }).start();
