@@ -27,7 +27,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -35,13 +35,34 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputFile>D:\jaspace\Plugins\Server\1_18_2_Paper\plugins\${project.artifactId}-${project.version}.jar</outputFile>
+                            <outputFile>${mc_server}\plugins\${project.artifactId}-${project.version}.jar</outputFile>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <files>
+                        <file>D:\programme\path\mc_server.properties</file>
+                    </files>
+                    <outputFile/>
+                    <properties/>
+                </configuration>
+            </plugin>
         </plugins>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -49,6 +70,8 @@
             </resource>
         </resources>
     </build>
+
+
 
     <repositories>
         <repository>
@@ -82,5 +105,12 @@
             <artifactId>HikariCP</artifactId>
             <version>5.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+        </dependency>
+
     </dependencies>
 </project>

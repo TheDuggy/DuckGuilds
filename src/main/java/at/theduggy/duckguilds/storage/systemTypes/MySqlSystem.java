@@ -1,4 +1,4 @@
-package at.theduggy.duckguilds.storage.systemTypes.MySql;
+package at.theduggy.duckguilds.storage.systemTypes;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
@@ -62,10 +62,17 @@ public class MySqlSystem {
 
 
     public static void cacheGuilds() throws SQLException {
-       Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
+
        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guilds");
        ResultSet resultSet = preparedStatement.executeQuery();//TODO Add try-catch stuff to mysql
+
+       boolean isFirst = true;
+
        while (resultSet.next()){
+           if (isFirst){
+               Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
+           }
+           isFirst = false;
            String name = resultSet.getString("name");
            try {
                Main.log("Caching " + name + " with storage-type File!", Main.LogLevel.DEFAULT);
@@ -99,10 +106,16 @@ public class MySqlSystem {
     }
 
     public static void cachePlayers() throws SQLException {
-        Main.log("--------------caching players-------------", Main.LogLevel.DEFAULT);
+        boolean isFirst = true;
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guildPlayers WHERE uuid IS NOT NULL AND name IS NOT NULL");
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
+            if (isFirst){
+                Main.log("--------------caching players-------------", Main.LogLevel.DEFAULT);
+            }
+
+            isFirst = false;
+
             try {
                 String name = resultSet.getString("name");
                 GuildPlayerObject guildPlayerObject = new GuildPlayerObject(UUID.fromString(resultSet.getString("uuid")), false, name, "");
@@ -223,5 +236,4 @@ public class MySqlSystem {
         deletePlayerTable.execute();
         Main.log("Deleted guild-player-data-table!", Main.LogLevel.DEFAULT);
     }
-
 }

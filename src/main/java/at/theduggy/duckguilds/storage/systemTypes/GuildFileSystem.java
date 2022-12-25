@@ -1,22 +1,23 @@
 package at.theduggy.duckguilds.storage.systemTypes;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.objects.GuildObject;
-import at.theduggy.duckguilds.objects.GuildPlayerObject;
+import at.theduggy.duckguilds.objects.*;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.ScoreboardHandler;
-import at.theduggy.duckguilds.utils.Utils;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.bukkit.entity.Player;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Scanner;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class GuildFileSystem {
     //TODO Create files if not exists independent
@@ -71,16 +72,18 @@ public class GuildFileSystem {
 
     public static void cacheGuildFiles() {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
-        Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
-        for (File file : guildGuildsFolder.toFile().listFiles()) {
-            if (GuildTextUtils.getFileExtension(file).equals(".json")) {
-                try {
-                    GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
-                    ScoreboardHandler.addGuild(guildObject);
-                    Main.getGuildCache().put(guildObject.getName(), guildObject); // guild indexed to HasMap
-                    Main.log("Caching " + GuildTextUtils.getFileBaseName(file) + " with storage-type File!", Main.LogLevel.DEFAULT);
-                }catch (Exception e){
-                    Main.log("Failed to cache guild-file for guild " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage()+")", Main.LogLevel.WARNING);
+        if (guildGuildsFolder.toFile().listFiles().length>0) {
+            Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
+            for (File file : guildGuildsFolder.toFile().listFiles()) {
+                if (GuildTextUtils.getFileExtension(file).equals(".json")) {
+                    try {
+                        GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
+                        ScoreboardHandler.addGuild(guildObject);
+                        Main.getGuildCache().put(guildObject.getName(), guildObject); // guild indexed to HasMap
+                        Main.log("Caching " + GuildTextUtils.getFileBaseName(file) + " with storage-type File!", Main.LogLevel.DEFAULT);
+                    } catch (Exception e) {
+                        Main.log("Failed to cache guild-file for guild " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                    }
                 }
             }
         }
@@ -142,7 +145,7 @@ public class GuildFileSystem {
             guildPlayerObject.setPlayer(UUID.fromString(GuildTextUtils.getFileBaseName(playerFile)));
             Main.getPlayerCache().put(player, guildPlayerObject);
         }catch (Exception e){
-            Main.log("Failed to cache player " + player + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to cache player " + player + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
 
     }
@@ -208,5 +211,106 @@ public class GuildFileSystem {
         fileWriter.write(Main.getGsonInstance().toJson(guildObject));
         fileWriter.close();
     }
-    
+
+    public static void exportStorage() throws IOException {
+        try {
+            File exportFolder = new File(Main.plugin.getDataFolder() + "/export/");
+            if (!Files.exists(exportFolder.toPath())){
+                Files.createDirectory(exportFolder.toPath());
+            }
+
+            HashMap<String, Integer> files = new HashMap<>();
+
+            for (File f : exportFolder.listFiles()){
+                int number = 0;
+                String filename = f.getName().split("\\.")[1].split("_")[1];
+                System.out.println(filename);
+                String fileNameBase = f.getName().split("\\.")[0] + "." + f.getName().split("\\.")[1];
+                if (fileNameBase.split("_").length > 4){
+                    number = Integer.parseInt(fileNameBase.split("_")[4]);
+                    filename = fileNameBase.split("_")[3];
+                }
+                if (files.containsKey(filename)){
+                    if (number > files.get(filename)){
+                        files.replace(filename, number);
+                    }
+                }else {
+                    files.put(filename, number);
+                }
+            }
+
+            String dateString = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now());
+            String dataFileName = "guild_data_v" + Main.getPlugin(Main.class).getDescription().getVersion() + "_" + dateString;
+            if (files.containsKey(dateString)){
+                dataFileName +=  "_" + (files.get(dateString) + 1);
+                System.out.println(dataFileName);
+            }
+
+            File compressedFile = new File(exportFolder + "/" + dataFileName + ".zip");
+            ZipOutputStream compressedData = new ZipOutputStream(new FileOutputStream(compressedFile));
+            GuildExportObject guildExportObject = new GuildExportObject();
+            for (GuildObject guild:Main.getGuildCache().values()){
+                guildExportObject.addGuild(guild);
+            }
+            for (GuildPlayerObject guildPlayer:Main.getPlayerCache().values()){
+                guildExportObject.addGuildPlayer(guildPlayer);
+            }
+            String dataToExport = Main.getGsonInstance().toJson(guildExportObject);
+            compressedData.putNextEntry(new ZipEntry(dataFileName + ".data"));
+            compressedData.write(dataToExport.getBytes(StandardCharsets.UTF_8));
+            compressedData.closeEntry();
+            compressedData.close();
+            Main.log("Successfully exported " + Main.getPlayerCache().size() + " Player" + (Main.getPlayerCache().size() > 1?"s":"") +" and " + Main.getGuildCache().size() + " Guild" + (Main.getGuildCache().size() > 1?"s":"") + " in file " + compressedFile.getAbsolutePath() + "!", Main.LogLevel.DEFAULT);
+        }catch (Exception e){
+            e.printStackTrace();
+            Main.log("Failed to export storage! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+        }
+    }
+
+
+    public static void importStorage(File path){
+        try {
+            ZipFile zipFile = new ZipFile(path);
+            if (zipFile.size()>1){
+                Main.log("The zip-file " + path + " has more than one entry in it. Failed to import guilds!", Main.LogLevel.WARNING);
+            }
+
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(path));
+            String result = "";
+            ZipEntry zipEntry = null;
+            while ((zipEntry=zis.getNextEntry()) != null){
+                byte[] buffer = new byte[1024];
+                int read = 0;
+                while ((read=zis.read(buffer)) != -1){
+                    result += new String(buffer, StandardCharsets.UTF_8).trim();
+                }
+            }
+            zis.close();
+            result = result.trim();
+            result = result.replaceAll("\n","");
+
+            GuildExportObject guildExportObject = Main.getGsonInstance().fromJson(result, GuildExportObject.class);
+            for ( GuildObject guildObject : guildExportObject.getGuildObjects()){
+                if (!Main.getGuildCache().containsKey(guildObject.getName())){
+                    Main.getMainStorage().createGuildStorageSection(guildObject);
+                }else {
+                    Main.log(guildObject.getName() + " already exist, skipped!", Main.LogLevel.WARNING);
+                }
+
+            }
+
+            for (GuildPlayerObject guildPlayerObjectData: guildExportObject.getGuildPlayers()){
+                if (!Main.getPlayerCache().containsKey(guildPlayerObjectData.getUniqueId())) {
+                    Main.getMainStorage().createPersonalPlayerStorageSection(guildPlayerObjectData, true);
+                }else {
+                    Main.log(guildPlayerObjectData.getUniqueId() + " (" + guildPlayerObjectData.getName() + ") already exist, skipped!", Main.LogLevel.WARNING);
+                }
+            }
+
+            Main.getMainStorage().loadStorage();
+        }catch (Exception e){
+            e.printStackTrace();
+            Main.log("Failed to import guild-export-file " + path + "! Caused by: " +e.getClass().getSimpleName() + "(" +e.getMessage() + ")", Main.LogLevel.WARNING);
+        }
+    }
 }

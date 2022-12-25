@@ -5,8 +5,7 @@ import at.theduggy.duckguilds.config.GuildConfigHandler;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
-import at.theduggy.duckguilds.storage.systemTypes.MySql.MySqlSystem;
-import at.theduggy.duckguilds.utils.GuildTextUtils;
+import at.theduggy.duckguilds.storage.systemTypes.MySqlSystem;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -224,9 +223,8 @@ public class StorageHandler {
                 throw new RuntimeException(e);
             }
             Main.setStorageBusy(true);
-            Main.log("#".repeat(69), Main.LogLevel.WARNING);
+            Main.log("=".repeat(69), Main.LogLevel.WARNING);
             Main.log("The plugin is not usable until the migration is complete from now on!", Main.LogLevel.WARNING);
-            Main.log("#".repeat(69), Main.LogLevel.WARNING);
             Main.log("", Main.LogLevel.WARNING);
             Main.log("------------recreate guild-sections------------", Main.LogLevel.WARNING);
             for (GuildObject guild : Main.getGuildCache().values()){
@@ -261,9 +259,8 @@ public class StorageHandler {
             Main.plugin.reloadConfig();
             Main.log("", Main.LogLevel.WARNING);
             Main.setStorageBusy(false);
-            Main.log("#".repeat(77), Main.LogLevel.WARNING);
             Main.log("Migration complete! The plugin is now usable with the new storage-type " + newStorageType + "!", Main.LogLevel.WARNING);
-            Main.log("#".repeat(77), Main.LogLevel.WARNING);
+            Main.log("=".repeat(77), Main.LogLevel.WARNING);
         }catch (Exception e){
                 e.printStackTrace();
             this.storageType=oldStorageType;
@@ -284,5 +281,20 @@ public class StorageHandler {
 
     public enum StorageType{
         File,MySQL
+    }
+
+    public void exportGuilds(){
+        new Thread(() -> {
+            if (Main.getGuildCache().size()>0&&Main.getPlayerCache().size()>0){
+                try {
+                    GuildFileSystem.exportStorage();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Main.log("Failed to export guild-storage! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                }
+            }else {
+                Main.log("Failed to export guild-storage, because there are no guilds and/or no players in the guild-storage!", Main.LogLevel.WARNING);
+            }
+        }).start();
     }
 }

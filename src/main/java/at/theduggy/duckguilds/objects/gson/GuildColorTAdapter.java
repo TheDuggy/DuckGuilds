@@ -1,5 +1,6 @@
 package at.theduggy.duckguilds.objects.gson;
 
+import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.objects.GuildColor;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -12,7 +13,7 @@ public class GuildColorTAdapter extends TypeAdapter<GuildColor> {
     @Override
     public void write(JsonWriter jsonWriter, GuildColor guildColor) throws IOException {
         jsonWriter.beginObject();
-        jsonWriter.name("color").jsonValue("\"" +guildColor.toString() + "\"");
+        jsonWriter.name("color").jsonValue("\"" + guildColor.toString() + "\"");
         jsonWriter.endObject();
     }
 

@@ -26,7 +26,7 @@ import at.theduggy.duckguilds.objects.gson.GuildColorTAdapter;
 import at.theduggy.duckguilds.objects.gson.GuildMetadataTAdapter;
 import at.theduggy.duckguilds.startUp.GuildPlayerHandler;
 import at.theduggy.duckguilds.storage.StorageHandler;
-import at.theduggy.duckguilds.storage.systemTypes.MySql.MySqlSystem;
+import at.theduggy.duckguilds.storage.systemTypes.MySqlSystem;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

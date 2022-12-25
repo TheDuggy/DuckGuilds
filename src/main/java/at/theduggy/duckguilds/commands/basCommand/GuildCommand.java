@@ -29,6 +29,7 @@ import at.theduggy.duckguilds.commands.list.GuildListCommand;
 import at.theduggy.duckguilds.commands.versionInfo.GuildVersionInfoCommand;
 import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.storage.StorageHandler;
+import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import at.theduggy.duckguilds.commands.help.GuildHelpCommand;
@@ -40,14 +41,17 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.*;
 
 public class GuildCommand implements TabExecutor {
 
-    public static String[] allColorsForColor = {"Blue","White","Aqua","Gold","Green","Red","Yellow"};
-    public static String[] allColorsForColorAndDark = {"Blue","White","Aqua","Gold","Green","Red","Yellow","Dark_Blue","Dark_Purple","Dark_Aqua","Dark_Green","Dark_Red"};
+    public static ArrayList<String> allColorsForColor = new ArrayList<>(Arrays.asList("Blue","White","Aqua","Gold","Green","Red","Yellow"));
+    public static ArrayList<String> allColorsForColorAndDark = new ArrayList<>(Arrays.asList("Blue","White","Aqua","Gold","Green","Red","Yellow","Dark_Blue","Dark_Purple","Dark_Aqua","Dark_Green","Dark_Red"));
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -94,9 +98,9 @@ public class GuildCommand implements TabExecutor {
                                 String tag;
                                 String tagColor;
                                 if (!args[1].equals("")) {
-                                    if (!args[2].equals("") && Arrays.asList(allColorsForColor).contains(args[2])) {
+                                    if (!args[2].equals("") && allColorsForColor.contains(args[2])) {
                                         if (!args[3].equals("")) {
-                                            if (!args[4].equals("") && Arrays.asList(allColorsForColorAndDark).contains(args[4])) {
+                                            if (!args[4].equals("") && allColorsForColorAndDark.contains(args[4])) {
                                                 try {
                                                     name = args[1];
                                                     color = args[2];
@@ -287,42 +291,55 @@ public class GuildCommand implements TabExecutor {
                 }
                 //
             } else {
-                if (args.length == 3) {
-                    if (args[0].equals("storage")) {
+                if (args[0].equals("storage")) {
+                    if (args.length==3){
                         if (args[1].equals("migrate")) {
                             switch (args[2]) {
                                 case "File_To_MySql":
-                                    if (Main.getMainStorage().storageType!= StorageHandler.StorageType.MySQL){
+                                    if (Main.getMainStorage().storageType != StorageHandler.StorageType.MySQL) {
                                         try {
                                             Main.getMainStorage().migrateStorage(StorageHandler.StorageType.MySQL);
                                         } catch (SQLException | IOException e) {
                                             throw new RuntimeException(e);
                                         }
-                                    }else {
+                                    } else {
                                         sender.sendMessage(GuildTextUtils.prefixWithoutColor + "The current storage-type is already MySQL!");
                                     }
                                     break;
-
                                 case "MySql_To_File":
-                                    if (Main.getMainStorage().storageType!= StorageHandler.StorageType.File){
+                                    if (Main.getMainStorage().storageType != StorageHandler.StorageType.File) {
                                         try {
                                             Main.getMainStorage().migrateStorage(StorageHandler.StorageType.File);
                                         } catch (SQLException | IOException e) {
                                             throw new RuntimeException(e);
                                         }
-                                    }else {
+                                    } else {
                                         sender.sendMessage(GuildTextUtils.prefixWithoutColor + "The current storage-type is already File!");
                                     }
                                     break;
                                 default:
                                     sender.sendMessage(GuildTextUtils.wrongUsageConsole);
                             }
-                        } else {
+                        }else if(args[1].equals("import")){
+                            if (Files.exists(Path.of(args[2]))){
+                                File fileToLoad = new File(args[2]);
+                                GuildFileSystem.importStorage(fileToLoad);
+                            }else {
+                                sender.sendMessage(GuildTextUtils.prefixWithoutColor + " The file " + args[2] + " doesn't exist!");
+                            }
+                        }else {
                             sender.sendMessage(GuildTextUtils.wrongUsageConsole);
                         }
-                    } else {
+                    } else if (args.length==2){
+                        if (args[1].equals("export")) {
+                            Main.getMainStorage().exportGuilds();
+                        }else {
+                            sender.sendMessage(GuildTextUtils.wrongUsageConsole);
+                        }
+                    }else {
                         sender.sendMessage(GuildTextUtils.wrongUsageConsole);
                     }
+
                 } else {
                     sender.sendMessage(GuildTextUtils.wrongUsageConsole);
                 }
@@ -575,8 +592,11 @@ public class GuildCommand implements TabExecutor {
                 switch (args[0]){
                     case "storage":
                         switch (args.length){
-                            case 2: return new ArrayList<>(Arrays.asList("migrate"));
-                            case 3: return new ArrayList<>(Arrays.asList("MySql_To_File","File_To_MySql"));
+                            case 2: return new ArrayList<>(Arrays.asList("migrate","export", "import"));
+                            case 3:
+                                if (args[1].equals("migrate")){
+                                    return new ArrayList<>(Arrays.asList("MySql_To_File","File_To_MySql"));
+                                }
                             default:
                                 return new ArrayList<>();
                         }
