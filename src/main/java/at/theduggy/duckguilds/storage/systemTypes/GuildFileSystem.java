@@ -270,33 +270,33 @@ public class GuildFileSystem {
 
     public static void importStorage(File path){
         try {
-            ZipFile zipFile = new ZipFile(path);
-            if (zipFile.size()>1){
+            if (new ZipFile(path).size()>1){
                 Main.log("The zip-file " + path + " has more than one entry in it. Failed to import guilds!", Main.LogLevel.WARNING);
+                return;
             }
 
             ZipInputStream zis = new ZipInputStream(new FileInputStream(path));
-            String result = "";
-            ZipEntry zipEntry = null;
-            while ((zipEntry=zis.getNextEntry()) != null){
-                byte[] buffer = new byte[1024];
-                int read = 0;
-                while ((read=zis.read(buffer)) != -1){
-                    result += new String(buffer, StandardCharsets.UTF_8).trim();
-                }
+            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+            zis.getNextEntry();
+            byte[] buffer = new byte[1024];
+            for (int len; (len = zis.read(buffer)) != -1;){
+                System.out.println(len);
+                bOut.write(buffer, 0, len);
             }
+            zis.closeEntry();
+            bOut.close();
             zis.close();
-            result = result.trim();
-            result = result.replaceAll("\n","");
-
-            GuildExportObject guildExportObject = Main.getGsonInstance().fromJson(result, GuildExportObject.class);
+            String data = bOut.toString(StandardCharsets.UTF_8);
+            data = data.replaceAll("\n", "");
+            System.out.println(data);
+            zis.close();
+            GuildExportObject guildExportObject = Main.getGsonInstance().fromJson(data, GuildExportObject.class);
             for ( GuildObject guildObject : guildExportObject.getGuildObjects()){
                 if (!Main.getGuildCache().containsKey(guildObject.getName())){
                     Main.getMainStorage().createGuildStorageSection(guildObject);
                 }else {
                     Main.log(guildObject.getName() + " already exist, skipped!", Main.LogLevel.WARNING);
                 }
-
             }
 
             for (GuildPlayerObject guildPlayerObjectData: guildExportObject.getGuildPlayers()){
