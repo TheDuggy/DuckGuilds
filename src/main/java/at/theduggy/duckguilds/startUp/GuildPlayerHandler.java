@@ -38,7 +38,7 @@ public class GuildPlayerHandler implements Listener {
         player.setScoreboard(Main.getScoreboard());
         if (!Main.getMainStorage().personalGuildPlayerSectionExists(player.getUniqueId())){
             GuildPlayerObject guildPlayerObject = new GuildPlayerObject(player.getUniqueId(),true,player.getName(),"");
-            Main.getMainStorage().createPersonalPlayerStorageSection(guildPlayerObject,true);
+            Main.getMainStorage().createPersonalPlayerSection(guildPlayerObject,true);
             Main.getPlayerCache().put(player.getUniqueId(), guildPlayerObject);
         }else{
             String oldName = Main.getMainStorage().getPlayerNameFromPlayerSection(Main.getPlayerCache().get(player.getUniqueId()));

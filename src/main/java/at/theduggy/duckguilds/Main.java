@@ -90,23 +90,16 @@ public static Path loggingFolder;
 
         plugin = this;
         mainFileConfiguration = this.getConfig();
+
         if (GuildConfigHandler.getStorageType()!=null) {
-            mainStorageHandler = new StorageHandler(GuildConfigHandler.getStorageType());
-
-            /*
-            try {
-                FakePlayerData.initFakePlayer();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-             */
-
-
             try {
                 guildRootFolder = GuildConfigHandler.getGuildRootFolder();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            mainStorageHandler = new StorageHandler(GuildConfigHandler.getStorageType());
+
+
             scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
             try {
                 commandRegistration();
@@ -121,15 +114,14 @@ public static Path loggingFolder;
         }else {
             shutDown("Invalid storage-type!");
         }
-
     }
     
     @Override
     public void onDisable(){
         this.saveDefaultConfig();
         try {
-            if (GuildConfigHandler.getStorageType()!=null&&GuildConfigHandler.getStorageType().equals(StorageHandler.StorageType.MySQL)&&MySqlSystem.connectionAvailable()){
-                MySqlSystem.close();
+            if (GuildConfigHandler.getStorageType()!=null&&mainStorageHandler.getStorageType() instanceof MySqlSystem&&MySqlSystem.connectionAvailable()){
+                ((MySqlSystem) mainStorageHandler.getStorageType()).close();
             }
         } catch (FileNotFoundException | SQLException e) {
             throw new RuntimeException(e);

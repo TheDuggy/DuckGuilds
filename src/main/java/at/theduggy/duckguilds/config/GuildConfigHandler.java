@@ -64,6 +64,7 @@ public class GuildConfigHandler {
     }
 
     public static File getGuildRootFolder() throws FileNotFoundException {
+
         FileConfiguration f = Main.mainFileConfiguration;
         if (f.getString("guildDirRootPath").equals("default")){
             return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
@@ -72,7 +73,6 @@ public class GuildConfigHandler {
                 return new File(f.getString("guildDirRootPath")+ "/guildStorage");
             }else {
                 return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
-
             }
         }
         return null;
@@ -117,21 +117,20 @@ public class GuildConfigHandler {
         return null;
     }
 
-    public static StorageHandler.StorageType getStorageType(){
+    public static String getStorageType(){
         FileConfiguration fileConfiguration = Main.mainFileConfiguration;
         String storageType = fileConfiguration.getString("storageType");
         switch (storageType) {
             case "File":
-                return StorageHandler.StorageType.File;
             case "MySQL":
-                return StorageHandler.StorageType.MySQL;
+                return storageType;
             default:
                 return null;
         }
     }
 
     public static boolean useFileSystemOnInvalidConnection() throws FileNotFoundException, SQLException {
-        if (getStorageType()== StorageHandler.StorageType.MySQL){
+        if (getStorageType().equals("MySQL")){
             return Main.mainFileConfiguration.getBoolean("useFileSystemOnInvalidConnection");
         }else {
             return false;

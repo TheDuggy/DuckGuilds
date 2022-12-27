@@ -33,7 +33,7 @@ public class GuildFileSystem extends StorageType{
         initFolders();
         cacheGuildFiles();
         cachePlayerFiles();
-        applyGuildsOnPlayers();
+        super.applyGuildsOnPlayers();
     }
 
     @Override

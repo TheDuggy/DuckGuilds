@@ -30,6 +30,7 @@ import at.theduggy.duckguilds.commands.versionInfo.GuildVersionInfoCommand;
 import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.storage.StorageHandler;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
+import at.theduggy.duckguilds.storage.systemTypes.MySqlSystem;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import at.theduggy.duckguilds.commands.help.GuildHelpCommand;
@@ -296,9 +297,9 @@ public class GuildCommand implements TabExecutor {
                         if (args[1].equals("migrate")) {
                             switch (args[2]) {
                                 case "File_To_MySql":
-                                    if (Main.getMainStorage().storageType != StorageHandler.StorageType.MySQL) {
+                                    if (!Main.getMainStorage().getStorageSystemID().equals("MySQL")) {
                                         try {
-                                            Main.getMainStorage().migrateStorage(StorageHandler.StorageType.MySQL);
+                                            Main.getMainStorage().migrateStorage(new MySqlSystem());
                                         } catch (SQLException | IOException e) {
                                             throw new RuntimeException(e);
                                         }
@@ -307,9 +308,9 @@ public class GuildCommand implements TabExecutor {
                                     }
                                     break;
                                 case "MySql_To_File":
-                                    if (Main.getMainStorage().storageType != StorageHandler.StorageType.File) {
+                                    if (!Main.getMainStorage().getStorageSystemID().equals("File")) {
                                         try {
-                                            Main.getMainStorage().migrateStorage(StorageHandler.StorageType.File);
+                                            Main.getMainStorage().migrateStorage(new GuildFileSystem());
                                         } catch (SQLException | IOException e) {
                                             throw new RuntimeException(e);
                                         }
@@ -323,7 +324,7 @@ public class GuildCommand implements TabExecutor {
                         }else if(args[1].equals("import")){
                             if (Files.exists(Path.of(args[2]))){
                                 File fileToLoad = new File(args[2]);
-                                GuildFileSystem.importStorage(fileToLoad);
+                                StorageHandler.importStorage(fileToLoad);
                             }else {
                                 sender.sendMessage(GuildTextUtils.prefixWithoutColor + " The file " + args[2] + " doesn't exist!");
                             }
@@ -332,7 +333,7 @@ public class GuildCommand implements TabExecutor {
                         }
                     } else if (args.length==2){
                         if (args[1].equals("export")) {
-                            Main.getMainStorage().exportGuilds();
+                            StorageHandler.exportStorage();
                         }else {
                             sender.sendMessage(GuildTextUtils.wrongUsageConsole);
                         }

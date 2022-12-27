@@ -27,19 +27,34 @@ import java.util.zip.ZipOutputStream;
 public class StorageHandler {
 
     private StorageType storageType;
-    private ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+    private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
 
-    public StorageHandler(StorageType storageType){
-        this.storageType=storageType;
+    public StorageHandler(String storageSystemID){
+        switch (storageSystemID){
+            case "File":
+                this.storageType = new GuildFileSystem();
+                break;
+
+            case "MySQL":
+                this.storageType = new MySqlSystem();
+                break;
+        }
     }
 
+    public String getStorageSystemID() {
+        return storageType.getStorageSystemID();
+    }
+
+    public StorageType getStorageType() {
+        return storageType;
+    }
 
     public boolean personalGuildPlayerSectionExists(UUID player) {
         try {
             return storageType.personalPlayerSectionExists(player);
         }catch (Exception e){
-            Main.log("Failed to check if player-section exists for player " + player + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to check if player-section exists for player " + player + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
         return false;
     }
@@ -67,7 +82,7 @@ public class StorageHandler {
         try {
             storageType.createGuildSection(guildData);
         }catch (Exception e){
-            Main.log("Failed to create guild-storage-section for guild " + guildData.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to create guild-storage-section for guild " + guildData.getName() + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
     }
 
@@ -78,14 +93,14 @@ public class StorageHandler {
                 try {
                     storageType.deleteGuildSection(guildObject);
                 } catch (Exception e) {
-                    Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                    Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
                 }
             });
         }else {
             try {
                 storageType.deleteGuildSection(guildObject);
             } catch (Exception e) {
-                Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
         }
     }
@@ -95,7 +110,7 @@ public class StorageHandler {
             try {
                 storageType.removePlayerFromGuildSection(player, guild);
             }catch (Exception e){
-                Main.log("Failed to remove player " + player.getUniqueId() + " (" + player.getName() + ") from guild " + guild.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                Main.log("Failed to remove player " + player.getUniqueId() + " (" + player.getName() + ") from guild " + guild.getName() + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
         });
     }
@@ -104,15 +119,15 @@ public class StorageHandler {
         try {
             storageType.deleteRootSection();
         }catch (Exception e){
-            Main.log("Failed to delete guild-root-storage-sections for storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to delete guild-root-storage-sections for storage-type "  + storageType.getStorageSystemID() +"! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
     }
 
     public String getPlayerNameFromPlayerSection(GuildPlayerObject player) {
         try {
-            storageType.getPlayerNameFromPlayerSection(player);
+            return storageType.getPlayerNameFromPlayerSection(player);
         }catch (Exception e){
-            Main.log("Failed to get name from player-name from player-storage-section for player " + player.getUniqueId() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to get name from player-name from player-storage-section for player " + player.getUniqueId() + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
         return null;
     }
@@ -122,7 +137,7 @@ public class StorageHandler {
             try {
                 storageType.updatePlayerSection(guildPlayerObject);
             }catch (Exception e){
-                Main.log("Failed to update player-storage-section for player " + guildPlayerObject.getUniqueId() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " ("  + e.getMessage() + ")", Main.LogLevel.WARNING);
+                Main.log("Failed to update player-storage-section for player " + guildPlayerObject.getUniqueId() + " with storage-type " + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " ("  + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
         });
     }
@@ -134,7 +149,7 @@ public class StorageHandler {
     public void loadStorage() throws SQLException, IOException {
         if (storageType instanceof MySqlSystem){
             if (MySqlSystem.connectionAvailable()){
-                MySqlSystem.init();
+                storageType.load();
             }else if (GuildConfigHandler.useFileSystemOnInvalidConnection()){
                 this.storageType = new GuildFileSystem();
                 storageType.load();
@@ -150,7 +165,7 @@ public class StorageHandler {
         try {
             storageType.deletePlayerSection(playerObject);
         }catch (Exception e){
-            Main.log("Failed to delete " + playerObject.getUniqueId() + "(" + playerObject.getName() + ")'s storage section with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to delete " + playerObject.getUniqueId() + "(" + playerObject.getName() + ")'s storage section with storage-type "  + storageType.getStorageSystemID() +"! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
     }
 
@@ -159,7 +174,7 @@ public class StorageHandler {
             try {
                 storageType.addPlayerToGuildSection(guild, player);
             }catch (Exception e){
-                Main.log("Failed to add player " + player.getUniqueId() + " (" + player.getName() + ") to guild-storage-section for guild " + guild.getName() + " with storage-tye " + storageType +  "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING );
+                Main.log("Failed to add player " + player.getUniqueId() + " (" + player.getName() + ") to guild-storage-section for guild " + guild.getName() + " with storage-tye "  + storageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING );
             }
         });
 
@@ -196,18 +211,18 @@ public class StorageHandler {
                 Main.log("-----------delete guilds-sections-----------", Main.LogLevel.WARNING);
                 for (GuildObject guild : Main.getGuildCache().values()) {
                     deleteGuildSection(guild, false);
-                    Main.log("Deleted storage-section for guild " + guild.getName() + " from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
+                    Main.log("Deleted storage-section for guild " + guild.getName() + " from storage-type "  + oldStorageType.getStorageSystemID() + "!", Main.LogLevel.DEFAULT);
                 }
                 Main.log("------------delete player-sections------------", Main.LogLevel.WARNING);
                 for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
                     deletePlayerSection(guildPlayer);
-                    Main.log("Deleted " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
+                    Main.log("Deleted " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section from storage-type "  + oldStorageType.getStorageSystemID() + "!", Main.LogLevel.DEFAULT);
                 }
                 Main.log("------------delete root-sections------------", Main.LogLevel.WARNING);
                 deleteRootStorageSection();
                 this.storageType=newStorageType;
             }
-            Main.mainFileConfiguration.set("storageType", newStorageType.toString());
+            Main.mainFileConfiguration.set("storageType", newStorageType.getStorageSystemID());
             Main.plugin.saveConfig();
             Main.plugin.reloadConfig();
             Main.log("", Main.LogLevel.WARNING);
@@ -226,13 +241,13 @@ public class StorageHandler {
             Main.plugin.saveConfig();
             Main.plugin.reloadConfig();
             Main.setStorageBusy(false);
-            Main.log("Failed to migrate from " + oldStorageType + " to " + newStorageType + "! Using old storage-type " + oldStorageType + "! Caused by: " + e.getClass().getSimpleName() + " (" +e.getMessage() + ")", Main.LogLevel.WARNING);
+            Main.log("Failed to migrate from "  + oldStorageType.getStorageSystemID() + " to " + newStorageType + "! Using old storage-type "  + oldStorageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" +e.getMessage() + ")", Main.LogLevel.WARNING);
         }
 
         }).start();
     }
 
-    public void exportStorage() {
+    public static void exportStorage() {
         try {
             File exportFolder = new File(Main.plugin.getDataFolder() + "/export/");
             if (!Files.exists(exportFolder.toPath())){
@@ -288,7 +303,7 @@ public class StorageHandler {
     }
 
 
-    public void importStorage(File path){
+    public static void importStorage(File path){
         try {
             if (new ZipFile(path).size()>1){
                 Main.log("The zip-file " + path + " has more than one entry in it. Failed to import guilds!", Main.LogLevel.WARNING);
@@ -308,7 +323,6 @@ public class StorageHandler {
             zis.close();
             String data = bOut.toString(StandardCharsets.UTF_8);
             data = data.replaceAll("\n", "");
-            System.out.println(data);
             zis.close();
             GuildExportObject guildExportObject = Main.getGsonInstance().fromJson(data, GuildExportObject.class);
             for ( GuildObject guildObject : guildExportObject.getGuildObjects()){
