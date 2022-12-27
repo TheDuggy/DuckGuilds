@@ -1,28 +1,32 @@
 package at.theduggy.duckguilds.storage.systemTypes;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfigHandler;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.StorageHandler;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public abstract class StorageType {
 
-    public abstract boolean personalGuildPlayerStorageSectionExists(UUID player);
-    public abstract void createPersonalPlayerStorageSection(GuildPlayerObject player, boolean inNewThread);
-    public abstract void createGuildStorageSection(GuildObject guildData);
-    public abstract void deleteGuildSection(GuildObject guildObject, boolean inNewThread);
-    public abstract void removePlayerFromGuildSection(GuildPlayerObject player, GuildObject guild);
-    public abstract void deleteRootStorageSection();
-    public abstract String getPlayerNameFromPlayerSection(GuildPlayerObject player);
-    public abstract void updatePlayerSection(GuildPlayerObject guildPlayerObject);
-    public abstract void loadStorageWithoutCaching(StorageHandler.StorageType storageType);
-    public abstract void loadStorage();
-    public abstract void deletePlayerStorageSection(GuildPlayerObject playerObject);
-    public abstract void addPlayerToGuildField(GuildObject guild, GuildPlayerObject player);
+    public abstract boolean personalPlayerSectionExists(UUID player);
+    public abstract void createPersonalPlayerSection(GuildPlayerObject player) throws IOException;
+    public abstract void createGuildSection(GuildObject guildData) throws IOException;
+    public abstract void deleteGuildSection(GuildObject guildObject) throws IOException;
+    public abstract void removePlayerFromGuildSection(GuildPlayerObject player, GuildObject guild) throws IOException;
+    public abstract void deleteRootSections() throws IOException;
+    public abstract String getPlayerNameFromPlayerSection(GuildPlayerObject player) throws IOException;
+    public abstract void updatePlayerSection(GuildPlayerObject guildPlayerObject) throws IOException;
+    public abstract void loadWithoutCaching();
+    public abstract void deletePlayerSection(GuildPlayerObject playerObject) throws IOException;
+    public abstract void addPlayerToGuildSection(GuildObject guild, GuildPlayerObject player) throws IOException;
+    public abstract void load() throws IOException;
+    protected void applyGuildsOnPlayers(){
+        for (GuildObject guildObject: Main.getGuildCache().values()){
+            for (UUID uuid:guildObject.getPlayers()){
+                Main.getPlayerCache().get(uuid).setGuild(guildObject.getName());
+            }
+        }
+    }
 }

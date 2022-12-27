@@ -1,7 +1,8 @@
 package at.theduggy.duckguilds.storage.systemTypes;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.objects.*;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import com.google.gson.JsonObject;
@@ -11,39 +12,38 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import java.util.Scanner;
+import java.util.UUID;
 
-public class GuildFileSystem {
-    //TODO Create files if not exists independent
-    public static File PLAYER_DATA_FOLDER = new File(Main.guildRootFolder.getPath() + "/playerData");
-    public static File GUILD_DATA_FOLDER = new File(Main.guildRootFolder.getPath() + "/guilds");
+public class GuildFileSystem extends StorageType{
+    private final File PLAYER_DATA_FOLDER = new File(Main.guildRootFolder.getPath() + "/playerData");
+    private final File GUILD_DATA_FOLDER = new File(Main.guildRootFolder.getPath() + "/guilds");
 
-    public static boolean personalGuildPlayerFileExists(UUID player){
+    @Override
+    public boolean personalPlayerSectionExists(UUID player){
         return Files.exists(Path.of(PLAYER_DATA_FOLDER + "/" + player + ".json"));
     }
 
-    public static void init() throws IOException {
+    @Override
+    public void load() throws IOException {
         initFolders();
         cacheGuildFiles();
-        cachePlayers();
+        cachePlayerFiles();
         applyGuildsOnPlayers();
     }
 
-    public static void initWithoutCaching(){
+    @Override
+    public void loadWithoutCaching() {
         initFolders();
     }
 
-    public static void deletePersonalPlayerFile(GuildPlayerObject player) throws IOException {
+    @Override
+    public void deletePlayerSection(GuildPlayerObject player) throws IOException {
         Files.delete(Path.of(PLAYER_DATA_FOLDER + "/" + player.getUniqueId() + ".json"));
     }
 
-    public static void deleteRootFolders() throws IOException {
+    @Override
+    public void deleteRootSections() throws IOException {
         Files.delete(PLAYER_DATA_FOLDER.toPath());
         Main.log("Deleted player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "!", Main.LogLevel.DEFAULT);
         Files.delete(GUILD_DATA_FOLDER.toPath());
@@ -52,14 +52,16 @@ public class GuildFileSystem {
         Main.log("Deleted root-guild-folder " + Main.guildRootFolder.toPath() + "!", Main.LogLevel.DEFAULT);
     }
 
-    public static void createPersonalPlayerFile(GuildPlayerObject player) throws IOException {
+    @Override
+    public void createPersonalPlayerSection(GuildPlayerObject player) throws IOException {
         Files.createFile(Path.of(PLAYER_DATA_FOLDER + "/"+ player.getUniqueId() + ".json"));
         FileWriter writeJsonData = new FileWriter(PLAYER_DATA_FOLDER + "/" + player.getUniqueId() + ".json");
         writeJsonData.write(Main.getGsonInstance().toJson(player));
         writeJsonData.close();
     }
-    
-    public static void createGuildFile(GuildObject guildObject) throws IOException {
+
+    @Override
+    public void createGuildSection(GuildObject guildObject) throws IOException {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         Path guildFile = Paths.get(guildGuildsFolder + "/" + guildObject.getName() + ".json");
         Files.createFile(guildFile);
@@ -69,8 +71,7 @@ public class GuildFileSystem {
     }
 
 
-
-    public static void cacheGuildFiles() {
+    private void cacheGuildFiles() {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         if (guildGuildsFolder.toFile().listFiles().length>0) {
             Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
@@ -89,21 +90,15 @@ public class GuildFileSystem {
         }
     }
 
-    private static void applyGuildsOnPlayers(){
-        for (GuildObject guildObject:Main.getGuildCache().values()){
-            for (UUID uuid:guildObject.getPlayers()){
-                Main.getPlayerCache().get(uuid).setGuild(guildObject.getName());
-            }
-        }
-    }
-
-    public static void deleteGuildFile(GuildObject guildObject) throws IOException {
+    @Override
+    public void deleteGuildSection(GuildObject guildObject) throws IOException {
         Path guild = Path.of(GUILD_DATA_FOLDER + "/" + guildObject.getName() + ".json");
         Files.delete(guild);
 
     }
 
-    public static void removePlayerFromGuildFile(GuildPlayerObject player, GuildObject guildName) throws IOException {
+    @Override
+    public void removePlayerFromGuildSection(GuildPlayerObject player, GuildObject guildName) throws IOException {
         File guildFile = new File(GUILD_DATA_FOLDER + "/" + guildName.getName() + ".json");
         GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(guildFile), GuildObject.class);
         guildObject.getPlayers().remove(player.getUniqueId());
@@ -112,7 +107,7 @@ public class GuildFileSystem {
         fileWriter.close();
     }
 
-    private static String readPrettyJsonFile(File fileToRead) throws IOException {
+    private String readPrettyJsonFile(File fileToRead) throws IOException {
         StringBuilder rawJsonData = new StringBuilder();
         Scanner getRawJsonData = new Scanner(new FileReader(fileToRead,StandardCharsets.UTF_8));
         while (getRawJsonData.hasNext()){
@@ -122,11 +117,11 @@ public class GuildFileSystem {
         return rawJsonData.toString();
     }
 
-    public static void cachePlayers() throws IOException {
+    private void cachePlayerFiles() throws IOException {
         for (File file:PLAYER_DATA_FOLDER.listFiles()){
             if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
                 try {
-                    cachePlayer(UUID.fromString(GuildTextUtils.getFileBaseName(file)));
+                    cachePlayerFile(UUID.fromString(GuildTextUtils.getFileBaseName(file)));
                 }catch (Exception e){
                     Main.log("Failed to cache player " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
                 }
@@ -135,7 +130,7 @@ public class GuildFileSystem {
         }
     }
 
-    public static void cachePlayer(UUID player) {
+    private void cachePlayerFile(UUID player) {
         try {
             Main.log("Caching " + player+ " with storage-type File!", Main.LogLevel.DEFAULT);
             File playerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
@@ -150,7 +145,7 @@ public class GuildFileSystem {
 
     }
 
-    public static void initFolders()  {
+    private void initFolders()  {
         if (Main.guildRootFolder.exists()){
             if (!GUILD_DATA_FOLDER.exists()){
                 try {
@@ -186,14 +181,15 @@ public class GuildFileSystem {
         }
     }
 
-    public static String getPlayerNameFromPlayerFile(GuildPlayerObject player) throws IOException {
+    @Override
+    public String getPlayerNameFromPlayerSection(GuildPlayerObject player) throws IOException {
         File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + player.getUniqueId() + ".json");
         GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(personalPlayerFile),GuildPlayerObject.class);
         return guildPlayerObject.getName();
-
     }
 
-    public static void updatePlayerFile(GuildPlayerObject guildPlayerObject) throws IOException {
+    @Override
+    public void updatePlayerSection(GuildPlayerObject guildPlayerObject) throws IOException {
         File personalPlayerFile = new File(PLAYER_DATA_FOLDER + "/" + guildPlayerObject.getUniqueId() + ".json");
         guildPlayerObject.setName(guildPlayerObject.getName());
         FileWriter writeNewData = new FileWriter(personalPlayerFile, StandardCharsets.UTF_8);
@@ -203,114 +199,13 @@ public class GuildFileSystem {
         writeNewData.close();
     }
 
-    public static void addPlayerToGuildFile(GuildObject guildObject, GuildPlayerObject guildPlayerObject) throws IOException {
+    @Override
+    public void addPlayerToGuildSection(GuildObject guildObject, GuildPlayerObject guildPlayerObject) throws IOException {
         FileWriter fileWriter = new FileWriter(GUILD_DATA_FOLDER + "/" + guildObject.getName() + ".json", StandardCharsets.UTF_8);
         if (!guildObject.getPlayers().contains(guildPlayerObject.getUniqueId())){
             guildObject.getPlayers().add(guildPlayerObject.getUniqueId());
         }
         fileWriter.write(Main.getGsonInstance().toJson(guildObject));
         fileWriter.close();
-    }
-
-    public static void exportStorage() throws IOException {
-        try {
-            File exportFolder = new File(Main.plugin.getDataFolder() + "/export/");
-            if (!Files.exists(exportFolder.toPath())){
-                Files.createDirectory(exportFolder.toPath());
-            }
-
-            HashMap<String, Integer> files = new HashMap<>();
-
-            for (File f : exportFolder.listFiles()){
-                int number = 0;
-                String filename = f.getName().split("\\.")[1].split("_")[1];
-                System.out.println(filename);
-                String fileNameBase = f.getName().split("\\.")[0] + "." + f.getName().split("\\.")[1];
-                if (fileNameBase.split("_").length > 4){
-                    number = Integer.parseInt(fileNameBase.split("_")[4]);
-                    filename = fileNameBase.split("_")[3];
-                }
-                if (files.containsKey(filename)){
-                    if (number > files.get(filename)){
-                        files.replace(filename, number);
-                    }
-                }else {
-                    files.put(filename, number);
-                }
-            }
-
-            String dateString = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now());
-            String dataFileName = "guild_data_v" + Main.getPlugin(Main.class).getDescription().getVersion() + "_" + dateString;
-            if (files.containsKey(dateString)){
-                dataFileName +=  "_" + (files.get(dateString) + 1);
-                System.out.println(dataFileName);
-            }
-
-            File compressedFile = new File(exportFolder + "/" + dataFileName + ".zip");
-            ZipOutputStream compressedData = new ZipOutputStream(new FileOutputStream(compressedFile));
-            GuildExportObject guildExportObject = new GuildExportObject();
-            for (GuildObject guild:Main.getGuildCache().values()){
-                guildExportObject.addGuild(guild);
-            }
-            for (GuildPlayerObject guildPlayer:Main.getPlayerCache().values()){
-                guildExportObject.addGuildPlayer(guildPlayer);
-            }
-            String dataToExport = Main.getGsonInstance().toJson(guildExportObject);
-            compressedData.putNextEntry(new ZipEntry(dataFileName + ".data"));
-            compressedData.write(dataToExport.getBytes(StandardCharsets.UTF_8));
-            compressedData.closeEntry();
-            compressedData.close();
-            Main.log("Successfully exported " + Main.getPlayerCache().size() + " Player" + (Main.getPlayerCache().size() > 1?"s":"") +" and " + Main.getGuildCache().size() + " Guild" + (Main.getGuildCache().size() > 1?"s":"") + " in file " + compressedFile.getAbsolutePath() + "!", Main.LogLevel.DEFAULT);
-        }catch (Exception e){
-            e.printStackTrace();
-            Main.log("Failed to export storage! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
-        }
-    }
-
-
-    public static void importStorage(File path){
-        try {
-            if (new ZipFile(path).size()>1){
-                Main.log("The zip-file " + path + " has more than one entry in it. Failed to import guilds!", Main.LogLevel.WARNING);
-                return;
-            }
-
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(path));
-            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            zis.getNextEntry();
-            byte[] buffer = new byte[1024];
-            for (int len; (len = zis.read(buffer)) != -1;){
-                System.out.println(len);
-                bOut.write(buffer, 0, len);
-            }
-            zis.closeEntry();
-            bOut.close();
-            zis.close();
-            String data = bOut.toString(StandardCharsets.UTF_8);
-            data = data.replaceAll("\n", "");
-            System.out.println(data);
-            zis.close();
-            GuildExportObject guildExportObject = Main.getGsonInstance().fromJson(data, GuildExportObject.class);
-            for ( GuildObject guildObject : guildExportObject.getGuildObjects()){
-                if (!Main.getGuildCache().containsKey(guildObject.getName())){
-                    Main.getMainStorage().createGuildStorageSection(guildObject);
-                }else {
-                    Main.log(guildObject.getName() + " already exist, skipped!", Main.LogLevel.WARNING);
-                }
-            }
-
-            for (GuildPlayerObject guildPlayerObjectData: guildExportObject.getGuildPlayers()){
-                if (!Main.getPlayerCache().containsKey(guildPlayerObjectData.getUniqueId())) {
-                    Main.getMainStorage().createPersonalPlayerStorageSection(guildPlayerObjectData, true);
-                }else {
-                    Main.log(guildPlayerObjectData.getUniqueId() + " (" + guildPlayerObjectData.getName() + ") already exist, skipped!", Main.LogLevel.WARNING);
-                }
-            }
-
-            Main.getMainStorage().loadStorage();
-        }catch (Exception e){
-            e.printStackTrace();
-            Main.log("Failed to import guild-export-file " + path + "! Caused by: " +e.getClass().getSimpleName() + "(" +e.getMessage() + ")", Main.LogLevel.WARNING);
-        }
     }
 }
