@@ -96,7 +96,7 @@ import java.util.UUID;
         guildObject.setName(name);
         guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now(), Main.getPlayerCache().get(player.getUniqueId()).getName()));
         //TODO Make a detailed option to save stuff like creation-time!
-        Main.getMainStorage().createGuildStorageSection(guildObject);
+        Main.getMainStorage().createGuildSection(guildObject);
         Main.getGuildCache().put(name, guildObject);
         reCachePlayer(name, player);
         guild.addEntry(player.getName());

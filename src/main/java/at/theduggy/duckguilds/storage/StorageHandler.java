@@ -2,82 +2,70 @@ package at.theduggy.duckguilds.storage;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.objects.GuildExportObject;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.storage.systemTypes.GuildFileSystem;
 import at.theduggy.duckguilds.storage.systemTypes.MySqlSystem;
+import at.theduggy.duckguilds.storage.systemTypes.StorageType;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class StorageHandler {
 
-    public StorageType storageType;
+    private StorageType storageType;
+    private ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
 
     public StorageHandler(StorageType storageType){
         this.storageType=storageType;
     }
 
 
-    public boolean personalguildPlayerstorageSectionExists(UUID player) {
+    public boolean personalGuildPlayerSectionExists(UUID player) {
         try {
-            if (storageType.equals(StorageType.File)){
-                return GuildFileSystem.personalGuildPlayerFileExists(player);
-            }else if(storageType.equals(StorageType.MySQL)){
-                return MySqlSystem.personalPlayerTableExists(player);
-            }
+            return storageType.personalPlayerSectionExists(player);
         }catch (Exception e){
             Main.log("Failed to check if player-section exists for player " + player + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
         return false;
     }
 
-    public void createPersonalPlayerStorageSection(GuildPlayerObject player, boolean inNewThread) {
-
+    public void createPersonalPlayerSection(GuildPlayerObject player, boolean inNewThread) {
         if (inNewThread){
-            new Thread(() -> {
-                if (storageType==StorageType.File){
-                    try {
-                        GuildFileSystem.createPersonalPlayerFile(player);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }else if (storageType == StorageType.MySQL){
-                    try {
-                        MySqlSystem.createPersonalPlayerRecord(player);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
+            threadPool.submit(() -> {
+                try {
+                    storageType.createPersonalPlayerSection(player);
+                } catch (Exception e) {
+                    Main.log("Failed to create Player section " + player.getUniqueId().toString() + " (" + player.getName() + ")! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
                 }
-
-            }).start();
+            });
         }else {
-            if (storageType==StorageType.File){
-                try {
-                    GuildFileSystem.createPersonalPlayerFile(player);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }else if (storageType == StorageType.MySQL){
-                try {
-                    MySqlSystem.createPersonalPlayerRecord(player);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+            try {
+                storageType.createPersonalPlayerSection(player);
+            } catch (Exception e) {
+                Main.log("Failed to create Player section " + player.getUniqueId().toString() + " (" + player.getName() + ")! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
         }
     }
 
 
-    public void createGuildStorageSection(GuildObject guildData) {
+    public void createGuildSection(GuildObject guildData) {
         try {
-            if (storageType.equals(StorageType.File)){
-                GuildFileSystem.createGuildFile(guildData);
-            }if (storageType.equals(StorageType.MySQL)){
-                MySqlSystem.createGuildRecord(guildData);
-            }
+            storageType.createGuildSection(guildData);
         }catch (Exception e){
             Main.log("Failed to create guild-storage-section for guild " + guildData.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
@@ -86,24 +74,16 @@ public class StorageHandler {
 
     public void deleteGuildSection(GuildObject guildObject, boolean inNewThread) {
         if (inNewThread) {
-            new Thread(() -> {
+            threadPool.submit(() -> {
                 try {
-                    if (storageType.equals(StorageType.File)) {
-                        GuildFileSystem.deleteGuildFile(guildObject);
-                    } else if (storageType.equals(StorageType.MySQL)) {
-                        MySqlSystem.deleteGuildRecord(guildObject);
-                    }
+                    storageType.deleteGuildSection(guildObject);
                 } catch (Exception e) {
                     Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
                 }
-            }).start();
+            });
         }else {
             try {
-                if (storageType.equals(StorageType.File)) {
-                    GuildFileSystem.deleteGuildFile(guildObject);
-                } else if (storageType.equals(StorageType.MySQL)) {
-                    MySqlSystem.deleteGuildRecord(guildObject);
-                }
+                storageType.deleteGuildSection(guildObject);
             } catch (Exception e) {
                 Main.log("Failed to delete guild-storage-section for guild " + guildObject.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
@@ -111,26 +91,18 @@ public class StorageHandler {
     }
 
     public void removePlayerFromGuildSection(GuildPlayerObject player, GuildObject guild) {
-        new Thread(() -> {
+        threadPool.submit(() -> {
             try {
-                if (storageType.equals(StorageType.File)){
-                    GuildFileSystem.removePlayerFromGuildFile(player, guild);
-                }else if (storageType.equals(StorageType.MySQL)){
-                    MySqlSystem.removePlayerFromGuildRecord(player,guild);
-                }
+                storageType.removePlayerFromGuildSection(player, guild);
             }catch (Exception e){
                 Main.log("Failed to remove player " + player.getUniqueId() + " (" + player.getName() + ") from guild " + guild.getName() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
-        }).start();
+        });
     }
 
     public void deleteRootStorageSection(){
         try {
-            if (storageType==StorageType.File){
-                GuildFileSystem.deleteRootFolders();
-            }else if (storageType==StorageType.MySQL){
-                MySqlSystem.deleteGuildTables();
-            }
+            storageType.deleteRootSection();
         }catch (Exception e){
             Main.log("Failed to delete guild-root-storage-sections for storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
@@ -138,11 +110,7 @@ public class StorageHandler {
 
     public String getPlayerNameFromPlayerSection(GuildPlayerObject player) {
         try {
-            if (storageType.equals(StorageType.File)){
-                return GuildFileSystem.getPlayerNameFromPlayerFile(player);
-            }else if (storageType.equals(StorageType.MySQL)){
-                return MySqlSystem.getPlayerNameFromPlayerRecord(player);
-            }
+            storageType.getPlayerNameFromPlayerSection(player);
         }catch (Exception e){
             Main.log("Failed to get name from player-name from player-storage-section for player " + player.getUniqueId() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
@@ -150,65 +118,50 @@ public class StorageHandler {
     }
 
     public void updatePlayerSection(GuildPlayerObject guildPlayerObject) {
-        new Thread(() -> {
+        threadPool.submit(() -> {
             try {
-                if (storageType.equals(StorageType.File)){
-                    GuildFileSystem.updatePlayerFile(guildPlayerObject);
-                }else if (storageType.equals(StorageType.MySQL)){
-                    MySqlSystem.updatePlayerRecord(guildPlayerObject);
-                }
+                storageType.updatePlayerSection(guildPlayerObject);
             }catch (Exception e){
                 Main.log("Failed to update player-storage-section for player " + guildPlayerObject.getUniqueId() + " with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " ("  + e.getMessage() + ")", Main.LogLevel.WARNING);
             }
-        }).start();
+        });
     }
 
-    public void loadStorageWithoutCaching(StorageType storageType) throws SQLException, FileNotFoundException {
-        if (storageType==StorageType.File){
-            GuildFileSystem.initWithoutCaching();
-        }else if (storageType==StorageType.MySQL){
-            MySqlSystem.initWithoutCache();
-        }
+    public void loadStorageWithoutCaching() throws SQLException, FileNotFoundException {
+        storageType.loadWithoutCaching();
     }
 
     public void loadStorage() throws SQLException, IOException {
-        if (storageType.equals(StorageType.File)){
-            GuildFileSystem.init();
-        }else if (storageType.equals(StorageType.MySQL)){
+        if (storageType instanceof MySqlSystem){
             if (MySqlSystem.connectionAvailable()){
                 MySqlSystem.init();
             }else if (GuildConfigHandler.useFileSystemOnInvalidConnection()){
-                GuildFileSystem.init();
+                this.storageType = new GuildFileSystem();
+                storageType.load();
             }else {
                 Main.shutDown("Failed to connect to " + GuildConfigHandler.getDataBase().getJdbcUrl() + "!");
             }
+        }else {
+            storageType.load();
         }
     }
 
-    public void deletePlayerStorageSection(GuildPlayerObject playerObject){
+    public void deletePlayerSection(GuildPlayerObject playerObject){
         try {
-            if (storageType==StorageType.File){
-                GuildFileSystem.deletePersonalPlayerFile(playerObject);
-            }else if (storageType.equals(StorageType.MySQL)){
-                MySqlSystem.deletePersonalPlayerRecord(playerObject);
-            }
+            storageType.deletePlayerSection(playerObject);
         }catch (Exception e){
             Main.log("Failed to delete " + playerObject.getUniqueId() + "(" + playerObject.getName() + ")'s storage section with storage-type " + storageType + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
         }
     }
 
-    public void addPlayerToGuildField(GuildObject guild, GuildPlayerObject player) {
-        new Thread(() -> {
+    public void addPlayerToGuildSection(GuildObject guild, GuildPlayerObject player) {
+        threadPool.submit(() -> {
             try {
-                if (storageType.equals(StorageType.File)){
-                    GuildFileSystem.addPlayerToGuildFile(guild,player);
-                }else if (storageType.equals(StorageType.MySQL)){
-                    MySqlSystem.addPlayerToGuildRecord(guild,player);
-                }
+                storageType.addPlayerToGuildSection(guild, player);
             }catch (Exception e){
                 Main.log("Failed to add player " + player.getUniqueId() + " (" + player.getName() + ") to guild-storage-section for guild " + guild.getName() + " with storage-tye " + storageType +  "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING );
             }
-        }).start();
+        });
 
     }
 
@@ -218,7 +171,7 @@ public class StorageHandler {
             try {
             this.storageType = newStorageType;
             try {
-                loadStorageWithoutCaching(newStorageType);
+                loadStorageWithoutCaching();
             } catch (SQLException | FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -228,13 +181,13 @@ public class StorageHandler {
             Main.log("", Main.LogLevel.WARNING);
             Main.log("------------recreate guild-sections------------", Main.LogLevel.WARNING);
             for (GuildObject guild : Main.getGuildCache().values()){
-                createGuildStorageSection(guild);
+                createGuildSection(guild);
                 Main.log("Recreated storage-section for guild " + guild.getName() + " in storage-type " + newStorageType + "!", Main.LogLevel.DEFAULT);
 
             }
             Main.log("------------recreate player-sections------------", Main.LogLevel.WARNING);
             for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
-                createPersonalPlayerStorageSection(guildPlayer,false);
+                createPersonalPlayerSection(guildPlayer,false);
                 Main.log("Recreated " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section in storage-type " + newStorageType + "!", Main.LogLevel.DEFAULT);
             }
 
@@ -247,7 +200,7 @@ public class StorageHandler {
                 }
                 Main.log("------------delete player-sections------------", Main.LogLevel.WARNING);
                 for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
-                    deletePlayerStorageSection(guildPlayer);
+                    deletePlayerSection(guildPlayer);
                     Main.log("Deleted " + guildPlayer.getUniqueId() + "(" + guildPlayer.getName() + ")'s storage-section from storage-type " + oldStorageType + "!", Main.LogLevel.DEFAULT);
                 }
                 Main.log("------------delete root-sections------------", Main.LogLevel.WARNING);
@@ -269,7 +222,7 @@ public class StorageHandler {
                 } catch (SQLException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
-                Main.mainFileConfiguration.set("storageType", oldStorageType.name());
+                Main.mainFileConfiguration.set("storageType", oldStorageType.getStorageSystemID());
             Main.plugin.saveConfig();
             Main.plugin.reloadConfig();
             Main.setStorageBusy(false);
@@ -279,22 +232,105 @@ public class StorageHandler {
         }).start();
     }
 
-    public enum StorageType{
-        File,MySQL
+    public void exportStorage() {
+        try {
+            File exportFolder = new File(Main.plugin.getDataFolder() + "/export/");
+            if (!Files.exists(exportFolder.toPath())){
+                Files.createDirectory(exportFolder.toPath());
+            }
+
+            HashMap<String, Integer> files = new HashMap<>();
+
+            for (File f : exportFolder.listFiles()){
+                int number = 0;
+                String filename = f.getName().split("\\.")[1].split("_")[1];
+                System.out.println(filename);
+                String fileNameBase = f.getName().split("\\.")[0] + "." + f.getName().split("\\.")[1];
+                if (fileNameBase.split("_").length > 4){
+                    number = Integer.parseInt(fileNameBase.split("_")[4]);
+                    filename = fileNameBase.split("_")[3];
+                }
+                if (files.containsKey(filename)){
+                    if (number > files.get(filename)){
+                        files.replace(filename, number);
+                    }
+                }else {
+                    files.put(filename, number);
+                }
+            }
+
+            String dateString = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now());
+            String dataFileName = "guild_data_v" + Main.getPlugin(Main.class).getDescription().getVersion() + "_" + dateString;
+            if (files.containsKey(dateString)){
+                dataFileName +=  "_" + (files.get(dateString) + 1);
+                System.out.println(dataFileName);
+            }
+
+            File compressedFile = new File(exportFolder + "/" + dataFileName + ".zip");
+            ZipOutputStream compressedData = new ZipOutputStream(new FileOutputStream(compressedFile));
+            GuildExportObject guildExportObject = new GuildExportObject();
+            for (GuildObject guild:Main.getGuildCache().values()){
+                guildExportObject.addGuild(guild);
+            }
+            for (GuildPlayerObject guildPlayer:Main.getPlayerCache().values()){
+                guildExportObject.addGuildPlayer(guildPlayer);
+            }
+            String dataToExport = Main.getGsonInstance().toJson(guildExportObject);
+            compressedData.putNextEntry(new ZipEntry(dataFileName + ".data"));
+            compressedData.write(dataToExport.getBytes(StandardCharsets.UTF_8));
+            compressedData.closeEntry();
+            compressedData.close();
+            Main.log("Successfully exported " + Main.getPlayerCache().size() + " Player" + (Main.getPlayerCache().size() > 1?"s":"") +" and " + Main.getGuildCache().size() + " Guild" + (Main.getGuildCache().size() > 1?"s":"") + " in file " + compressedFile.getAbsolutePath() + "!", Main.LogLevel.DEFAULT);
+        }catch (Exception e){
+            e.printStackTrace();
+            Main.log("Failed to export storage! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+        }
     }
 
-    public void exportGuilds(){
-        new Thread(() -> {
-            if (Main.getGuildCache().size()>0&&Main.getPlayerCache().size()>0){
-                try {
-                    GuildFileSystem.exportStorage();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Main.log("Failed to export guild-storage! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
-                }
-            }else {
-                Main.log("Failed to export guild-storage, because there are no guilds and/or no players in the guild-storage!", Main.LogLevel.WARNING);
+
+    public void importStorage(File path){
+        try {
+            if (new ZipFile(path).size()>1){
+                Main.log("The zip-file " + path + " has more than one entry in it. Failed to import guilds!", Main.LogLevel.WARNING);
+                return;
             }
-        }).start();
+
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(path));
+            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+            zis.getNextEntry();
+            byte[] buffer = new byte[1024];
+            for (int len; (len = zis.read(buffer)) != -1;){
+                System.out.println(len);
+                bOut.write(buffer, 0, len);
+            }
+            zis.closeEntry();
+            bOut.close();
+            zis.close();
+            String data = bOut.toString(StandardCharsets.UTF_8);
+            data = data.replaceAll("\n", "");
+            System.out.println(data);
+            zis.close();
+            GuildExportObject guildExportObject = Main.getGsonInstance().fromJson(data, GuildExportObject.class);
+            for ( GuildObject guildObject : guildExportObject.getGuildObjects()){
+                if (!Main.getGuildCache().containsKey(guildObject.getName())){
+                    Main.getMainStorage().createGuildSection(guildObject);
+                }else {
+                    Main.log(guildObject.getName() + " already exist, skipped!", Main.LogLevel.WARNING);
+                }
+            }
+
+            for (GuildPlayerObject guildPlayerObjectData: guildExportObject.getGuildPlayers()){
+                if (!Main.getPlayerCache().containsKey(guildPlayerObjectData.getUniqueId())) {
+                    Main.getMainStorage().createPersonalPlayerSection(guildPlayerObjectData, true);
+                }else {
+                    Main.log(guildPlayerObjectData.getUniqueId() + " (" + guildPlayerObjectData.getName() + ") already exist, skipped!", Main.LogLevel.WARNING);
+                }
+            }
+
+            Main.getMainStorage().loadStorage();
+        }catch (Exception e){
+            e.printStackTrace();
+            Main.log("Failed to import guild-export-file " + path + "! Caused by: " +e.getClass().getSimpleName() + "(" +e.getMessage() + ")", Main.LogLevel.WARNING);
+        }
     }
 }

@@ -18,14 +18,12 @@ package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.objects.GuildObject;
-import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.ScoreboardHandler;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -40,7 +38,7 @@ public class GuildJoinCommand {
                 GuildObject guildObject = Main.getGuildCache().get(guildName);
                 if (guildObject.getAllInvites().containsKey(player.getUniqueId())){
                     Main.getGuildCache().get(guildName).getPlayers().add(player.getUniqueId());
-                    Main.getMainStorage().addPlayerToGuildField(Main.getGuildCache().get(guildName), Main.getPlayerCache().get(player.getUniqueId()));
+                    Main.getMainStorage().addPlayerToGuildSection(Main.getGuildCache().get(guildName), Main.getPlayerCache().get(player.getUniqueId()));
                     Main.getPlayerCache().get(player.getUniqueId()).setGuild(guildName);
                     ScoreboardHandler.updateScoreboardAddPlayer(player, Main.getGuildCache().get(guildName));
                     player.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You successfully accepted the guild-invite from " + guildObject.getAllInvites().get(player.getUniqueId()).getSender().getName() + " to " + ChatColor.YELLOW + guildName + ChatColor.GREEN + "!");

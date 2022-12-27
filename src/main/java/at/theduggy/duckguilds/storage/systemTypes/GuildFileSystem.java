@@ -19,6 +19,10 @@ public class GuildFileSystem extends StorageType{
     private final File PLAYER_DATA_FOLDER = new File(Main.guildRootFolder.getPath() + "/playerData");
     private final File GUILD_DATA_FOLDER = new File(Main.guildRootFolder.getPath() + "/guilds");
 
+    public GuildFileSystem(){
+        super("File");
+    }
+
     @Override
     public boolean personalPlayerSectionExists(UUID player){
         return Files.exists(Path.of(PLAYER_DATA_FOLDER + "/" + player + ".json"));
@@ -43,7 +47,7 @@ public class GuildFileSystem extends StorageType{
     }
 
     @Override
-    public void deleteRootSections() throws IOException {
+    public void deleteRootSection() throws IOException {
         Files.delete(PLAYER_DATA_FOLDER.toPath());
         Main.log("Deleted player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "!", Main.LogLevel.DEFAULT);
         Files.delete(GUILD_DATA_FOLDER.toPath());
