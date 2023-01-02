@@ -2,6 +2,7 @@ package at.theduggy.duckguilds.storage.systemTypes;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
@@ -30,7 +31,7 @@ public class MySqlSystem extends StorageType{
 
     @Override
     public void load() throws IOException, SQLException {
-        HikariConfig hikariConfig = GuildConfigHandler.getDataBase();
+        HikariConfig hikariConfig = Main.getGuildConfigHandler().getDataBase();
         if (hikariConfig!=null) {
             hikariConfig.setPoolName("GuildConnectionPool");
             dataSource = new HikariDataSource(hikariConfig);
@@ -46,7 +47,7 @@ public class MySqlSystem extends StorageType{
 
     @Override
     public void loadWithoutCaching() throws SQLException, FileNotFoundException {
-        HikariConfig hikariConfig = GuildConfigHandler.getDataBase();
+        HikariConfig hikariConfig = Main.getGuildConfigHandler().getDataBase();
         if (hikariConfig!=null) {
             hikariConfig.setPoolName("GuildConnectionPool");
             dataSource = new HikariDataSource(hikariConfig);
@@ -57,7 +58,7 @@ public class MySqlSystem extends StorageType{
 
     public static boolean connectionAvailable() throws FileNotFoundException, SQLException {
         try {
-            DriverManager.getConnection(GuildConfigHandler.getDataBase().getJdbcUrl(), GuildConfigHandler.getDataBase().getUsername(), GuildConfigHandler.getDataBase().getPassword());
+            DriverManager.getConnection(Main.getGuildConfigHandler().getDataBase().getJdbcUrl(), Main.getGuildConfigHandler().getDataBase().getUsername(), Main.getGuildConfigHandler().getDataBase().getPassword());
             return true;
         }catch (SQLException e){
             return false;
@@ -74,12 +75,11 @@ public class MySqlSystem extends StorageType{
 
        while (resultSet.next()){
            if (isFirst){
-               Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
+               GuildLogger.getLogger().debug("--------------caching guilds--------------");
            }
            isFirst = false;
            String name = resultSet.getString("name");
            try {
-               Main.log("Caching " + name + " with storage-type File!", Main.LogLevel.DEFAULT);
                GuildObject guildObject = new GuildObject();
                guildObject.setGuildColor(new GuildColor(resultSet.getString("color")));
                guildObject.setTagColor(new GuildColor(resultSet.getString("tagColor")));
@@ -96,7 +96,7 @@ public class MySqlSystem extends StorageType{
                ScoreboardHandler.addGuild(guildObject);
                Main.getGuildCache().put(guildObject.getName(), guildObject);
            }catch (Exception e){
-               Main.log("Failed to cache guild-record for guild " + name  + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage()+")", Main.LogLevel.WARNING);
+               GuildLogger.getLogger().debug("Failed to cache guild-record for guild " + name  + " with storage-type MySQL! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage()+")");
            }
        }
     }
@@ -107,7 +107,7 @@ public class MySqlSystem extends StorageType{
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
             if (isFirst){
-                Main.log("--------------caching players-------------", Main.LogLevel.DEFAULT);
+                GuildLogger.getLogger().debug("--------------caching players-------------");
             }
 
             isFirst = false;
@@ -117,7 +117,7 @@ public class MySqlSystem extends StorageType{
                 GuildPlayerObject guildPlayerObject = new GuildPlayerObject(UUID.fromString(resultSet.getString("uuid")), false, name, "");
                 Main.getPlayerCache().put(UUID.fromString(resultSet.getString("uuid")), guildPlayerObject);
             }catch (Exception e){
-                Main.log("Failed to cache player " + resultSet.getString("uuid") + "(" + resultSet.getString("name") + ") ! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                GuildLogger.getLogger().debug("Failed to cache player " + resultSet.getString("uuid") + "(" + resultSet.getString("name") + ") ! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")");
             }
         }
     }
@@ -241,9 +241,9 @@ public class MySqlSystem extends StorageType{
     private void deleteTables() throws SQLException {
         PreparedStatement deleteGuildTable = connection.prepareStatement("DROP TABLE guilds");
         deleteGuildTable.execute();
-        Main.log("Deleted guild-data-table!", Main.LogLevel.DEFAULT);
+        GuildLogger.getLogger().debug("Deleted guild-data-table!");
         PreparedStatement deletePlayerTable = connection.prepareStatement("DROP TABLE guildPlayers");
         deletePlayerTable.execute();
-        Main.log("Deleted guild-player-data-table!", Main.LogLevel.DEFAULT);
+        GuildLogger.getLogger().debug("Deleted guild-player-data-table!");
     }
 }

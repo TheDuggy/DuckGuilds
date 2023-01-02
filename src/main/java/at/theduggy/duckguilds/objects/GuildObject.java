@@ -90,7 +90,7 @@ public class GuildObject {
             public void run() {
                 guildInvites.remove(guildInvite.getReceiver().getUniqueId());
             }
-        }.runTaskLater(Main.getPlugin(Main.class), GuildConfigHandler.getTimeTillInviteIsDeleted());
+        }.runTaskLater(Main.getPlugin(Main.class), Main.getGuildConfigHandler().getTimeTillInviteIsDeleted());
     }
 
     public HashMap<UUID,GuildInviteObject> getAllInvites(){

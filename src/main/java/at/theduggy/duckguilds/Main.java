@@ -15,9 +15,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds;
 
-import at.theduggy.duckguilds.commands.basCommand.GuildCommand;
+import at.theduggy.duckguilds.commands.GuildCommand;
 import at.theduggy.duckguilds.commands.invite.GuildDeleteInviteOnPlayerLeave;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
@@ -30,6 +31,7 @@ import at.theduggy.duckguilds.storage.systemTypes.MySqlSystem;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -40,7 +42,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -56,23 +57,26 @@ private static final HashMap<String, GuildObject> cachedGuilds = new HashMap<>()
 public static File guildRootFolder;
 private static StorageHandler mainStorageHandler;
 private static boolean isStorageBusy = false;
-public static Path loggingFolder;
+private static GuildConfigHandler guildConfigHandler;
 
     @Override
     public void onLoad(){
         this.saveDefaultConfig();
         plugin = this;
-        mainFileConfiguration = this.getConfig();
-        logIgnoreConfig("---------------config values---------------", LogLevel.WARNING);
-        logIgnoreConfig("               ---Server---", LogLevel.WARNING);
-        logIgnoreConfig("inviteDeleteTime: " + GuildConfigHandler.getTimeTillInviteIsDeleted(), LogLevel.WARNING);
-        logIgnoreConfig("maxGuilds: " + GuildConfigHandler.getMaxGuildSize(), LogLevel.WARNING );
-        logIgnoreConfig("logging: " + GuildConfigHandler.getLoggingType(),LogLevel.WARNING);
-        logIgnoreConfig("               ---Storage---", LogLevel.WARNING);
-        logIgnoreConfig("storageType: " + GuildConfigHandler.getStorageType(), LogLevel.WARNING);
-        logIgnoreConfig("useFileSystemOnInvalidConnection: " + mainFileConfiguration.getBoolean("useFileSystemOnInvalidConnection"), LogLevel.WARNING);
-        logIgnoreConfig("guildDirRootPath: " + mainFileConfiguration.getString("guildDirRootPath"), LogLevel.WARNING);
-        logIgnoreConfig("deleteOldStorageSectionsWhileMigration: " + mainFileConfiguration.getBoolean("deleteOldStorageSectionsWhileMigration"),LogLevel.WARNING);
+        guildConfigHandler = new GuildConfigHandler(this.getConfig());
+        GuildLogger.getLogger().debug("---------------config values---------------");
+        GuildLogger.getLogger().debug("               ---Server---");
+        GuildLogger.getLogger().debug("inviteDeleteTime: " + Main.getGuildConfigHandler().getTimeTillInviteIsDeleted());
+        GuildLogger.getLogger().debug("maxGuilds: " + Main.getGuildConfigHandler().getMaxGuildSize());
+        GuildLogger.getLogger().debug("               ---Storage---");
+        GuildLogger.getLogger().debug("storageType: " + Main.getGuildConfigHandler().getStorageType());
+        GuildLogger.getLogger().debug("useFileSystemOnInvalidConnection: " + guildConfigHandler.useFileSystemOnInvalidConnection());
+        GuildLogger.getLogger().debug("guildDirRootPath: " + guildConfigHandler.getGuildRootFolder());
+        GuildLogger.getLogger().debug("deleteOldStorageSectionsWhileMigration: " + guildConfigHandler.deleteOldStorageSectionsWhileMigration());
+        GuildLogger.getLogger().debug("               ---Logging---");
+        GuildLogger.getLogger().debug("logging-path: " + guildConfigHandler.getLoggingPath());
+        GuildLogger.getLogger().debug("logging-level: " + guildConfigHandler.getLogLevel());
+        GuildLogger.getLogger().debug("max-log-file-size: " + guildConfigHandler.getMaxLogFileSize());
 
     }
 
@@ -91,14 +95,9 @@ public static Path loggingFolder;
         plugin = this;
         mainFileConfiguration = this.getConfig();
 
-        if (GuildConfigHandler.getStorageType()!=null) {
-            try {
-                guildRootFolder = GuildConfigHandler.getGuildRootFolder();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            mainStorageHandler = new StorageHandler(GuildConfigHandler.getStorageType());
-
+        if (Main.getGuildConfigHandler().getStorageType()!=null) {
+            guildRootFolder = Main.getGuildConfigHandler().getGuildRootFolder();
+            mainStorageHandler = new StorageHandler(Main.getGuildConfigHandler().getStorageType());
 
             scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
             try {
@@ -119,8 +118,9 @@ public static Path loggingFolder;
     @Override
     public void onDisable(){
         this.saveDefaultConfig();
+        LogManager.shutdown();
         try {
-            if (GuildConfigHandler.getStorageType()!=null&&mainStorageHandler.getStorageType() instanceof MySqlSystem&&MySqlSystem.connectionAvailable()){
+            if (Main.getGuildConfigHandler().getStorageType()!=null&&mainStorageHandler.getStorageType() instanceof MySqlSystem&&MySqlSystem.connectionAvailable()){
                 ((MySqlSystem) mainStorageHandler.getStorageType()).close();
             }
         } catch (FileNotFoundException | SQLException e) {
@@ -168,39 +168,13 @@ public static Path loggingFolder;
     }
 
     public static void shutDown(String shutdownMessage){
-        log(shutdownMessage, LogLevel.WARNING);
-        log("Disabling...", LogLevel.WARNING);
+        GuildLogger.getLogger().error(shutdownMessage);
+        GuildLogger.getLogger().error("Disabling...");
         Bukkit.getPluginManager().disablePlugin(plugin);
     }
 
     public static StorageHandler getMainStorage(){
         return mainStorageHandler;
-    }
-
-    public static void log(String msg, LogLevel logLevel){
-        if (GuildConfigHandler.getLoggingType()==GuildConfigHandler.LoggingType.ALL){
-            switch (logLevel){
-                case WARNING: Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg); break;
-                case DEFAULT: Bukkit.getLogger().info(GuildTextUtils.prefixWithoutColor + msg); break;
-            }
-        }else if (GuildConfigHandler.getLoggingType()== GuildConfigHandler.LoggingType.WARNINGS_ONLY){
-            if (logLevel==LogLevel.WARNING){
-                Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg);
-            }
-        }
-
-    }
-
-    public static void logIgnoreConfig(String msg, LogLevel logLevel){
-        switch (logLevel){
-            case DEFAULT: Bukkit.getLogger().info(GuildTextUtils.prefixWithoutColor + msg);break;
-            case WARNING: Bukkit.getLogger().warning(GuildTextUtils.prefixWithoutColor + msg);break;
-        }
-    }
-
-    public enum LogLevel{
-        DEFAULT,
-        WARNING
     }
 
     public static boolean isIsStorageBusy(){
@@ -211,4 +185,7 @@ public static Path loggingFolder;
         isStorageBusy=busy;
     }
 
+    public static GuildConfigHandler getGuildConfigHandler() {
+        return guildConfigHandler;
+    }
 }

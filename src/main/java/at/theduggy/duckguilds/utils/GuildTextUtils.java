@@ -25,7 +25,7 @@ public class GuildTextUtils {
     playerNotFound = prefix +ChatColor.RED + "That player doesn't exist or isn't online!",
     pageIndexMustBeNumeric = prefix + ChatColor.RED + "The page-index must be numeric!",
     pageIndexCantBe0 = prefix + ChatColor.RED + "The page-index can't be 0!",
-    maxServerGuildsReached = prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + GuildConfigHandler.getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " ! You can't create guilds till a minimum of 1 is deleted!",
+    maxServerGuildsReached = prefix + ChatColor.RED + "The servers max guild-level was reached, which is " + ChatColor.YELLOW + Main.getGuildConfigHandler().getMaxGuildSize() + ChatColor.RED + " and the amount of guilds on this server is " + ChatColor.YELLOW + Main.getGuildCache().size() + ChatColor.RED + " ! You can't create guilds till a minimum of 1 is deleted!",
     forbiddenTag = prefix + "The tag contains forbidden symbols!",
     guildNameToLong = prefix + ChatColor.RED + "The name of a guild can't be longer that 25 characters!";
 
@@ -220,6 +220,10 @@ public class GuildTextUtils {
             }
         }
         return UUID.fromString(uuidString.toString());
+    }
+
+    public static String formatTimeTake(long time){
+        return String.format("%dh%2dmin%2dsec.%d", time / 3_600_000, time % 3_600_000 / 60_000, time % 3_600_000 % 60_000 / 1000, time % 3_600_000 % 60_000);
     }
 
 }

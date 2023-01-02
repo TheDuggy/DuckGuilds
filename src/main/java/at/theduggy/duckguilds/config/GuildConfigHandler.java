@@ -33,14 +33,19 @@ import java.util.*;
 
 public class GuildConfigHandler {
 
-    public static Object getMaxGuildSize(){
-        FileConfiguration f = Main.mainFileConfiguration;
-        if (f.get("maxGuilds")instanceof Boolean){
-            return f.get("maxGuilds");
-        }else if (f.get("maxGuilds") instanceof Integer){
-            if (f.getInt("maxGuilds")>0){
-                if (f.getInt("maxGuilds")<=Main.getGuildCache().size()){
-                    return f.getInt("maxGuilds");
+    private final FileConfiguration conf;
+    
+    public GuildConfigHandler(FileConfiguration conf){
+        this.conf = conf;
+    }
+    
+    public Object getMaxGuildSize(){
+        if (conf.get("maxGuilds")instanceof Boolean){
+            return conf.get("maxGuilds");
+        }else if (conf.get("maxGuilds") instanceof Integer){
+            if (conf.getInt("maxGuilds")>0){
+                if (conf.getInt("maxGuilds")<=Main.getGuildCache().size()){
+                    return conf.getInt("maxGuilds");
                 }else {
                     return false;
                 }
@@ -52,25 +57,22 @@ public class GuildConfigHandler {
         }
     }
 
-    public static long getTimeTillInviteIsDeleted(){
-        FileConfiguration f = Main.mainFileConfiguration;
-        if (f.getLong("inviteDeleteTime")>108000){
+    public long getTimeTillInviteIsDeleted(){
+        if (conf.getLong("inviteDeleteTime")>108000){
             return 18000;
-        }else if (f.getLong("inviteDeleteTime")<6000){
+        }else if (conf.getLong("inviteDeleteTime")<6000){
             return 18000;
         }else {
-            return f.getLong("inviteDeleteTime");
+            return conf.getLong("inviteDeleteTime");
         }
     }
 
-    public static File getGuildRootFolder() throws FileNotFoundException {
-
-        FileConfiguration f = Main.mainFileConfiguration;
-        if (f.getString("guildDirRootPath").equals("default")){
+    public File getGuildRootFolder(){
+        if (conf.getString("guildDirRootPath").equals("default")){
             return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
-        }else if (!f.getString("guildDirRootPath").equals("default")){
-            if (Files.exists(Paths.get(f.getString("guildDirRootPath")))){
-                return new File(f.getString("guildDirRootPath")+ "/guildStorage");
+        }else if (!conf.getString("guildDirRootPath").equals("default")){
+            if (Files.exists(Paths.get(conf.getString("guildDirRootPath")))){
+                return new File(conf.getString("guildDirRootPath")+ "/guildStorage");
             }else {
                 return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
             }
@@ -78,18 +80,27 @@ public class GuildConfigHandler {
         return null;
     }
 
-    public static LoggingType getLoggingType(){
-        FileConfiguration f = Main.mainFileConfiguration;
-        String loggingType =f.getString("logging");
-        switch (loggingType){
-            case "ALL": return LoggingType.ALL;
-            case "NOTHING": return LoggingType.NOTHING;
-            default: return LoggingType.WARNINGS_ONLY;
+    public String getLoggingPath(){
+        String path = conf.getString("logging-path");
+        if ("default".equals(path)) {
+            path = Main.getPlugin(Main.class).getDataFolder().getPath() + "/logs/";
         }
+        return path;
     }
 
+    public String getLogLevel(){
+        String logLevel = conf.getString("log-level");
+        if (logLevel.equals("IMPORTANT") || logLevel.equals("DEBUG")){
+            return logLevel;
+        }
+        return "IMPORTANT";
+    }
 
-    public static HikariConfig getDataBase() throws FileNotFoundException {
+    public long getMaxLogFileSize(){
+        return conf.getLong("max-log-file-size");
+    }
+
+    public HikariConfig getDataBase() throws FileNotFoundException {
         ArrayList<String> fileNames = new ArrayList<>();
         for (File currentFile : Main.plugin.getDataFolder().listFiles()){
             fileNames.add(currentFile.getName());
@@ -117,9 +128,8 @@ public class GuildConfigHandler {
         return null;
     }
 
-    public static String getStorageType(){
-        FileConfiguration fileConfiguration = Main.mainFileConfiguration;
-        String storageType = fileConfiguration.getString("storageType");
+    public String getStorageType(){
+        String storageType = conf.getString("storageType");
         switch (storageType) {
             case "File":
             case "MySQL":
@@ -129,20 +139,15 @@ public class GuildConfigHandler {
         }
     }
 
-    public static boolean useFileSystemOnInvalidConnection() throws FileNotFoundException, SQLException {
+    public boolean useFileSystemOnInvalidConnection(){
         if (getStorageType().equals("MySQL")){
-            return Main.mainFileConfiguration.getBoolean("useFileSystemOnInvalidConnection");
+            return conf.getBoolean("useFileSystemOnInvalidConnection");
         }else {
             return false;
         }
     }
 
-    public static boolean deleteOldStorageSectionsWhileMigration(){
-        return Main.mainFileConfiguration.getBoolean("deleteOldStorageSectionsWhileMigration");
+    public boolean deleteOldStorageSectionsWhileMigration(){
+        return conf.getBoolean("deleteOldStorageSectionsWhileMigration");
     }
-
-    public enum LoggingType{
-        WARNINGS_ONLY, ALL, NOTHING
-    }
-
 }

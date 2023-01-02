@@ -1,6 +1,7 @@
 package at.theduggy.duckguilds.storage.systemTypes;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
@@ -49,11 +50,11 @@ public class GuildFileSystem extends StorageType{
     @Override
     public void deleteRootSection() throws IOException {
         Files.delete(PLAYER_DATA_FOLDER.toPath());
-        Main.log("Deleted player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "!", Main.LogLevel.DEFAULT);
+        GuildLogger.getLogger().info("Deleted player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "!");
         Files.delete(GUILD_DATA_FOLDER.toPath());
-        Main.log("Deleted guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "!", Main.LogLevel.DEFAULT);
+        GuildLogger.getLogger().info("Deleted guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "!");
         Files.delete(Main.guildRootFolder.toPath());
-        Main.log("Deleted root-guild-folder " + Main.guildRootFolder.toPath() + "!", Main.LogLevel.DEFAULT);
+        GuildLogger.getLogger().info("Deleted root-guild-folder " + Main.guildRootFolder.toPath() + "!");
     }
 
     @Override
@@ -78,16 +79,15 @@ public class GuildFileSystem extends StorageType{
     private void cacheGuildFiles() {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         if (guildGuildsFolder.toFile().listFiles().length>0) {
-            Main.log("--------------caching guilds--------------", Main.LogLevel.DEFAULT);
+            GuildLogger.getLogger().debug("--------------caching guilds--------------");
             for (File file : guildGuildsFolder.toFile().listFiles()) {
                 if (GuildTextUtils.getFileExtension(file).equals(".json")) {
                     try {
                         GuildObject guildObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(file), GuildObject.class);
                         ScoreboardHandler.addGuild(guildObject);
-                        Main.getGuildCache().put(guildObject.getName(), guildObject); // guild indexed to HasMap
-                        Main.log("Caching " + GuildTextUtils.getFileBaseName(file) + " with storage-type File!", Main.LogLevel.DEFAULT);
+                        Main.getGuildCache().put(guildObject.getName(), guildObject);
                     } catch (Exception e) {
-                        Main.log("Failed to cache guild-file for guild " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                        GuildLogger.getLogger().error("Failed to cache guild " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")");
                     }
                 }
             }
@@ -122,65 +122,60 @@ public class GuildFileSystem extends StorageType{
     }
 
     private void cachePlayerFiles() throws IOException {
+        GuildLogger.getLogger().debug("--------------caching players--------------");
         for (File file:PLAYER_DATA_FOLDER.listFiles()){
             if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
-                try {
-                    cachePlayerFile(UUID.fromString(GuildTextUtils.getFileBaseName(file)));
-                }catch (Exception e){
-                    Main.log("Failed to cache player " + GuildTextUtils.getFileBaseName(file) + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
-                }
-
+                cachePlayerFile(UUID.fromString(GuildTextUtils.getFileBaseName(file)));
             }
         }
     }
 
     private void cachePlayerFile(UUID player) {
         try {
-            Main.log("Caching " + player+ " with storage-type File!", Main.LogLevel.DEFAULT);
             File playerFile = new File(PLAYER_DATA_FOLDER + "/" + player + ".json");
-            GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(playerFile), GuildPlayerObject.class);//new GuildPlayerObject(player,GuildTextUtils.isPlayerOnline(player), (String) jsonData.get("name"),guild);
+            GuildPlayerObject guildPlayerObject = Main.getGsonInstance().fromJson(readPrettyJsonFile(playerFile), GuildPlayerObject.class);
             guildPlayerObject.setGuild("");
             guildPlayerObject.setOnline(false);
             guildPlayerObject.setPlayer(UUID.fromString(GuildTextUtils.getFileBaseName(playerFile)));
             Main.getPlayerCache().put(player, guildPlayerObject);
         }catch (Exception e){
-            Main.log("Failed to cache player " + player + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+            GuildLogger.getLogger().error("Failed to cache player " + player + " with storage-type " + Main.getMainStorage().getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
         }
 
     }
 
-    private void initFolders()  {
+    private void initFolders() {
         if (Main.guildRootFolder.exists()){
             if (!GUILD_DATA_FOLDER.exists()){
                 try {
                     Files.createDirectory(GUILD_DATA_FOLDER.toPath());
                 }catch (Exception e){
-                    Main.log("Failed to create guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                    GuildLogger.getLogger().error("Failed to create guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
                 }
             }
             if (!PLAYER_DATA_FOLDER.exists()){
                 try {
                     Files.createDirectory(PLAYER_DATA_FOLDER.toPath());
                 }catch (Exception e){
-                    Main.log("Failed to create player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                    GuildLogger.getLogger().error("Failed to create player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
                 }
             }
         }else {
             try {
                 Files.createDirectory(Main.guildRootFolder.toPath());
             }catch (Exception e){
-                Main.log("Failed to create guild-root-folder " + Main.guildRootFolder.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                GuildLogger.getLogger().error("Failed to create guild-root-folder " + Main.guildRootFolder.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
             }
 
             try {
                 Files.createDirectory(PLAYER_DATA_FOLDER.toPath());
             }catch (Exception e){
-                Main.log("Failed to create player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                GuildLogger.getLogger().error("Failed to create player-data-folder " + PLAYER_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")");
             }
             try {
                 Files.createDirectory(GUILD_DATA_FOLDER.toPath());
             }catch (Exception e){
-                Main.log("Failed to create guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", Main.LogLevel.WARNING);
+                GuildLogger.getLogger().error("Failed to create guild-data-folder " + GUILD_DATA_FOLDER.toPath() + "! Caused by: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
             }
         }
     }

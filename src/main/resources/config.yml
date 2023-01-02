@@ -1,5 +1,5 @@
 ##############################
-#-----------Server-----------#
+#----------General-----------#
 ##############################
 
 #The inviteDeleteTime is the length of time since a guild-invite was created until it is deleted.
@@ -13,10 +13,22 @@ inviteDeleteTime: 18000
 #would ignore it!
 maxGuilds: false
 
-#This configuration has three options: ALL (logs everything, can be very annoying),
-#WARNINGS_ONLY (logs only if anything went wrong, this is the default) and
-#NOTHING (doesn't log anything)!
-logging: WARNINGS_ONLY
+
+##############################
+#-----------Logging----------#
+##############################
+
+#This defines where the log files of the plugin are stored. Default means in <DATA_FOLDER>/logs/
+logging-path: default
+
+#log-level can be either IMPORTANT or DEBUG, where IMPORTANT is the default. IMPORTANT will only show errors
+#in the servers console. DEBUG logs EVERY thing that happens in the plugins. Thi can be useful when for example
+#the storage is broken. For the log-files, DEBUG is always enabled.
+log-level: IMPORTANT
+
+#This option defines the max-file-size of the log-files in BYTES. Keep in mind that the log-files are also compressed into
+#a .tar.gz archive. Default is 10000000
+max-log-file-size: 10000000
 
 
 ##############################

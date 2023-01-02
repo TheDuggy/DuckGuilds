@@ -18,6 +18,7 @@ package at.theduggy.duckguilds.commands.creatGuild;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.config.GuildConfigHandler;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildColor;
 import at.theduggy.duckguilds.objects.GuildMetadata;
 import at.theduggy.duckguilds.objects.GuildObject;
@@ -44,9 +45,9 @@ import java.util.UUID;
                         if (GuildTextUtils.isStringReadyToUse(name)) {
                             if (GuildTextUtils.isReadyForCreate(tag)) {
                                 if (tag.length() <= 4) {
-                                    if (!(GuildConfigHandler.getMaxGuildSize() instanceof Boolean)){
-                                        Bukkit.getLogger().warning(String.valueOf(GuildConfigHandler.getMaxGuildSize()));
-                                        if (Main.getGuildCache().size() > (int) GuildConfigHandler.getMaxGuildSize()){
+                                    if (!(Main.getGuildConfigHandler().getMaxGuildSize() instanceof Boolean)){
+                                        Bukkit.getLogger().warning(String.valueOf(Main.getGuildConfigHandler().getMaxGuildSize()));
+                                        if (Main.getGuildCache().size() > (int) Main.getGuildConfigHandler().getMaxGuildSize()){
                                             addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
                                         }else {
                                             player.sendMessage(GuildTextUtils.maxServerGuildsReached);
@@ -54,6 +55,7 @@ import java.util.UUID;
                                     }else {
                                         addPlayerToTeamAndCreateFiles(player,color,name,tag,tagColor);
                                     }
+                                    GuildLogger.getLogger().info(player.getUniqueId() + " (" + Main.getPlayerCache().get(player.getUniqueId()).getName() + ") created the guild " + name + "[" + tag + "]; color: " + GuildTextUtils.chatColorToString(color) + "; tag-color: " + GuildTextUtils.chatColorToString(tagColor));
                                 } else {
                                     player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The tag is " + ChatColor.YELLOW + tag.length() + ChatColor.RED + " characters long, but can only be 4 characters long!");
                                 }
@@ -95,7 +97,6 @@ import java.util.UUID;
         guildObject.setHead(player.getUniqueId());
         guildObject.setName(name);
         guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.now(), Main.getPlayerCache().get(player.getUniqueId()).getName()));
-        //TODO Make a detailed option to save stuff like creation-time!
         Main.getMainStorage().createGuildSection(guildObject);
         Main.getGuildCache().put(name, guildObject);
         reCachePlayer(name, player);
