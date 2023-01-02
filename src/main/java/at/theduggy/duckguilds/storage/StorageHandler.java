@@ -151,7 +151,7 @@ public class StorageHandler {
         if (storageType instanceof MySqlSystem){
             if (MySqlSystem.connectionAvailable()){
                 storageType.load();
-            }else if (Main.getGuildConfigHandler().useFileSystemOnInvalidConnection()){
+            }else if (Main.getGuildConfigHandler().fileOnConFail()){
                 this.storageType = new GuildFileSystem();
                 storageType.load();
             }else {
@@ -182,11 +182,11 @@ public class StorageHandler {
     }
 
     public void migrateStorage(StorageType newStorageType) throws SQLException, IOException {
-        new Thread(() -> {
-            long start = 0;
-            long end = 0;
-            StorageType oldStorageType = this.storageType;
-            try {
+        threadPool.submit(() -> {
+        long start;
+        long end;
+        StorageType oldStorageType = this.storageType;
+        try {
             this.storageType = newStorageType;
             try {
                 loadStorageWithoutCaching();
@@ -194,36 +194,36 @@ public class StorageHandler {
                 throw new RuntimeException(e);
             }
             Main.setStorageBusy(true);
-            GuildLogger.getLogger().debug("=".repeat(69));
-            GuildLogger.getLogger().debug("The plugin is not usable until the migration is complete from now on!");
-            GuildLogger.getLogger().debug("");
+            GuildLogger.getLogger().warn("========================================================================");
+            GuildLogger.getLogger().warn("![The plugin is not usable until the migration is complete from now on]!");
+            GuildLogger.getLogger().warn("========================================================================");
             start = System.currentTimeMillis();
-            GuildLogger.getLogger().debug("Recreate guild-sections...");
+            GuildLogger.getLogger().debug("Moving guild-sections...");
             for (GuildObject guild : Main.getGuildCache().values()){
                 createGuildSection(guild);
             }
             end = System.currentTimeMillis();
+            GuildLogger.getLogger().debug("Moved " + Main.getGuildCache().size() + " guild-sections (" + GuildTextUtils.formatTimeTake(start - end) + ")");
 
-            GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
-            GuildLogger.getLogger().debug("Recreate player-sections...");
+            GuildLogger.getLogger().debug("Moving player-sections...");
             start = System.currentTimeMillis();
             for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
                 createPersonalPlayerSection(guildPlayer,false);
             }
             end = System.currentTimeMillis();
-            GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+            GuildLogger.getLogger().debug("Moved " + Main.getGuildCache().size() + " player-sections (" + GuildTextUtils.formatTimeTake(start - end) + ")");
 
-            if (Main.getGuildConfigHandler().deleteOldStorageSectionsWhileMigration()) {
+            if (Main.getGuildConfigHandler().delOldStorage()) {
                 this.storageType = oldStorageType;
                 start = System.currentTimeMillis();
-                GuildLogger.getLogger().debug("Delete guilds-sections...");
+                GuildLogger.getLogger().debug("Delete guilds-sections in " + storageType.getStorageSystemID() + "...");
                 for (GuildObject guild : Main.getGuildCache().values()) {
                     deleteGuildSection(guild, false);
                 }
                 end = System.currentTimeMillis();
                 GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
 
-                GuildLogger.getLogger().debug("Delete player-sections...");
+                GuildLogger.getLogger().debug("Delete player-sections in " + storageType.getStorageSystemID() + "...");
                 start = System.currentTimeMillis();
                 for (GuildPlayerObject guildPlayer : Main.getPlayerCache().values()){
                     deletePlayerSection(guildPlayer);
@@ -232,7 +232,7 @@ public class StorageHandler {
                 GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
 
 
-                GuildLogger.getLogger().debug("Delete root-sections...");
+                GuildLogger.getLogger().debug("Delete root-sections in " + storageType.getStorageSystemID() + "...");
                 start = System.currentTimeMillis();
                 deleteRootStorageSection();
                 end = System.currentTimeMillis();
@@ -240,29 +240,29 @@ public class StorageHandler {
 
                 this.storageType=newStorageType;
             }
-            Main.mainFileConfiguration.set("storageType", newStorageType.getStorageSystemID());
-            Main.plugin.saveConfig();
-            Main.plugin.reloadConfig();
+            Main.getGuildConfigHandler().set("storageType", newStorageType.getStorageSystemID());
+            Main.getPlugin(Main.class).saveConfig();
+            Main.getPlugin(Main.class).reloadConfig();
             GuildLogger.getLogger().debug("");
             Main.setStorageBusy(false);
-            GuildLogger.getLogger().debug("Migration complete! The plugin is now usable with the new storage-type " + newStorageType + "!");
-            GuildLogger.getLogger().debug("=".repeat(77));
+            GuildLogger.getLogger().warn("=".repeat(55 + storageType.getStorageSystemID().length()));
+            GuildLogger.getLogger().warn("![Migration successfully complete! New storage-type: " + storageType.getStorageSystemID() + "]!");
+            GuildLogger.getLogger().warn("=".repeat(55 + storageType.getStorageSystemID().length()));
         }catch (Exception e){
-                e.printStackTrace();
+            e.printStackTrace();
             this.storageType=oldStorageType;
-                try {
-                    loadStorage();
-                } catch (SQLException | IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                Main.mainFileConfiguration.set("storageType", oldStorageType.getStorageSystemID());
-            Main.plugin.saveConfig();
-            Main.plugin.reloadConfig();
+            try {
+                loadStorage();
+            } catch (SQLException | IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            Main.getGuildConfigHandler().set("storageType", oldStorageType.getStorageSystemID());
+            Main.getPlugin(Main.class).saveConfig();
+            Main.getPlugin(Main.class).reloadConfig();
             Main.setStorageBusy(false);
             GuildLogger.getLogger().error("Failed to migrate from "  + oldStorageType.getStorageSystemID() + " to " + newStorageType + "! Using old storage-type "  + oldStorageType.getStorageSystemID() + "! Caused by: " + e.getClass().getSimpleName() + " (" +e.getMessage() + ")");
         }
-
-        }).start();
+        });
     }
 
     public static void exportStorage() {

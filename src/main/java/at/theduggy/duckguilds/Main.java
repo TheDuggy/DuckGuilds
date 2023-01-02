@@ -28,7 +28,6 @@ import at.theduggy.duckguilds.objects.gson.GuildMetadataTAdapter;
 import at.theduggy.duckguilds.startUp.GuildPlayerHandler;
 import at.theduggy.duckguilds.storage.StorageHandler;
 import at.theduggy.duckguilds.storage.systemTypes.MySqlSystem;
-import at.theduggy.duckguilds.utils.GuildTextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.log4j.LogManager;
@@ -64,24 +63,25 @@ private static GuildConfigHandler guildConfigHandler;
         this.saveDefaultConfig();
         plugin = this;
         guildConfigHandler = new GuildConfigHandler(this.getConfig());
-        GuildLogger.getLogger().debug("---------------config values---------------");
-        GuildLogger.getLogger().debug("               ---Server---");
-        GuildLogger.getLogger().debug("inviteDeleteTime: " + Main.getGuildConfigHandler().getTimeTillInviteIsDeleted());
-        GuildLogger.getLogger().debug("maxGuilds: " + Main.getGuildConfigHandler().getMaxGuildSize());
-        GuildLogger.getLogger().debug("               ---Storage---");
-        GuildLogger.getLogger().debug("storageType: " + Main.getGuildConfigHandler().getStorageType());
-        GuildLogger.getLogger().debug("useFileSystemOnInvalidConnection: " + guildConfigHandler.useFileSystemOnInvalidConnection());
-        GuildLogger.getLogger().debug("guildDirRootPath: " + guildConfigHandler.getGuildRootFolder());
-        GuildLogger.getLogger().debug("deleteOldStorageSectionsWhileMigration: " + guildConfigHandler.deleteOldStorageSectionsWhileMigration());
-        GuildLogger.getLogger().debug("               ---Logging---");
-        GuildLogger.getLogger().debug("logging-path: " + guildConfigHandler.getLoggingPath());
-        GuildLogger.getLogger().debug("logging-level: " + guildConfigHandler.getLogLevel());
-        GuildLogger.getLogger().debug("max-log-file-size: " + guildConfigHandler.getMaxLogFileSize());
 
     }
 
     @Override
     public void onEnable(){
+        GuildLogger.getLogger().debug("---------------config values---------------");
+        GuildLogger.getLogger().debug("               ---Server---");
+        GuildLogger.getLogger().debug("invite-delete-time: " + Main.getGuildConfigHandler().getTimeDeleteTime());
+        GuildLogger.getLogger().debug("max-guilds: " + Main.getGuildConfigHandler().getMaxGuildSize());
+        GuildLogger.getLogger().debug("               ---Logging---");
+        GuildLogger.getLogger().debug("logging-path: " + guildConfigHandler.getLoggingPath());
+        GuildLogger.getLogger().debug("logging-level: " + guildConfigHandler.getLogLevel());
+        GuildLogger.getLogger().debug("max-log-file-size: " + guildConfigHandler.getMaxLogFileSize());
+        GuildLogger.getLogger().debug("               ---Storage---");
+        GuildLogger.getLogger().debug("storage-type: " + Main.getGuildConfigHandler().getStorageType());
+        GuildLogger.getLogger().debug("file-on-con-fail: " + guildConfigHandler.fileOnConFail());
+        GuildLogger.getLogger().debug("guild-root-path: " + guildConfigHandler.getGuildRootPath());
+        GuildLogger.getLogger().debug("del-old-storage: " + guildConfigHandler.delOldStorage());
+
         Bukkit.getPluginManager().registerEvents(new GuildDeleteInviteOnPlayerLeave(), this);
         try {
             if (!Files.exists(Paths.get(this.getDataFolder() + "/database.yml"))){
@@ -96,7 +96,7 @@ private static GuildConfigHandler guildConfigHandler;
         mainFileConfiguration = this.getConfig();
 
         if (Main.getGuildConfigHandler().getStorageType()!=null) {
-            guildRootFolder = Main.getGuildConfigHandler().getGuildRootFolder();
+            guildRootFolder = Main.getGuildConfigHandler().getGuildRootPath();
             mainStorageHandler = new StorageHandler(Main.getGuildConfigHandler().getStorageType());
 
             scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();

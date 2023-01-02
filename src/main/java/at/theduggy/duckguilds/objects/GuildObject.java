@@ -1,9 +1,6 @@
 package at.theduggy.duckguilds.objects;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.config.GuildConfigHandler;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -90,7 +87,7 @@ public class GuildObject {
             public void run() {
                 guildInvites.remove(guildInvite.getReceiver().getUniqueId());
             }
-        }.runTaskLater(Main.getPlugin(Main.class), Main.getGuildConfigHandler().getTimeTillInviteIsDeleted());
+        }.runTaskLater(Main.getPlugin(Main.class), Main.getGuildConfigHandler().getTimeDeleteTime());
     }
 
     public HashMap<UUID,GuildInviteObject> getAllInvites(){

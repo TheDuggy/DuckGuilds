@@ -2,32 +2,35 @@
 #----------General-----------#
 ##############################
 
-#The inviteDeleteTime is the length of time since a guild-invite was created until it is deleted.
-#IMPORTANT! This is in ticks(1 sec = 20 ticks)
-#By default it is set to 15 min(18000 ticks)
-inviteDeleteTime: 18000
+# If true displays all config-values on enable! Default=true
+config-banner: false
 
-#This option sets hoe many guilds can be created! By default, it is set to false. It must between 1 and
+# The inviteDeleteTime is the length of time since a guild-invite was created until it is deleted.
+# IMPORTANT! This is in ticks(1 sec = 20 ticks)
+# By default it is set to 15 min(18000 ticks)
+invite-delete-time: 18000
+
+# This option sets hoe many guilds can be created! By default, it is set to false. It must between 1 and
 #9223372036854775807. If it is 0 or bigger than 9223372036854775807,it will take the default value
-#(false), which is endless! If you enter something that isn't a false or not a valid number, the plugin
-#would ignore it!
-maxGuilds: false
+# (false), which is endless! If you enter something that isn't a false or not a valid number, the plugin
+# would ignore it!
+max-guilds: false
 
 
 ##############################
 #-----------Logging----------#
 ##############################
 
-#This defines where the log files of the plugin are stored. Default means in <DATA_FOLDER>/logs/
+# This defines where the log files of the plugin are stored. Default means in <DATA_FOLDER>/logs/
 logging-path: default
 
-#log-level can be either IMPORTANT or DEBUG, where IMPORTANT is the default. IMPORTANT will only show errors
-#in the servers console. DEBUG logs EVERY thing that happens in the plugins. Thi can be useful when for example
-#the storage is broken. For the log-files, DEBUG is always enabled.
+# log-level can be either IMPORTANT or DEBUG, where IMPORTANT is the default. IMPORTANT will only show errors
+# in the servers console. DEBUG logs EVERY thing that happens in the plugins. Thi can be useful when for example
+# the storage is broken. For the log-files, DEBUG is always enabled.
 log-level: IMPORTANT
 
-#This option defines the max-file-size of the log-files in BYTES. Keep in mind that the log-files are also compressed into
-#a .tar.gz archive. Default is 10000000
+# This option defines the max-file-size of the log-files in BYTES. Keep in mind that the log-files are also compressed into
+# a .tar.gz archive. Default is 10000000
 max-log-file-size: 10000000
 
 
@@ -35,22 +38,22 @@ max-log-file-size: 10000000
 #-----------Storage----------#
 ##############################
 
-#This option sets which type of storage should be used! On small server, File (which is the default)
-#is strong enough, but if you've got a server with >100 players it's highly recommended using a
-#database (MySQL)!
-storageType: File
+# This option sets which type of storage should be used! On small server, File (which is the default)
+# is strong enough, but if you've got a server with >100 players it's highly recommended using a
+# database (MySQL)
+storage-type: File
 
-#If this is set to true, the plugin will automatically start in the file-system-mode if db-connection is not
-#available. By default, it is set to false, which means that the plugin will show a small warning-msg in the
-#consol and then disable itself!
-useFileSystemOnInvalidConnection: false
+# If this is set to true, the plugin will automatically start in the file-system-mode if the db-connection is not
+# available. By default, it is set to false, which means that the plugin will show a small warning-msg in the
+# console and then disable itself!
+file-on-con-fai: false
 
-#This is the folder where all guild-data is stored! By default, it's the root-folder of the server.
-#If the path doesn't exist than it automatically uses the root-folder of the server.
-#If you change this, and you already created a few guilds, they would be lost!
-#The old guild-folder isn't deleted automatically, so you can copy all guild-files to the new folder!
-guildDirRootPath: default
+# This is the folder where all guild-data is stored! By default, it's the root-folder of the server.
+# If the path doesn't exist than it automatically uses the root-folder of the server.
+# If you change this, and you already created a few guilds, they would be lost!
+# The old guild-folder isn't deleted automatically, so you can copy all guild-files to the new folder!
+guild-root-path: default
 
-#If this option is set to true, the plugin will automatically delete all old files/record while
-#migratiing to a new storage-type!
-deleteOldStorageSectionsWhileMigration: true
+# If this option is set to true, the plugin will automatically delete all old files/record while
+# migratiing to a new storage-type!
+del-old-storage: true

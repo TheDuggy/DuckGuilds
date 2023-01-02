@@ -16,10 +16,8 @@
 package at.theduggy.duckguilds.config;
 
 import at.theduggy.duckguilds.Main;
-import at.theduggy.duckguilds.storage.StorageHandler;
 import com.zaxxer.hikari.HikariConfig;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -28,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.*;
 
 public class GuildConfigHandler {
@@ -38,14 +35,19 @@ public class GuildConfigHandler {
     public GuildConfigHandler(FileConfiguration conf){
         this.conf = conf;
     }
-    
+
+    public void set(String path, Object value){
+        conf.set(path, value);
+    }
+
+
     public Object getMaxGuildSize(){
-        if (conf.get("maxGuilds")instanceof Boolean){
-            return conf.get("maxGuilds");
-        }else if (conf.get("maxGuilds") instanceof Integer){
-            if (conf.getInt("maxGuilds")>0){
-                if (conf.getInt("maxGuilds")<=Main.getGuildCache().size()){
-                    return conf.getInt("maxGuilds");
+        if (conf.get("max-guilds")instanceof Boolean){
+            return conf.get("max-guilds");
+        }else if (conf.get("max-guilds") instanceof Integer){
+            if (conf.getInt("max-guilds")>0){
+                if (conf.getInt("max-guilds")<=Main.getGuildCache().size()){
+                    return conf.getInt("max-guilds");
                 }else {
                     return false;
                 }
@@ -57,22 +59,22 @@ public class GuildConfigHandler {
         }
     }
 
-    public long getTimeTillInviteIsDeleted(){
-        if (conf.getLong("inviteDeleteTime")>108000){
+    public long getTimeDeleteTime(){
+        if (conf.getLong("invite-delete-time")>108000){
             return 18000;
-        }else if (conf.getLong("inviteDeleteTime")<6000){
+        }else if (conf.getLong("invite-delete-time")<6000){
             return 18000;
         }else {
-            return conf.getLong("inviteDeleteTime");
+            return conf.getLong("invite-delete-time");
         }
     }
 
-    public File getGuildRootFolder(){
-        if (conf.getString("guildDirRootPath").equals("default")){
+    public File getGuildRootPath(){
+        if (conf.getString("guild-root-path").equals("default")){
             return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
-        }else if (!conf.getString("guildDirRootPath").equals("default")){
-            if (Files.exists(Paths.get(conf.getString("guildDirRootPath")))){
-                return new File(conf.getString("guildDirRootPath")+ "/guildStorage");
+        }else if (!conf.getString("guild-root-path").equals("default")){
+            if (Files.exists(Paths.get(conf.getString("guild-root-path")))){
+                return new File(conf.getString("guild-root-path")+ "/guildStorage");
             }else {
                 return new File(Main.getPlugin(Main.class).getDataFolder() + "/guildStorage");
             }
@@ -129,7 +131,7 @@ public class GuildConfigHandler {
     }
 
     public String getStorageType(){
-        String storageType = conf.getString("storageType");
+        String storageType = conf.getString("storage-type");
         switch (storageType) {
             case "File":
             case "MySQL":
@@ -139,15 +141,15 @@ public class GuildConfigHandler {
         }
     }
 
-    public boolean useFileSystemOnInvalidConnection(){
+    public boolean fileOnConFail(){
         if (getStorageType().equals("MySQL")){
-            return conf.getBoolean("useFileSystemOnInvalidConnection");
+            return conf.getBoolean("file-on-con-fail");
         }else {
             return false;
         }
     }
 
-    public boolean deleteOldStorageSectionsWhileMigration(){
-        return conf.getBoolean("deleteOldStorageSectionsWhileMigration");
+    public boolean delOldStorage(){
+        return conf.getBoolean("del-old-storage");
     }
 }
