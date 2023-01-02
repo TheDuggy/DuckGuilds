@@ -223,7 +223,7 @@ public class GuildTextUtils {
     }
 
     public static String formatTimeTake(long time){
-        return String.format("%dh%dmin%dsec.%d", time / 3_600_000, time % 3_600_000 / 60_000, time % 60_000 / 1000, time % 60_000);
+        return String.format("%dh%dmin%dsec.%d", time / 3_600_000, time % 3_600_000 / 60_000, time % 60_000 / 1000, time % 60_000 % 1000);
     }
 
 }

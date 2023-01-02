@@ -203,7 +203,7 @@ public class StorageHandler {
                 createGuildSection(guild);
             }
             end = System.currentTimeMillis();
-            GuildLogger.getLogger().debug("Moved " + Main.getGuildCache().size() + " guild-sections (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+            GuildLogger.getLogger().debug("Moved " + Main.getGuildCache().size() + " guild-sections (" + GuildTextUtils.formatTimeTake(end - start) + ")");
 
             GuildLogger.getLogger().debug("Moving player-sections...");
             start = System.currentTimeMillis();
@@ -211,7 +211,7 @@ public class StorageHandler {
                 createPersonalPlayerSection(guildPlayer,false);
             }
             end = System.currentTimeMillis();
-            GuildLogger.getLogger().debug("Moved " + Main.getPlayerCache().size() + " player-sections (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+            GuildLogger.getLogger().debug("Moved " + Main.getPlayerCache().size() + " player-sections (" + GuildTextUtils.formatTimeTake(end - start) + ")");
 
             if (Main.getGuildConfigHandler().delOldStorage()) {
                 this.storageType = oldStorageType;
@@ -221,7 +221,7 @@ public class StorageHandler {
                     deleteGuildSection(guild, false);
                 }
                 end = System.currentTimeMillis();
-                GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+                GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(end - start) + ")");
 
                 GuildLogger.getLogger().debug("Delete player-sections in " + storageType.getStorageSystemID() + "...");
                 start = System.currentTimeMillis();
@@ -229,14 +229,14 @@ public class StorageHandler {
                     deletePlayerSection(guildPlayer);
                 }
                 end = System.currentTimeMillis();
-                GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+                GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(end - start) + ")");
 
 
                 GuildLogger.getLogger().debug("Delete root-sections in " + storageType.getStorageSystemID() + "...");
                 start = System.currentTimeMillis();
                 deleteRootStorageSection();
                 end = System.currentTimeMillis();
-                GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+                GuildLogger.getLogger().debug("Done (" + GuildTextUtils.formatTimeTake(end - start) + ")");
 
                 this.storageType=newStorageType;
             }
