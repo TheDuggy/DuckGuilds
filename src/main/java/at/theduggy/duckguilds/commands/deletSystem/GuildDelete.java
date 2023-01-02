@@ -17,6 +17,7 @@ package at.theduggy.duckguilds.commands.deletSystem;
 
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -36,6 +37,7 @@ public class GuildDelete {
                         if (Utils.getPlayerGuild(playerFromServer).equals(name)) {
                             if (playerFromServer.isOnline()) {
                                 if (Utils.getIfPlayerIsHeadOfGuild(name, playerFromServer)) {
+                                    //GuildLogger.getLogger().debug(Main.getPlayerCache().get(player.) " deleted guild");
                                     playerFromServer.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.YELLOW + name + ChatColor.GREEN + " has been deleted!");
                                 } else {
                                     playerFromServer.sendMessage(GuildTextUtils.guildHeadLeftGuild);

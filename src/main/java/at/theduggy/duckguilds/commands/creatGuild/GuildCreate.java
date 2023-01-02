@@ -79,7 +79,7 @@ import java.util.UUID;
     public static void addPlayerToTeamAndCreateFiles(Player player, ChatColor color, String name, String tag, ChatColor tagColor) throws SQLException, IOException {
         Team guild;
         try {
-             guild = Main.getScoreboard().registerNewTeam(name);
+            guild = Main.getScoreboard().registerNewTeam(name);
         }catch (IllegalArgumentException e){
             guild = Main.getScoreboard().getTeam(name);
         }

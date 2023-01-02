@@ -120,7 +120,7 @@ public class GuildAppender extends WriterAppender {
 
     protected void subAppend(LoggingEvent event) {
         long size = ((CountingQuietWriter) qw).getCount();
-        if (event.getLevel() == Level.ERROR || event.getLevel() == Level.FATAL) {
+        if (event.getLevel() == Level.ERROR || event.getLevel() == Level.FATAL || event.getLevel() == Level.WARN) {
             PLUGIN_LOGGER.warning(event.getRenderedMessage());
         } else if (event.getLevel() == Level.DEBUG) {
             PLUGIN_LOGGER.info(event.getRenderedMessage());

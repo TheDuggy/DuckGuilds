@@ -76,9 +76,6 @@ public class GuildObject {
         return tagColor;
     }
 
-    public String toString(){
-        return Main.getGsonInstance().toJson(this);
-    }
 
     public void addInvite(GuildInviteObject guildInvite){
         guildInvites.put(guildInvite.getReceiver().getUniqueId(),guildInvite);
@@ -92,5 +89,9 @@ public class GuildObject {
 
     public HashMap<UUID,GuildInviteObject> getAllInvites(){
         return guildInvites;
+    }
+
+    public String toString(){
+        return name + "[" + tag + "]; color: " + color.toString()  + "; tag-color: " + tagColor.toString();
     }
 }

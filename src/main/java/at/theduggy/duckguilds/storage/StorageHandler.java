@@ -211,7 +211,7 @@ public class StorageHandler {
                 createPersonalPlayerSection(guildPlayer,false);
             }
             end = System.currentTimeMillis();
-            GuildLogger.getLogger().debug("Moved " + Main.getGuildCache().size() + " player-sections (" + GuildTextUtils.formatTimeTake(start - end) + ")");
+            GuildLogger.getLogger().debug("Moved " + Main.getPlayerCache().size() + " player-sections (" + GuildTextUtils.formatTimeTake(start - end) + ")");
 
             if (Main.getGuildConfigHandler().delOldStorage()) {
                 this.storageType = oldStorageType;
@@ -240,10 +240,9 @@ public class StorageHandler {
 
                 this.storageType=newStorageType;
             }
-            Main.getGuildConfigHandler().set("storageType", newStorageType.getStorageSystemID());
+            Main.getGuildConfigHandler().set("storage-type", newStorageType.getStorageSystemID());
             Main.getPlugin(Main.class).saveConfig();
             Main.getPlugin(Main.class).reloadConfig();
-            GuildLogger.getLogger().debug("");
             Main.setStorageBusy(false);
             GuildLogger.getLogger().warn("=".repeat(55 + storageType.getStorageSystemID().length()));
             GuildLogger.getLogger().warn("![Migration successfully complete! New storage-type: " + storageType.getStorageSystemID() + "]!");
@@ -277,7 +276,6 @@ public class StorageHandler {
             for (File f : exportFolder.listFiles()){
                 int number = 0;
                 String filename = f.getName().split("\\.")[1].split("_")[1];
-                System.out.println(filename);
                 String fileNameBase = f.getName().split("\\.")[0] + "." + f.getName().split("\\.")[1];
                 if (fileNameBase.split("_").length > 4){
                     number = Integer.parseInt(fileNameBase.split("_")[4]);
@@ -296,7 +294,6 @@ public class StorageHandler {
             String dataFileName = "guild_data_v" + Main.getPlugin(Main.class).getDescription().getVersion() + "_" + dateString;
             if (files.containsKey(dateString)){
                 dataFileName +=  "_" + (files.get(dateString) + 1);
-                System.out.println(dataFileName);
             }
 
             File compressedFile = new File(exportFolder + "/" + dataFileName + ".zip");
@@ -333,7 +330,6 @@ public class StorageHandler {
             zis.getNextEntry();
             byte[] buffer = new byte[1024];
             for (int len; (len = zis.read(buffer)) != -1;){
-                System.out.println(len);
                 bOut.write(buffer, 0, len);
             }
             zis.closeEntry();

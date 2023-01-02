@@ -55,12 +55,7 @@ public class GuildPlayerObject {
     }
 
     public String toString(){
-        JSONObject data = new JSONObject();
-        data.put("uuid",player.toString());
-        data.put("name",name);
-        data.put("guild",guild);//TODO Remove !!!! Only temp for debugging!
-        data.put("online",online);//TODO Remove !!!! Only temp for debugging!
-        return data.toJSONString();
+        return player.toString() + " (" + name + ")";
     }
 
 }

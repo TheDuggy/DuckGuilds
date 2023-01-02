@@ -62,12 +62,12 @@ private static GuildConfigHandler guildConfigHandler;
     public void onLoad(){
         this.saveDefaultConfig();
         plugin = this;
-        guildConfigHandler = new GuildConfigHandler(this.getConfig());
 
     }
 
     @Override
     public void onEnable(){
+        guildConfigHandler = new GuildConfigHandler(this.getConfig());
         GuildLogger.getLogger().debug("---------------config values---------------");
         GuildLogger.getLogger().debug("               ---Server---");
         GuildLogger.getLogger().debug("invite-delete-time: " + Main.getGuildConfigHandler().getTimeDeleteTime());
