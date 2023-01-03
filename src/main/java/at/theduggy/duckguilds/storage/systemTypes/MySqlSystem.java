@@ -68,50 +68,41 @@ public class MySqlSystem extends StorageType{
 
     private void cacheGuilds() throws SQLException {
 
-       PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guilds");
-       ResultSet resultSet = preparedStatement.executeQuery();//TODO Add try-catch stuff to mysql
-
-       boolean isFirst = true;
-
-       while (resultSet.next()){
-           if (isFirst){
-               GuildLogger.getLogger().debug("--------------caching guilds--------------");
-           }
-           isFirst = false;
-           String name = resultSet.getString("name");
-           try {
-               GuildObject guildObject = new GuildObject();
-               guildObject.setGuildColor(new GuildColor(resultSet.getString("color")));
-               guildObject.setTagColor(new GuildColor(resultSet.getString("tagColor")));
-               guildObject.setName(name);
-               guildObject.setTag(resultSet.getString("tag"));
-               guildObject.setHead(UUID.fromString(resultSet.getString("head")));
-               String[] trimmedPlayerUUIDs = resultSet.getString("players").split(",");
-               ArrayList<UUID> players = new ArrayList<>();
-               for (String uuid:trimmedPlayerUUIDs){
-                   players.add(GuildTextUtils.untrimUUID(uuid));
-               }//TODO Fix two missing guilds
-               guildObject.setPlayers(players);
-               guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.parse(resultSet.getString("creationDate")), resultSet.getString("creatorName")));
-               ScoreboardHandler.addGuild(guildObject);
-               Main.getGuildCache().put(guildObject.getName(), guildObject);
-           }catch (Exception e){
-               GuildLogger.getLogger().debug("Failed to cache guild-record for guild " + name  + " with storage-type MySQL! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage()+")");
-           }
-       }
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guilds");
+        ResultSet resultSet = preparedStatement.executeQuery();//TODO Add try-catch stuff to mysql
+        GuildLogger.getLogger().warn("Caching guilds...");
+        long start = System.currentTimeMillis();
+        while (resultSet.next()){
+            String name = resultSet.getString("name");
+            try {
+                GuildObject guildObject = new GuildObject();
+                guildObject.setGuildColor(new GuildColor(resultSet.getString("color")));
+                guildObject.setTagColor(new GuildColor(resultSet.getString("tagColor")));
+                guildObject.setName(name);
+                guildObject.setTag(resultSet.getString("tag"));
+                guildObject.setHead(UUID.fromString(resultSet.getString("head")));
+                String[] trimmedPlayerUUIDs = resultSet.getString("players").split(",");
+                ArrayList<UUID> players = new ArrayList<>();
+                for (String uuid:trimmedPlayerUUIDs){
+                    players.add(GuildTextUtils.untrimUUID(uuid));
+                }//TODO Fix two missing guilds
+                guildObject.setPlayers(players);
+                guildObject.setGuildMetadata(new GuildMetadata(LocalDateTime.parse(resultSet.getString("creationDate")), resultSet.getString("creatorName")));
+                ScoreboardHandler.addGuild(guildObject);
+                Main.getGuildCache().put(guildObject.getName(), guildObject);
+            }catch (Exception e){
+                GuildLogger.getLogger().debug("Failed to cache guild-record for guild " + name  + " with storage-type MySQL! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage()+")");
+            }
+        }
+        GuildLogger.getLogger().warn("Done with caching players (" + GuildTextUtils.formatTimeTake(System.currentTimeMillis()-start) + ")");
     }
 
     private void cachePlayers() throws SQLException {
-        boolean isFirst = true;
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM guildPlayers WHERE uuid IS NOT NULL AND name IS NOT NULL");
         ResultSet resultSet = preparedStatement.executeQuery();
+        GuildLogger.getLogger().warn("Caching players...");
+        long start = System.currentTimeMillis();
         while (resultSet.next()){
-            if (isFirst){
-                GuildLogger.getLogger().debug("--------------caching players-------------");
-            }
-
-            isFirst = false;
-
             try {
                 String name = resultSet.getString("name");
                 GuildPlayerObject guildPlayerObject = new GuildPlayerObject(UUID.fromString(resultSet.getString("uuid")), false, name, "");
@@ -120,6 +111,7 @@ public class MySqlSystem extends StorageType{
                 GuildLogger.getLogger().debug("Failed to cache player " + resultSet.getString("uuid") + "(" + resultSet.getString("name") + ") ! Caused by: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")");
             }
         }
+        GuildLogger.getLogger().warn("Done with caching players (" + GuildTextUtils.formatTimeTake(System.currentTimeMillis()-start) + ")");
     }
 
 

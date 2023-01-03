@@ -79,7 +79,8 @@ public class GuildFileSystem extends StorageType{
     private void cacheGuildFiles() {
         Path guildGuildsFolder = Paths.get(Main.guildRootFolder + "/guilds");
         if (guildGuildsFolder.toFile().listFiles().length>0) {
-            GuildLogger.getLogger().debug("--------------caching guilds--------------");
+            long start = System.currentTimeMillis();
+            GuildLogger.getLogger().warn("Caching guilds...");
             for (File file : guildGuildsFolder.toFile().listFiles()) {
                 if (GuildTextUtils.getFileExtension(file).equals(".json")) {
                     try {
@@ -91,6 +92,7 @@ public class GuildFileSystem extends StorageType{
                     }
                 }
             }
+            GuildLogger.getLogger().warn("Done with caching guilds (" + GuildTextUtils.formatTimeTake(System.currentTimeMillis()-start) + ")");
         }
     }
 
@@ -122,12 +124,14 @@ public class GuildFileSystem extends StorageType{
     }
 
     private void cachePlayerFiles() throws IOException {
-        GuildLogger.getLogger().debug("--------------caching players--------------");
+        GuildLogger.getLogger().warn("Caching players...");
+        long start = System.currentTimeMillis();
         for (File file:PLAYER_DATA_FOLDER.listFiles()){
             if (GuildTextUtils.isStringUUID(GuildTextUtils.getFileBaseName(file))) {
                 cachePlayerFile(UUID.fromString(GuildTextUtils.getFileBaseName(file)));
             }
         }
+        GuildLogger.getLogger().warn("Done with caching players (" + GuildTextUtils.formatTimeTake(System.currentTimeMillis()-start) + ")");
     }
 
     private void cachePlayerFile(UUID player) {
