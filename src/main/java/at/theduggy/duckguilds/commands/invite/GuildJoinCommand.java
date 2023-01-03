@@ -17,6 +17,8 @@ package at.theduggy.duckguilds.commands.invite;
 
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
+import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.ScoreboardHandler;
@@ -42,6 +44,8 @@ public class GuildJoinCommand {
                     Main.getPlayerCache().get(player.getUniqueId()).setGuild(guildName);
                     ScoreboardHandler.updateScoreboardAddPlayer(player, Main.getGuildCache().get(guildName));
                     player.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You successfully accepted the guild-invite from " + guildObject.getAllInvites().get(player.getUniqueId()).getSender().getName() + " to " + ChatColor.YELLOW + guildName + ChatColor.GREEN + "!");
+                    GuildInviteObject invite = Main.getGuildCache().get(guildName).getAllInvites().get(player.getUniqueId());
+                    GuildLogger.getLogger().info(invite.getReceiver() + " joined guild " + invite.getGuild() + " through invite from " + invite.getSender());
                     for (UUID guildPlayer:guildObject.getPlayers()){
                         if (Main.getPlayerCache().get(guildPlayer).isOnline()&&guildPlayer!=player.getUniqueId()){
                             Bukkit.getPlayer(guildPlayer).sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + ">>> " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has joined your guild!");

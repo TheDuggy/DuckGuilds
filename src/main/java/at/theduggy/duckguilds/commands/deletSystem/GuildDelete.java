@@ -18,6 +18,8 @@ package at.theduggy.duckguilds.commands.deletSystem;
 import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
 import at.theduggy.duckguilds.logging.GuildLogger;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -26,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.util.UUID;
 
 public class GuildDelete {
 
@@ -33,22 +36,21 @@ public class GuildDelete {
         if (Main.getGuildCache().keySet().contains(name)) {
             if (Utils.isPlayerInGuild(player)) {
                 if (Utils.getIfPlayerIsHeadOfGuild(name,player)) {
+                    GuildPlayerObject head = Main.getPlayerCache().get(Main.getGuildCache().get(name).getHead());
+                    GuildObject guild = Main.getGuildCache().get(name);
                     for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
-                        if (Utils.getPlayerGuild(playerFromServer).equals(name)) {
-                            if (playerFromServer.isOnline()) {
-                                if (Utils.getIfPlayerIsHeadOfGuild(name, playerFromServer)) {
-                                    //GuildLogger.getLogger().debug(Main.getPlayerCache().get(player.) " deleted guild");
-                                    playerFromServer.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "Your guild with the name " + ChatColor.YELLOW + name + ChatColor.GREEN + " has been deleted!");
-                                } else {
-                                    playerFromServer.sendMessage(GuildTextUtils.guildHeadLeftGuild);
-                                }
-                            }
-                            PlayerLeaveGuild.leaveGuild(playerFromServer, name);
+                        if (Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals(name)) {
+                            boolean guildDelete = !Main.getGuildCache().get(name).getHead().equals(head.getUniqueId());
+                            PlayerLeaveGuild.leaveGuild(playerFromServer, name, guildDelete);
                             playerFromServer.setDisplayName(ChatColor.WHITE  + playerFromServer.getName() );
                         }
                     }
                     Main.getMainStorage().deleteGuildSection(Main.getGuildCache().get(name), true);
                     Main.getGuildCache().remove(name);
+                    GuildLogger.getLogger().info(head.toString() + " deleted guild " + guild.toString() + "!");
+                    if (head.isOnline()){
+                        Bukkit.getPlayer(head.getUniqueId()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + "Your guild with the name " + ChatColor.YELLOW + name + ChatColor.RED + " has been deleted!");
+                    }
                 } else {
                     player.sendMessage(GuildTextUtils.youAreNotTheHeadOfThatGuild);
                 }

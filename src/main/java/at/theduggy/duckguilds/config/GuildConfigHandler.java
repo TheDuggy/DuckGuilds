@@ -152,4 +152,8 @@ public class GuildConfigHandler {
     public boolean delOldStorage(){
         return conf.getBoolean("del-old-storage");
     }
+
+    public boolean showConfBanner(){
+        return conf.getBoolean("config-banner");
+    }
 }

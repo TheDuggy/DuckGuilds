@@ -16,6 +16,7 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
@@ -38,6 +39,7 @@ public class GuildInviteDiscardCommand {
                 if (Main.getPlayerCache().get(Main.getGuildCache().get(guildName).getHead()).isOnline()){
                     Bukkit.getPlayer(guild.getHead()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has discarded your guild-invite!");
                 }
+                GuildLogger.getLogger().info(guildInvite.getReceiver() + " discarded guild-invite from " + guildInvite.getSender() + " to " + guildInvite.getGuild() + "!");
                 player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You successfully discarded the invite of " + ChatColor.YELLOW + Main.getPlayerCache().get(guildInvite.getSender().getUniqueId()).getName() + ChatColor.RED + " to " + guildName + "!" );
             }else {
                 player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You are not invited to this guild or you have accepted the invite/it was deleted!");

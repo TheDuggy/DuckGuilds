@@ -17,6 +17,8 @@ package at.theduggy.duckguilds.commands.invite;
 
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -34,10 +36,16 @@ public class GuildDeleteInvite {
                     if (Main.getGuildCache().get(Utils.getPlayerGuild(sender)).getAllInvites().size()>0) {
                         if (Main.getGuildCache().get(Utils.getPlayerGuild(sender)).getAllInvites().containsKey(Utils.getPlayerByName(playerName).getUniqueId())) {
                             Main.getGuildCache().get(Utils.getPlayerGuild(sender)).getAllInvites().remove(Utils.getPlayerByName(playerName).getUniqueId());
-                            if (Utils.getPlayerByName(playerName).isOnline()){
+                            GuildPlayerObject target = null;
+                            for (GuildPlayerObject guildPlayerObject : Main.getPlayerCache().values()){
+                                if (guildPlayerObject.getName().equals(playerName)){
+                                    target = guildPlayerObject;
+                                    break;
+                                }
+                            }
+                            GuildLogger.getLogger().info(Main.getPlayerCache().get(sender.getUniqueId()).toString() + " deleted guild-invite for " + target.toString() + " to guild " + Main.getGuildCache().get(Main.getPlayerCache().get(sender.getUniqueId()).getGuild()).toString());
+                            if (target.isOnline()){
                                 Bukkit.getPlayerExact(playerName).sendMessage( GuildTextUtils.prefix + ChatColor.RED + "Your guild-invite to " + ChatColor.YELLOW + Utils.getPlayerGuild(sender) + ChatColor.RED + " was deleted by " + ChatColor.YELLOW + sender.getName() + ChatColor.RED + "!");
-                            }else {
-                                sender.sendMessage("False");
                             }
                             sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "The guild-invite for " + ChatColor.YELLOW + playerName + ChatColor.RED + " was deleted!");
                         } else {

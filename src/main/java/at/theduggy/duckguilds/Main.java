@@ -68,19 +68,22 @@ private static GuildConfigHandler guildConfigHandler;
     @Override
     public void onEnable(){
         guildConfigHandler = new GuildConfigHandler(this.getConfig());
-        GuildLogger.getLogger().debug("---------------config values---------------");
-        GuildLogger.getLogger().debug("               ---Server---");
-        GuildLogger.getLogger().debug("invite-delete-time: " + Main.getGuildConfigHandler().getTimeDeleteTime());
-        GuildLogger.getLogger().debug("max-guilds: " + Main.getGuildConfigHandler().getMaxGuildSize());
-        GuildLogger.getLogger().debug("               ---Logging---");
-        GuildLogger.getLogger().debug("logging-path: " + guildConfigHandler.getLoggingPath());
-        GuildLogger.getLogger().debug("logging-level: " + guildConfigHandler.getLogLevel());
-        GuildLogger.getLogger().debug("max-log-file-size: " + guildConfigHandler.getMaxLogFileSize());
-        GuildLogger.getLogger().debug("               ---Storage---");
-        GuildLogger.getLogger().debug("storage-type: " + Main.getGuildConfigHandler().getStorageType());
-        GuildLogger.getLogger().debug("file-on-con-fail: " + guildConfigHandler.fileOnConFail());
-        GuildLogger.getLogger().debug("guild-root-path: " + guildConfigHandler.getGuildRootPath());
-        GuildLogger.getLogger().debug("del-old-storage: " + guildConfigHandler.delOldStorage());
+        if (guildConfigHandler.showConfBanner()){
+            GuildLogger.getLogger().debug("---------------config values---------------");
+            GuildLogger.getLogger().debug("               ---General---");
+            GuildLogger.getLogger().debug("config-banner: " + Main.getGuildConfigHandler().showConfBanner());
+            GuildLogger.getLogger().debug("invite-delete-time: " + Main.getGuildConfigHandler().getTimeDeleteTime());
+            GuildLogger.getLogger().debug("max-guilds: " + Main.getGuildConfigHandler().getMaxGuildSize());
+            GuildLogger.getLogger().debug("               ---Logging---");
+            GuildLogger.getLogger().debug("logging-path: " + guildConfigHandler.getLoggingPath());
+            GuildLogger.getLogger().debug("logging-level: " + guildConfigHandler.getLogLevel());
+            GuildLogger.getLogger().debug("max-log-file-size: " + guildConfigHandler.getMaxLogFileSize());
+            GuildLogger.getLogger().debug("               ---Storage---");
+            GuildLogger.getLogger().debug("storage-type: " + Main.getGuildConfigHandler().getStorageType());
+            GuildLogger.getLogger().debug("file-on-con-fail: " + guildConfigHandler.fileOnConFail());
+            GuildLogger.getLogger().debug("guild-root-path: " + guildConfigHandler.getGuildRootPath());
+            GuildLogger.getLogger().debug("del-old-storage: " + guildConfigHandler.delOldStorage());
+        }
 
         Bukkit.getPluginManager().registerEvents(new GuildDeleteInviteOnPlayerLeave(), this);
         try {

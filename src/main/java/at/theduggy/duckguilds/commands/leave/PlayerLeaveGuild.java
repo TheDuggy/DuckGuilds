@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public class PlayerLeaveGuild {
 
-    public static void leaveGuild(Player player, String name) throws IOException, ParseException {
+    public static void leaveGuild(Player player, String name, boolean guildDelete) throws IOException, ParseException {
         if (Main.getGuildCache().containsKey(name)) {
             ArrayList<UUID> players = Main.getGuildCache().get(name).getPlayers();
             if (players.contains(player.getUniqueId())) {
@@ -38,7 +38,11 @@ public class PlayerLeaveGuild {
                     Main.getMainStorage().removePlayerFromGuildSection(Main.getPlayerCache().get(player.getUniqueId()), Main.getGuildCache().get(name));
                     player.setDisplayName(ChatColor.WHITE + "<" + player.getName() + ">");
                     reindexAndChangeFile(name,player.getUniqueId());
-                    player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
+                    String leaveMsg = GuildTextUtils.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!";
+                    if (guildDelete){
+                        leaveMsg =  GuildTextUtils.prefix +  ChatColor.RED + Main.getPlayerCache().get(Main.getGuildCache().get(name).getHead()).getName() + " deleted " + ChatColor.GOLD + name + ChatColor.RED + "!";
+                    }
+                    player.sendMessage(leaveMsg);
             } else {
                 player.sendMessage(GuildTextUtils.youArentInThatGuild);
 

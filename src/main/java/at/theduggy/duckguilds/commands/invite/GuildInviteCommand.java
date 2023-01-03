@@ -16,6 +16,7 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildInviteObject;
 import at.theduggy.duckguilds.objects.GuildObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
@@ -44,8 +45,10 @@ public class GuildInviteCommand {
                         GuildObject guildObject = Main.getGuildCache().get(guildName);
                         HashMap<UUID, GuildInviteObject> allInvites = guildObject.getAllInvites();
                         if (!allInvites.containsKey(Bukkit.getPlayerExact(playerNameToInvite).getUniqueId())) {
-                            guildObject.addInvite(new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId()));
+                            GuildInviteObject invite = new GuildInviteObject(guildObject.getName(),sender.getUniqueId(), invitedPlayer.getUniqueId());
+                            guildObject.addInvite(invite);
                             invitedPlayer.spigot().sendMessage(new TextComponent(GuildTextUtils.prefix + " " + ChatColor.YELLOW + sender.getName() + ChatColor.GREEN + " has invited you to " + ChatColor.GOLD + guildName + ChatColor.GREEN + "!\n"), new TextComponent(" ".repeat(15) + ChatColor.GRAY + "-".repeat(5)), clickableMsgJoin(guildName), new TextComponent("  "), clickableMsgDiscard(sender, guildName), new TextComponent(ChatColor.GRAY + "-".repeat(5)));
+                            GuildLogger.getLogger().info(invite.getSender() + " invited " + invite.getReceiver() + " to " + invite.getGuild() + "!");
                             sender.sendMessage(GuildTextUtils.prefix + ChatColor.GREEN + "You invited " + ChatColor.YELLOW + playerNameToInvite + ChatColor.GREEN + " to your guild!");
                         } else {
                             sender.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You already sent an invite to this player!");

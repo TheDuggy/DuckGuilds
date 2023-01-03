@@ -16,7 +16,10 @@
 package at.theduggy.duckguilds.commands.invite;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.objects.GuildInviteObject;
+import at.theduggy.duckguilds.objects.GuildObject;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -33,6 +36,7 @@ public class GuildDeleteInviteOnPlayerLeave implements Listener {
         Player player = e.getPlayer();
         for (GuildInviteObject guildInviteObject:Utils.getPlayerGuildInvites(player)){
             guildInviteObject.getGuild().getAllInvites().remove(guildInviteObject.getReceiver().getUniqueId());
+            GuildLogger.getLogger().info(guildInviteObject.getReceiver().toString() + " left the server and his invite to " + guildInviteObject.getGuild().toString() + " by " + guildInviteObject.getSender() + " was deleted!");
             if (Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).isOnline()) {
                 Bukkit.getPlayerExact(Main.getPlayerCache().get(guildInviteObject.getGuild().getHead()).getName()).sendMessage(GuildTextUtils.prefix + ChatColor.RED + player.getName() + " has left the server and his invite was deleted!");
             }

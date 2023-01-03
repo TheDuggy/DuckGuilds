@@ -152,7 +152,7 @@ public class GuildCommand implements TabExecutor {
                             try {
                                 if (args.length == 2) {
                                     if (!Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
-                                        PlayerLeaveGuild.leaveGuild(player, args[1]);
+                                        PlayerLeaveGuild.leaveGuild(player, args[1], false);
                                     } else if (Utils.getIfPlayerIsHeadOfGuild(args[1], player)) {
                                         player.sendMessage(GuildTextUtils.youAreTheHeadOfThatGuild);
                                     }

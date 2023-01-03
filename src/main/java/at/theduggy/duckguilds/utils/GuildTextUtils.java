@@ -17,7 +17,6 @@ public class GuildTextUtils {
     playerAlreadyInGuild = prefix + ChatColor.RED + "You are already in a guild! use /guild leave to leave yor current guild. Use /guild leave -y to leave the guild if you are the head, but your guild would be lost for ever!",
     guildDoesntExist = prefix + ChatColor.RED + "That guild doesn't exist. Use /guild list <page> to see all guilds!",
     youArentInThatGuild = prefix + ChatColor.RED + "Your aren't in that guild.",
-    guildHeadLeftGuild = prefix +  ChatColor.RED + "Your guild-head had left the guild and the guild was deleted!",
     youAreNotInAGuild = prefix + ChatColor.RED + "You are not in a guild!",
     youAreTheHeadOfThatGuild = prefix + ChatColor.RED + "You are the head of that guild! You can't leave it, but delete it with /guild delete -y!",
     youAreNotTheHeadOfThatGuild = prefix + ChatColor.RED + "You are not the head of that guild!",
@@ -223,7 +222,7 @@ public class GuildTextUtils {
     }
 
     public static String formatTimeTake(long time){
-        return String.format("%dh%dmin%dsec.%d", time / 3_600_000, time % 3_600_000 / 60_000, time % 60_000 / 1000, time % 60_000 % 1000);
+        return String.format("%dh %dmin %dsec.%d", time / 3_600_000, time % 3_600_000 / 60_000, time % 60_000 / 1000, time % 60_000 % 1000);
     }
 
 }
