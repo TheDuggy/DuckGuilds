@@ -40,9 +40,9 @@ public class GuildDelete {
                     GuildObject guild = Main.getGuildCache().get(name);
                     for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
                         if (Main.getPlayerCache().get(player.getUniqueId()).getGuild().equals(name)) {
-                            boolean guildDelete = !Main.getGuildCache().get(name).getHead().equals(head.getUniqueId());
-                            PlayerLeaveGuild.leaveGuild(playerFromServer, name, guildDelete);
+                            PlayerLeaveGuild.leaveGuild(playerFromServer, name, true);
                             playerFromServer.setDisplayName(ChatColor.WHITE  + playerFromServer.getName() );
+                            playerFromServer.sendMessage(GuildTextUtils.prefix +  ChatColor.RED + Main.getPlayerCache().get(Main.getGuildCache().get(name).getHead()).getName() + " deleted " + ChatColor.GOLD + name + ChatColor.RED + "!");
                         }
                     }
                     Main.getMainStorage().deleteGuildSection(Main.getGuildCache().get(name), true);

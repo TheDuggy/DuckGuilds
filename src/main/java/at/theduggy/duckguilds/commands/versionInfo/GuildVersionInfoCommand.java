@@ -1,6 +1,8 @@
 package at.theduggy.duckguilds.commands.versionInfo;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
+import at.theduggy.duckguilds.objects.GuildPlayerObject;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
@@ -10,7 +12,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 public class GuildVersionInfoCommand {
 
-    public static BaseComponent[] guildVersionInfo(){
+    public static BaseComponent[] guildVersionInfo(GuildPlayerObject guildPlayer){
 
         TextComponent line1 = new TextComponent(GuildTextUtils.prefix + ChatColor.GREEN + "DuckGuilds-version-info: ");
         TextComponent line2 = new TextComponent(ChatColor.WHITE + "-".repeat(line1.getText().length()));
@@ -33,7 +35,7 @@ public class GuildVersionInfoCommand {
         msg.append(line2).append(new TextComponent("\n"));
         msg.append(line3).append(new TextComponent("\n"));
         msg.append(line4);
-
+        GuildLogger.getLogger().info(guildPlayer + " requested version info!");
         return msg.create();
     }
 

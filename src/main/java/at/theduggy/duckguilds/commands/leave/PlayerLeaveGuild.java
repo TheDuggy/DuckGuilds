@@ -16,6 +16,7 @@
 package at.theduggy.duckguilds.commands.leave;
 
 import at.theduggy.duckguilds.Main;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,7 +30,7 @@ import java.util.UUID;
 
 public class PlayerLeaveGuild {
 
-    public static void leaveGuild(Player player, String name, boolean guildDelete) throws IOException, ParseException {
+    public static void leaveGuild(Player player, String name, boolean silent) throws IOException, ParseException {
         if (Main.getGuildCache().containsKey(name)) {
             ArrayList<UUID> players = Main.getGuildCache().get(name).getPlayers();
             if (players.contains(player.getUniqueId())) {
@@ -38,11 +39,10 @@ public class PlayerLeaveGuild {
                     Main.getMainStorage().removePlayerFromGuildSection(Main.getPlayerCache().get(player.getUniqueId()), Main.getGuildCache().get(name));
                     player.setDisplayName(ChatColor.WHITE + "<" + player.getName() + ">");
                     reindexAndChangeFile(name,player.getUniqueId());
-                    String leaveMsg = GuildTextUtils.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!";
-                    if (guildDelete){
-                        leaveMsg =  GuildTextUtils.prefix +  ChatColor.RED + Main.getPlayerCache().get(Main.getGuildCache().get(name).getHead()).getName() + " deleted " + ChatColor.GOLD + name + ChatColor.RED + "!";
+                    if (!silent){
+                        player.sendMessage(GuildTextUtils.prefix + ChatColor.RED + "You left the guild " + ChatColor.YELLOW + name + ChatColor.RED + "!");
+                        GuildLogger.getLogger().info(Main.getPlayerCache().get(player.getUniqueId()) + " left " + Main.getGuildCache().get(name) + "!");
                     }
-                    player.sendMessage(leaveMsg);
             } else {
                 player.sendMessage(GuildTextUtils.youArentInThatGuild);
 

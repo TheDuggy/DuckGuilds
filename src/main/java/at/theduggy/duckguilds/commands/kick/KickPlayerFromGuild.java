@@ -15,7 +15,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package at.theduggy.duckguilds.commands.kick;
 
+import at.theduggy.duckguilds.Main;
 import at.theduggy.duckguilds.commands.leave.PlayerLeaveGuild;
+import at.theduggy.duckguilds.logging.GuildLogger;
 import at.theduggy.duckguilds.utils.GuildTextUtils;
 import at.theduggy.duckguilds.utils.Utils;
 import org.bukkit.Bukkit;
@@ -34,7 +36,8 @@ public class KickPlayerFromGuild {
             if (Utils.getIfPlayerIsHeadOfGuild(guildName, sender)) {
                 if (!sender.getName().equals(player.getName())) {
                     if (guildName.equals(guildNameOfPlayerToKick)) {
-                        PlayerLeaveGuild.leaveGuild(player, guildName, false);
+                        PlayerLeaveGuild.leaveGuild(player, guildName, true);
+                        GuildLogger.getLogger().info(Main.getPlayerCache().get(sender.getUniqueId()) + " kicked " + Main.getPlayerCache().get(player.getUniqueId()) + " from guild " + Main.getGuildCache().get(guildName));
                         player.sendMessage(GuildTextUtils.prefix  + ChatColor.RED + "You were kicked from the guild " + ChatColor.YELLOW + guildNameOfPlayerToKick + ChatColor.RED + " by " + ChatColor.YELLOW + sender.getName());
                         for (Player playerFromServer : Bukkit.getOnlinePlayers()) {
                             if (Utils.getPlayerGuild(playerFromServer).equals(guildNameOfPlayerToKick)) {

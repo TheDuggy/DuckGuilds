@@ -282,7 +282,7 @@ public class GuildCommand implements TabExecutor {
                             break;
                         case "versionInfo":
                             if (args.length==1){
-                                player.spigot().sendMessage(GuildVersionInfoCommand.guildVersionInfo());
+                                player.spigot().sendMessage(GuildVersionInfoCommand.guildVersionInfo(Main.getPlayerCache().get(player.getUniqueId())));
                             }else {
                                 player.sendMessage(GuildTextUtils.wrongUsage);
                             }
