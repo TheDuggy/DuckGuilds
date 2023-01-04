@@ -3,7 +3,6 @@ package at.theduggy.duckguilds.logging;
 import at.theduggy.duckguilds.Main;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
@@ -12,7 +11,6 @@ import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.helpers.OnlyOnceErrorHandler;
 import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.LoggingEvent;
-import org.bukkit.Bukkit;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -30,12 +28,13 @@ import java.util.regex.Pattern;
 public class GuildAppender extends WriterAppender {
 
     private final Logger PLUGIN_LOGGER = Main.getPlugin(Main.class).getLogger();
+    private final long DAYS = 86_400_000L;
     private final ErrorHandler errorHandler = new OnlyOnceErrorHandler();
     private final Path pathToLogs;
     private File logFile;
     private final long maxFileSize;
 
-    private int currentEpochDay;
+    private long currentLogDay;
 
     public GuildAppender(String pathToLogs, long maxFileSize){
         super.name = "GuildAppender";
@@ -99,7 +98,7 @@ public class GuildAppender extends WriterAppender {
     }
 
     private void initAppender(){
-        currentEpochDay = (int) Math.floor(Instant.now().toEpochMilli() / 84_600_000d);
+        currentLogDay = Instant.now().toEpochMilli() / DAYS;
         setImmediateFlush(true);
         FileOutputStream fos = null;
         try {
@@ -123,7 +122,7 @@ public class GuildAppender extends WriterAppender {
         tout.putArchiveEntry(tarArchiveEntry);
         Files.copy(logFile.toPath(), tout);
         tout.closeArchiveEntry();
-        tout.finish();
+        tout.close();
         FileOutputStream clearFile = new FileOutputStream(logFile, false);
         clearFile.close();
         initAppender();
@@ -132,16 +131,19 @@ public class GuildAppender extends WriterAppender {
 
     protected void subAppend(LoggingEvent event) {
         long size = ((CountingQuietWriter) qw).getCount();
+        long now = Instant.now().toEpochMilli() / DAYS;
         if (event.getLevel() == Level.ERROR || event.getLevel() == Level.FATAL || event.getLevel() == Level.WARN) {
-            PLUGIN_LOGGER.warning(event.getRenderedMessage());
+            PLUGIN_LOGGER.warning(event.getRenderedMessage() + " Now: " + now + " Other: " + currentLogDay);
         } else if (event.getLevel() == Level.DEBUG) {
             PLUGIN_LOGGER.info(event.getRenderedMessage());
         } else {
-                if (Main.getGuildConfigHandler().getLogLevel().equals("DEBUG")){
-                    PLUGIN_LOGGER.info(event.getRenderedMessage());
-                }
+            if (Main.getGuildConfigHandler().getLogLevel().equals("DEBUG")){
+                PLUGIN_LOGGER.info(event.getRenderedMessage());
             }
-        if ( size + layout.format(event).getBytes(StandardCharsets.UTF_8).length > maxFileSize || currentEpochDay < Math.floor(Instant.now().toEpochMilli() / 86_400_000d)){
+        }
+
+        if ( size + layout.format(event).getBytes(StandardCharsets.UTF_8).length > maxFileSize || now > currentLogDay){
+
             try {
                 rollOver();
             } catch (IOException e) {
